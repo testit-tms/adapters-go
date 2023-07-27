@@ -15,6 +15,7 @@ type testResult struct {
 	nameSpace   string
 	steps       []step
 	links       []Link
+	resultLinks []Link
 	workItemIds []string
 	status      string
 	message     string

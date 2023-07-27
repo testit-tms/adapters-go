@@ -154,6 +154,25 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 		req.SetStepResults(steps)
 	}
 
+	if len(test.resultLinks) != 0 {
+		links := make([]tmsclient.LinkPostModel, 0, len(test.resultLinks))
+		for _, link := range test.resultLinks {
+			l := tmsclient.NewLinkPostModel(link.Url)
+			l.SetTitle(link.Title)
+			l.SetDescription(link.Description)
+			if link.LinkType != "" {
+				linkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
+				if err != nil {
+					logger.Error("Error converting link type", "error", err)
+				} else {
+					l.SetType(*linkType)
+				}
+			}
+			links = append(links, *l)
+		}
+		req.SetLinks(links)
+	}
+
 	return []tmsclient.AutoTestResultsForTestRunModel{*req}, nil
 }
 
