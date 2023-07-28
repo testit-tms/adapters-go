@@ -1,6 +1,9 @@
 package tms
 
 import (
+	"fmt"
+	"strconv"
+
 	tmsclient "github.com/testit-tms/api-client-golang"
 )
 
@@ -182,6 +185,14 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 		req.SetAttachments(attachs)
 	}
 
+	if len(test.parameters) != 0 {
+		params := make(map[string]string, len(test.parameters))
+		for k, v := range test.parameters {
+			params[k] = parseValueParameter(v)
+		}
+		req.SetParameters(params)
+	}
+
 	return []tmsclient.AutoTestResultsForTestRunModel{*req}, nil
 }
 
@@ -217,8 +228,60 @@ func stepToAttachmentPutModelAutoTestStepResultsModel(s []step) ([]tmsclient.Att
 			model.SetStepResults(cs)
 		}
 
+		if len(step.parameters) != 0 {
+			params := make(map[string]string, len(step.parameters))
+			for k, v := range step.parameters {
+				params[k] = parseValueParameter(v)
+			}
+			model.SetParameters(params)
+		}
+
 		steps = append(steps, *model)
 	}
 
 	return steps, nil
+}
+
+func parseValueParameter(value interface{}) string {
+
+	switch value.(type) {
+	case []byte:
+		return string(value.([]byte))
+	case uintptr:
+		return strconv.Itoa(int(value.(uintptr)))
+	case float32:
+		return strconv.FormatFloat(float64(value.(float32)), 'f', -1, 64)
+	case float64:
+		return strconv.FormatFloat(value.(float64), 'f', -1, 64)
+	case complex64:
+		return fmt.Sprintf("%f i%f", real(value.(complex64)), imag(value.(complex64)))
+	case complex128:
+		return fmt.Sprintf("%f i%f", real(value.(complex128)), imag(value.(complex128)))
+	case uint:
+		return strconv.FormatUint(uint64(value.(uint)), 10)
+	case uint8:
+		return strconv.FormatUint(uint64(value.(uint8)), 10)
+	case uint16:
+		return strconv.FormatUint(uint64(value.(uint16)), 10)
+	case uint32:
+		return strconv.FormatUint(uint64(value.(uint32)), 10)
+	case uint64:
+		return strconv.FormatUint(value.(uint64), 10)
+	case int:
+		return strconv.FormatInt(int64(value.(int)), 10)
+	case int8:
+		return strconv.FormatInt(int64(value.(int8)), 10)
+	case int16:
+		return strconv.FormatInt(int64(value.(int16)), 10)
+	case int32:
+		return strconv.FormatInt(int64(value.(int32)), 10)
+	case int64:
+		return strconv.FormatInt(value.(int64), 10)
+	case bool:
+		return strconv.FormatBool(value.(bool))
+	case string:
+		return value.(string)
+	default:
+		return fmt.Sprintf("%+v", value)
+	}
 }

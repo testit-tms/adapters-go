@@ -19,6 +19,7 @@ type TestMetadata struct {
 	NameSpace   string
 	Description string
 	DisplayName string
+	Parameters  map[string]interface{}
 	Links       []Link
 	Labels      []string
 	ExternalId  string
@@ -93,6 +94,7 @@ func newTestResult(m TestMetadata, t *testing.T) *testResult {
 		labels:      m.Labels,
 		externalId:  m.ExternalId,
 		workItemIds: m.WorkItemIds,
+		parameters: m.Parameters,
 	}
 
 	if testResult.displayName == "" {

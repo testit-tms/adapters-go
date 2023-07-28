@@ -18,6 +18,7 @@ type testResult struct {
 	resultLinks []Link
 	attachments []string
 	workItemIds []string
+	parameters  map[string]interface{}
 	status      string
 	message     string
 	trace       string

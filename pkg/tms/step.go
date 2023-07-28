@@ -18,11 +18,13 @@ type step struct {
 	completedOn   time.Time
 	duration      int64
 	attachments   []string
+	parameters    map[string]interface{}
 }
 
 type StepMetadata struct {
 	Name        string
 	Description string
+	Parameters  map[string]interface{}
 }
 
 func (s *step) getSteps() []step {
@@ -82,6 +84,7 @@ func newStep(m StepMetadata) *step {
 	step := &step{
 		description: m.Description,
 		startedOn:   time.Now(),
+		parameters:  m.Parameters,
 	}
 
 	if m.Name != "" {
