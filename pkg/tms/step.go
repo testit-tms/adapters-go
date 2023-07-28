@@ -85,11 +85,10 @@ func newStep(m StepMetadata) *step {
 		description: m.Description,
 		startedOn:   time.Now(),
 		parameters:  m.Parameters,
+		name:        m.Name,
 	}
 
-	if m.Name != "" {
-		step.name = m.Name
-	} else {
+	if step.name == "" {
 		step.name = "Step"
 	}
 

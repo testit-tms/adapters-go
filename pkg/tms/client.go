@@ -3,11 +3,14 @@ package tms
 import (
 	"context"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	"strings"
 
 	"github.com/testit-tms/adapters-go/pkg/tms/config"
 	tmsclient "github.com/testit-tms/api-client-golang"
+	"golang.org/x/exp/slog"
 )
 
 type tmsClient struct {
@@ -47,7 +50,7 @@ func (c *tmsClient) writeTest(test testResult) error {
 	nulBool := new(bool)
 	*nulBool = false
 	logger.Debug("searching for test", "externalId", test.externalId)
-	resp, _, err := c.client.AutoTestsApi.ApiV2AutoTestsSearchPost(ctx).
+	resp, r, err := c.client.AutoTestsApi.ApiV2AutoTestsSearchPost(ctx).
 		ApiV2AutoTestsSearchPostRequest(tmsclient.ApiV2AutoTestsSearchPostRequest{
 			Filter: &tmsclient.AutotestsSelectModelFilter{
 				ExternalIds: []string{test.externalId},
@@ -57,7 +60,7 @@ func (c *tmsClient) writeTest(test testResult) error {
 		}).Execute()
 
 	if err != nil {
-		logger.Error("failed to search for test", "error", err)
+		logger.Error("failed to search for test", "error", err, slog.String("response", respToString(r.Body)))
 		return err
 	}
 
@@ -70,7 +73,7 @@ func (c *tmsClient) writeTest(test testResult) error {
 			Execute()
 
 		if err != nil {
-			logger.Error("failed to create new autotest", "error", err)
+			logger.Error("failed to create new autotest", "error", err, slog.String("response", respToString(r.Body)))
 			return err
 		}
 
@@ -78,12 +81,12 @@ func (c *tmsClient) writeTest(test testResult) error {
 	} else {
 		req := testToUpdateAutotestModel(test, resp[0])
 		logger.Debug("update existing autotest", "request", req)
-		_, err = c.client.AutoTestsApi.UpdateAutoTest(ctx).
+		r, err = c.client.AutoTestsApi.UpdateAutoTest(ctx).
 			UpdateAutoTestRequest(req).
 			Execute()
 
 		if err != nil {
-			logger.Error("failed to update existing autotest", "error", err)
+			logger.Error("failed to update existing autotest", "error", err, slog.String("response", respToString(r.Body)))
 			return err
 		}
 
@@ -93,14 +96,14 @@ func (c *tmsClient) writeTest(test testResult) error {
 	if len(test.workItemIds) != 0 {
 		for _, v := range test.workItemIds {
 			logger.Debug("link autotest to workitem", "workItemId", v, "autotestId", autotestID)
-			_, err = c.client.AutoTestsApi.LinkAutoTestToWorkItem(ctx, autotestID).
+			r, err = c.client.AutoTestsApi.LinkAutoTestToWorkItem(ctx, autotestID).
 				LinkAutoTestToWorkItemRequest(tmsclient.LinkAutoTestToWorkItemRequest{
 					Id: v,
 				}).
 				Execute()
 		}
 		if err != nil {
-			logger.Error("failed to link autotest to workitem", "error", err)
+			logger.Error("failed to link autotest to workitem", "error", err, slog.String("response", respToString(r.Body)))
 		}
 	}
 
@@ -110,12 +113,12 @@ func (c *tmsClient) writeTest(test testResult) error {
 		return err
 	}
 	logger.Debug("upload result to test run", "request", req)
-	_, _, err = c.client.TestRunsApi.SetAutoTestResultsForTestRun(ctx, c.cfg.TestRunId).
+	_, r, err = c.client.TestRunsApi.SetAutoTestResultsForTestRun(ctx, c.cfg.TestRunId).
 		AutoTestResultsForTestRunModel(req).
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to upload result to test run", "error", err)
+		logger.Error("failed to upload result to test run", "error", err, slog.String("response", respToString(r.Body)))
 		return err
 	}
 
@@ -140,12 +143,12 @@ func (c *tmsClient) writeAttachments(paths ...string) []string {
 			logger.Error("failed to open file", "error", err)
 			continue
 		}
-		resp, _, err := c.client.AttachmentsApi.ApiV2AttachmentsPost(ctx).
+		resp, r, err := c.client.AttachmentsApi.ApiV2AttachmentsPost(ctx).
 			File(f).
 			Execute()
 
 		if err != nil {
-			logger.Error("failed to upload attachment", "error", err)
+			logger.Error("failed to upload attachment", "error", err, slog.String("response", respToString(r.Body)))
 			continue
 		}
 
@@ -153,4 +156,13 @@ func (c *tmsClient) writeAttachments(paths ...string) []string {
 	}
 
 	return attachmanetsIds
+}
+
+func respToString(r io.ReadCloser) string {
+	respBytes, err := ioutil.ReadAll(r)
+	if err != nil {
+		logger.Error("failed to read response body", "error", err)
+		return ""
+	}
+	return string(respBytes)
 }

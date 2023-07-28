@@ -58,6 +58,10 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.CreateAuto
 		req.SetSteps(stepToAutoTestStepModel(test.steps))
 	}
 
+	if len(test.befores) != 0 {
+		req.SetSetup(stepToAutoTestStepModel(test.befores))
+	}
+
 	return *req
 }
 
@@ -131,6 +135,10 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel
 		req.SetSteps(stepToAutoTestStepModel(test.steps))
 	}
 
+	if len(test.befores) != 0 {
+		req.SetSetup(stepToAutoTestStepModel(test.befores))
+	}
+
 	req.SetIsFlaky(*autotest.IsFlaky.Get())
 	req.SetId(*autotest.Id)
 
@@ -155,6 +163,14 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 			return nil, err
 		}
 		req.SetStepResults(steps)
+	}
+
+	if len(test.befores) != 0 {
+		steps, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.befores)
+		if err != nil {
+			return nil, err
+		}
+		req.SetSetupResults(steps)
 	}
 
 	if len(test.resultLinks) != 0 {

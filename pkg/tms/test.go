@@ -28,10 +28,11 @@ type TestMetadata struct {
 
 func Test(t *testing.T, m TestMetadata, f func()) {
 	tr := newTestResult(m, t)
+	testPhaseObjects := getCurrentTestPhaseObject(t)
+	testPhaseObjects.test = tr
 
 	defer func() {
 		panicObject := recover()
-		// getCurrentTestPhaseObject(t).Test = tr
 		tr.completedOn = time.Now()
 		tr.duration = tr.completedOn.UnixMilli() - tr.startedOn.UnixMilli()
 		if panicObject != nil {
@@ -40,24 +41,36 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 			tr.trace = string(debug.Stack())
 		}
 
+		if testPhaseObjects.before != nil {
+			tr.addBefore(step{
+				name:        testPhaseObjects.before.name,
+				description: testPhaseObjects.before.description,
+				status:      testPhaseObjects.before.status,
+				startedOn:   testPhaseObjects.before.startedOn,
+				completedOn: testPhaseObjects.before.completedOn,
+				duration:    testPhaseObjects.before.duration,
+				attachments: testPhaseObjects.before.attachments,
+				parameters:  testPhaseObjects.before.parameters,
+				childrenSteps: testPhaseObjects.before.childrenSteps,
+			})
+		}
+
 		if tr.status == "" {
-			tr.status = getTestStatus(t)
+			if testPhaseObjects.before != nil && testPhaseObjects.before.status == failed {
+				tr.status = failed
+				tr.message = testPhaseObjects.before.message
+				tr.trace = testPhaseObjects.before.trace
+			} else {
+				tr.status = getTestStatus(t)
+			}
 		}
 
 		tr.write()
-		// setups := getCurrentTestPhaseObject(t).Befores
-		// for _, setup := range setups {
-		// 	setup.Children = append(setup.Children, r.UUID)
-		// 	err := setup.writeResultsFile()
-		// 	if err != nil {
-		// 		log.Println("Failed to write content of result to json file", err)
-		// 	}
-		// }
-
-		//if panicObject != nil {
-		//	panic(panicObject)
-		//}
 	}()
+
+	if testPhaseObjects.before != nil && testPhaseObjects.before.status == failed {
+		return
+	}
 
 	ctxMgr.SetValues(gls.Values{
 		testResultKey:   tr,
@@ -94,7 +107,7 @@ func newTestResult(m TestMetadata, t *testing.T) *testResult {
 		labels:      m.Labels,
 		externalId:  m.ExternalId,
 		workItemIds: m.WorkItemIds,
-		parameters: m.Parameters,
+		parameters:  m.Parameters,
 	}
 
 	if testResult.displayName == "" {

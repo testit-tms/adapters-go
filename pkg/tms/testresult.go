@@ -13,6 +13,7 @@ type testResult struct {
 	labels      []string
 	className   string
 	nameSpace   string
+	befores     []step
 	steps       []step
 	links       []Link
 	resultLinks []Link
@@ -40,6 +41,10 @@ func (tr *testResult) addStatus(v string) {
 
 func (tr *testResult) addStep(step step) {
 	tr.steps = append(tr.steps, step)
+}
+
+func (tr *testResult) addBefore(step step) {
+	tr.befores = append(tr.befores, step)
 }
 
 func (tr *testResult) getSteps() []step {

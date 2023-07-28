@@ -9,16 +9,17 @@ import (
 )
 
 var (
-	cfg    *config.Config
-	client *tmsClient
-	logger *slog.Logger
-	ctxMgr *gls.ContextManager
+	cfg              *config.Config
+	client           *tmsClient
+	logger           *slog.Logger
+	ctxMgr           *gls.ContextManager
+	testPhaseObjects map[string]*testPhaseContainer
 )
 
 const (
-	nodeKey           = "current_step_container"
-	testResultKey     = "test_result_object"
-	testInstanceKey   = "test_instance"
+	nodeKey         = "current_step_container"
+	testResultKey   = "test_result_object"
+	testInstanceKey = "test_instance"
 )
 
 func init() {
@@ -28,4 +29,5 @@ func init() {
 		slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
 	)
 	ctxMgr = gls.NewContextManager()
+	testPhaseObjects = make(map[string]*testPhaseContainer)
 }
