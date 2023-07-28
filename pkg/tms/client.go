@@ -3,6 +3,7 @@ package tms
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/testit-tms/adapters-go/pkg/tms/config"
@@ -119,4 +120,37 @@ func (c *tmsClient) writeTest(test testResult) error {
 	}
 
 	return nil
+}
+
+func (c *tmsClient) writeAttachments(paths ...string) []string {
+	const op = "tmsClient.writeAttachment"
+	logger := logger.With("op", op)
+
+	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
+		"Bearer or PrivateToken": {
+			Key:    c.cfg.Token,
+			Prefix: "PrivateToken",
+		},
+	})
+
+	attachmanetsIds := make([]string, 0, len(paths))
+	for _, p := range paths {
+		f, err := os.Open(p)
+		if err != nil {
+			logger.Error("failed to open file", "error", err)
+			continue
+		}
+		resp, _, err := c.client.AttachmentsApi.ApiV2AttachmentsPost(ctx).
+			File(f).
+			Execute()
+
+		if err != nil {
+			logger.Error("failed to upload attachment", "error", err)
+			continue
+		}
+
+		attachmanetsIds = append(attachmanetsIds, resp.Id)
+	}
+
+	return attachmanetsIds
 }

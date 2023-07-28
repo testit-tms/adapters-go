@@ -173,6 +173,15 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 		req.SetLinks(links)
 	}
 
+	if len(test.attachments) != 0 {
+		attachs := make([]tmsclient.AttachmentPutModel, 0, len(test.attachments))
+		for _, attach := range test.attachments {
+			a := tmsclient.NewAttachmentPutModel(attach)
+			attachs = append(attachs, *a)
+		}
+		req.SetAttachments(attachs)
+	}
+
 	return []tmsclient.AutoTestResultsForTestRunModel{*req}, nil
 }
 
@@ -190,6 +199,15 @@ func stepToAttachmentPutModelAutoTestStepResultsModel(s []step) ([]tmsclient.Att
 		model.SetStartedOn(step.startedOn)
 		model.SetCompletedOn(step.completedOn)
 		model.SetDuration(step.duration)
+
+		if len(step.attachments) != 0 {
+			attachs := make([]tmsclient.AttachmentPutModel, 0, len(step.attachments))
+			for _, attach := range step.attachments {
+				a := tmsclient.NewAttachmentPutModel(attach)
+				attachs = append(attachs, *a)
+			}
+			model.SetAttachments(attachs)
+		}
 
 		if len(step.childrenSteps) != 0 {
 			cs, err := stepToAttachmentPutModelAutoTestStepResultsModel(step.childrenSteps)

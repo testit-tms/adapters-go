@@ -8,3 +8,7 @@ type hasSteps interface {
 type hasStatus interface {
 	addStatus(status string)
 }
+
+type hasAttachments interface {
+	addAttachments(a string)
+}

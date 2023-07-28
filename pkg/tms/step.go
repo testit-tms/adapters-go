@@ -17,6 +17,7 @@ type step struct {
 	startedOn     time.Time
 	completedOn   time.Time
 	duration      int64
+	attachments   []string
 }
 
 type StepMetadata struct {
@@ -36,6 +37,10 @@ func (s *step) addStatus(status string) {
 	s.status = status
 }
 
+func (s *step) addAttachments(a string) {
+	s.attachments = append(s.attachments, a)
+}
+
 // TODO: try to use StepMetadata as a pointer
 func Step(m StepMetadata, f func()) {
 	step := newStep(m)
@@ -52,7 +57,7 @@ func Step(m StepMetadata, f func()) {
 				}
 				if testInstance.(*testing.T).Failed() ||
 					panicObject != nil {
-					if step.status == ""  {
+					if step.status == "" {
 						step.status = failed
 					}
 				}

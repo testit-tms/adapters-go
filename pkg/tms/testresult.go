@@ -16,6 +16,7 @@ type testResult struct {
 	steps       []step
 	links       []Link
 	resultLinks []Link
+	attachments []string
 	workItemIds []string
 	status      string
 	message     string
@@ -42,4 +43,8 @@ func (tr *testResult) addStep(step step) {
 
 func (tr *testResult) getSteps() []step {
 	return tr.steps
+}
+
+func (tr *testResult) addAttachments(a string) {
+	tr.attachments = append(tr.attachments, a)
 }
