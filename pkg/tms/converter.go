@@ -58,8 +58,8 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.CreateAuto
 		req.SetSteps(stepToAutoTestStepModel(test.steps))
 	}
 
-	if len(test.befores) != 0 {
-		req.SetSetup(stepToAutoTestStepModel(test.befores))
+	if len(test.setups) != 0 {
+		req.SetSetup(stepToAutoTestStepModel(test.setups))
 	}
 
 	return *req
@@ -135,8 +135,12 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel
 		req.SetSteps(stepToAutoTestStepModel(test.steps))
 	}
 
-	if len(test.befores) != 0 {
-		req.SetSetup(stepToAutoTestStepModel(test.befores))
+	if len(test.setups) != 0 {
+		req.SetSetup(stepToAutoTestStepModel(test.setups))
+	}
+
+	if len(test.teardowns) != 0 {
+		req.SetTeardown(stepToAutoTestStepModel(test.teardowns))
 	}
 
 	req.SetIsFlaky(*autotest.IsFlaky.Get())
@@ -165,8 +169,8 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 		req.SetStepResults(steps)
 	}
 
-	if len(test.befores) != 0 {
-		steps, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.befores)
+	if len(test.setups) != 0 {
+		steps, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.setups)
 		if err != nil {
 			return nil, err
 		}
@@ -300,4 +304,34 @@ func parseValueParameter(value interface{}) string {
 	default:
 		return fmt.Sprintf("%+v", value)
 	}
+}
+
+func getSearchRequest(externalID, projectID string) tmsclient.ApiV2AutoTestsSearchPostRequest {
+	f := tmsclient.NewAutotestsSelectModelFilter()
+	f.SetExternalIds([]string{externalID})
+	f.SetProjectIds([]string{projectID})
+	f.SetIsDeleted(false)
+
+	req := tmsclient.NewApiV2AutoTestsSearchPostRequest()
+	req.SetFilter(*f)
+
+	return *req
+}
+
+func testToUpdateResultModel(test testResult) (tmsclient.ApiV2TestResultsIdPutRequest, error) {
+	tearDowns, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.teardowns)
+	if err != nil {
+		return tmsclient.ApiV2TestResultsIdPutRequest{}, err
+	}
+
+	setups, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.setups)
+	if err != nil {
+		return tmsclient.ApiV2TestResultsIdPutRequest{}, err
+	}
+
+	req := tmsclient.NewApiV2TestResultsIdPutRequest()
+	req.SetTeardownResults(tearDowns)
+	req.SetSetupResults(setups)
+
+	return *req, nil
 }

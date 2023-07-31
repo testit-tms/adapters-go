@@ -9,36 +9,6 @@ import (
 	"github.com/jtolds/gls"
 )
 
-type before struct {
-	name          string
-	description   string
-	childrenSteps []step
-	status        string
-	startedOn     time.Time
-	completedOn   time.Time
-	duration      int64
-	attachments   []string
-	parameters    map[string]interface{}
-	message       string
-	trace         string
-}
-
-func (b *before) getSteps() []step {
-	return b.childrenSteps
-}
-
-func (b *before) addStep(step step) {
-	b.childrenSteps = append(b.childrenSteps, step)
-}
-
-func (b *before) addStatus(status string) {
-	b.status = status
-}
-
-func (b *before) addAttachments(a string) {
-	b.attachments = append(b.attachments, a)
-}
-
 func BeforeTest(t *testing.T, m StepMetadata, f func()) {
 	testPhaseObject := getCurrentTestPhaseObject(t)
 	if testPhaseObject.test != nil {
@@ -70,8 +40,8 @@ func BeforeTest(t *testing.T, m StepMetadata, f func()) {
 	}, f)
 }
 
-func newBefore(m StepMetadata) *before {
-	before := &before{
+func newBefore(m StepMetadata) *fixture {
+	before := &fixture{
 		description: m.Description,
 		startedOn:   time.Now(),
 		parameters:  m.Parameters,

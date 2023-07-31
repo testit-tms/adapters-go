@@ -44,11 +44,11 @@ func AddAtachmentsFromString(name, content string) {
 		logger.Error("cannot write file: %s", err, slog.With("op", "AddAtachmentsFromString"))
 	}
 
-	atachs := client.writeAttachments(fp)
+	attachs := client.writeAttachments(fp)
 
 	if node, ok := ctxMgr.GetValue(nodeKey); ok {
 		n := node.(hasAttachments)
-		for _, a := range atachs {
+		for _, a := range attachs {
 			n.addAttachments(a)
 		}
 	}

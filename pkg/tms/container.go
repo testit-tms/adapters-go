@@ -3,8 +3,10 @@ package tms
 import "testing"
 
 type testPhaseContainer struct {
-	before *before
-	test    *testResult
+	before   *fixture
+	test     *testResult
+	resultID string
+	after    *fixture
 }
 
 func getCurrentTestPhaseObject(t *testing.T) *testPhaseContainer {

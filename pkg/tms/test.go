@@ -43,14 +43,14 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 
 		if testPhaseObjects.before != nil {
 			tr.addBefore(step{
-				name:        testPhaseObjects.before.name,
-				description: testPhaseObjects.before.description,
-				status:      testPhaseObjects.before.status,
-				startedOn:   testPhaseObjects.before.startedOn,
-				completedOn: testPhaseObjects.before.completedOn,
-				duration:    testPhaseObjects.before.duration,
-				attachments: testPhaseObjects.before.attachments,
-				parameters:  testPhaseObjects.before.parameters,
+				name:          testPhaseObjects.before.name,
+				description:   testPhaseObjects.before.description,
+				status:        testPhaseObjects.before.status,
+				startedOn:     testPhaseObjects.before.startedOn,
+				completedOn:   testPhaseObjects.before.completedOn,
+				duration:      testPhaseObjects.before.duration,
+				attachments:   testPhaseObjects.before.attachments,
+				parameters:    testPhaseObjects.before.parameters,
 				childrenSteps: testPhaseObjects.before.childrenSteps,
 			})
 		}
@@ -65,7 +65,10 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 			}
 		}
 
-		tr.write()
+		id := tr.write()
+		if id != "" {
+			testPhaseObjects.resultID = id
+		}
 	}()
 
 	if testPhaseObjects.before != nil && testPhaseObjects.before.status == failed {

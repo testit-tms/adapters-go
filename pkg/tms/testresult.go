@@ -13,8 +13,9 @@ type testResult struct {
 	labels      []string
 	className   string
 	nameSpace   string
-	befores     []step
+	setups      []step
 	steps       []step
+	teardowns   []step
 	links       []Link
 	resultLinks []Link
 	attachments []string
@@ -28,11 +29,13 @@ type testResult struct {
 	duration    int64
 }
 
-func (tr *testResult) write() {
-	err := client.writeTest(*tr)
+func (tr *testResult) write() string {
+	id, err := client.writeTest(*tr)
 	if err != nil {
 		log.Printf("Error writing test result: %v", err)
 	}
+
+	return id
 }
 
 func (tr *testResult) addStatus(v string) {
@@ -44,7 +47,11 @@ func (tr *testResult) addStep(step step) {
 }
 
 func (tr *testResult) addBefore(step step) {
-	tr.befores = append(tr.befores, step)
+	tr.setups = append(tr.setups, step)
+}
+
+func (tr *testResult) addAfter(step step) {
+	tr.teardowns = append(tr.teardowns, step)
 }
 
 func (tr *testResult) getSteps() []step {
