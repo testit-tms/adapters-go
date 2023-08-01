@@ -122,6 +122,7 @@ func TestMethods_attachments_success(t *testing.T) {
 					tms.AddAtachmentsFromString("myFile.txt", "content of my file")
 				},
 			)
+
 			assert.True(t, true)
 		})
 }

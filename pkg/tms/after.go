@@ -1,6 +1,8 @@
 package tms
 
 import (
+	"fmt"
+	"runtime/debug"
 	"testing"
 	"time"
 
@@ -17,34 +19,22 @@ func AfterTest(t *testing.T, m StepMetadata, f func()) {
 
 		testPhaseObject := getCurrentTestPhaseObject(t)
 		if testPhaseObject.test == nil {
-			logger.Error("Cannot add after to test before test has been started")
+			logger.Error("cannot add after to test before test has been started")
 		}
 
-		testPhaseObject.after = after
+		tr := testPhaseObject.test
 
-		if testPhaseObject.after != nil {
-			testPhaseObject.test.addAfter(step{
-				name:          testPhaseObject.after.name,
-				description:   testPhaseObject.after.description,
-				status:        testPhaseObject.after.status,
-				startedOn:     testPhaseObject.after.startedOn,
-				completedOn:   testPhaseObject.after.completedOn,
-				duration:      testPhaseObject.after.duration,
-				attachments:   testPhaseObject.after.attachments,
-				parameters:    testPhaseObject.after.parameters,
-				childrenSteps: testPhaseObject.after.childrenSteps,
-			})
-
-			err := client.updateTest(*testPhaseObject.test)
-			if err != nil {
-				logger.Error("Failed to update test: %s", err)
-			}
-
-			err = client.updateTestResult(testPhaseObject.resultID, *testPhaseObject.test)		
-			if err != nil {
-				logger.Error("Failed to update test result: %s", err)
-			}
+		panicObject := recover()
+		if panicObject != nil {
+			t.Fail()
+			after.status = failed
+			tr.status = failed
+			tr.message = fmt.Sprintf("%+v", panicObject)
+			tr.trace = string(debug.Stack())
 		}
+
+		tr.addAfter(after.convertToStepResult())
+		tr.update(testPhaseObject.resultID)
 	}()
 	ctxMgr.SetValues(gls.Values{
 		testResultKey:   after,

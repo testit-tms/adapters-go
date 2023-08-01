@@ -42,17 +42,7 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 		}
 
 		if testPhaseObjects.before != nil {
-			tr.addBefore(step{
-				name:          testPhaseObjects.before.name,
-				description:   testPhaseObjects.before.description,
-				status:        testPhaseObjects.before.status,
-				startedOn:     testPhaseObjects.before.startedOn,
-				completedOn:   testPhaseObjects.before.completedOn,
-				duration:      testPhaseObjects.before.duration,
-				attachments:   testPhaseObjects.before.attachments,
-				parameters:    testPhaseObjects.before.parameters,
-				childrenSteps: testPhaseObjects.before.childrenSteps,
-			})
+			tr.addBefore(testPhaseObjects.before.convertToStepResult())
 		}
 
 		if tr.status == "" {
@@ -80,22 +70,6 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 		nodeKey:         tr,
 		testInstanceKey: t,
 	}, f)
-}
-
-const (
-	passed  = "Passed"
-	failed  = "Failed"
-	skipped = "Skipped"
-)
-
-func getTestStatus(t *testing.T) string {
-	if t.Failed() {
-		return failed
-	} else if t.Skipped() {
-		return skipped
-	} else {
-		return passed
-	}
 }
 
 func newTestResult(m TestMetadata, t *testing.T) *testResult {

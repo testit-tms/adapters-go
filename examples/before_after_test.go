@@ -36,6 +36,21 @@ func TestFixture_success(t *testing.T) {
 				})
 			assert.True(t, true)
 		})
+	tms.AfterTest(t,
+		tms.StepMetadata{
+			Name:        "after test",
+			Description: "after test description",
+		},
+		func() {
+			tms.Step(
+				tms.StepMetadata{
+					Name:        "step1",
+					Description: "step1 description",
+				}, func() {
+					assert.True(t, true)
+				})
+		},
+	)
 }
 
 func TestFixture_failed(t *testing.T) {
@@ -67,4 +82,19 @@ func TestFixture_failed(t *testing.T) {
 				})
 			assert.True(t, true)
 		})
+	tms.AfterTest(t,
+		tms.StepMetadata{
+			Name:        "after test",
+			Description: "after test description",
+		},
+		func() {
+			tms.Step(
+				tms.StepMetadata{
+					Name:        "step1",
+					Description: "step1 description",
+				}, func() {
+					assert.True(t, true)
+				})
+		},
+	)
 }

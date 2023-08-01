@@ -17,14 +17,14 @@ var (
 )
 
 const (
-	nodeKey         = "current_step_container"
-	testResultKey   = "test_result_object"
+	nodeKey         = "current_step"
+	testResultKey   = "current_result_object"
 	testInstanceKey = "test_instance"
 )
 
 func init() {
 	cfg = config.MustLoad()
-	client = New(*cfg)
+	client = new(*cfg)
 	logger = slog.New(
 		slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
 	)

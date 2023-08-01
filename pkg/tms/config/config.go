@@ -3,7 +3,6 @@ package config
 import (
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -23,15 +22,9 @@ type Config struct {
 func MustLoad() *Config {
 	configPath := os.Getenv("TMS_CONFIG_FILE")
 	if configPath == "" {
-		// TODO: get current executable path
-		path, err := os.Getwd()
-		if err != nil {
-			log.Fatalf("cannot get executable path: %s", err)
-		}
-		configPath = filepath.Join(path, configFile)
+		log.Fatal("TMS_CONFIG_FILE is not set")
 	}
 
-	// check if file exists
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("config file does not exist: %s", configPath)
 	}

@@ -43,7 +43,7 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.CreateAuto
 			if link.LinkType != "" {
 				linkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
 				if err != nil {
-					logger.Error("Error converting link type", "error", err)
+					logger.Error("error converting link type", "error", err)
 				} else {
 					l.SetType(*linkType)
 				}
@@ -65,7 +65,7 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.CreateAuto
 	return *req
 }
 
-func stepToAutoTestStepModel(s []step) []tmsclient.AutoTestStepModel {
+func stepToAutoTestStepModel(s []stepresult) []tmsclient.AutoTestStepModel {
 	steps := make([]tmsclient.AutoTestStepModel, 0, len(s))
 	for _, step := range s {
 		model := tmsclient.NewAutoTestStepModel(step.name)
@@ -120,7 +120,7 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel
 			if link.LinkType != "" {
 				linkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
 				if err != nil {
-					logger.Error("Error converting link type", "error", err)
+					logger.Error("error converting link type", "error", err)
 				} else {
 					l.SetType(*linkType)
 				}
@@ -152,7 +152,7 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel
 func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResultsForTestRunModel, error) {
 	outcome, err := tmsclient.NewAvailableTestResultOutcomeFromValue(test.status)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error converting test status to outcome: %w", err)
 	}
 	req := tmsclient.NewAutoTestResultsForTestRunModel(confID, test.externalId, *outcome)
 	req.SetDuration(test.duration)
@@ -164,7 +164,7 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 	if len(test.steps) != 0 {
 		steps, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.steps)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error converting steps to attachment model: %w", err)
 		}
 		req.SetStepResults(steps)
 	}
@@ -172,7 +172,7 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 	if len(test.setups) != 0 {
 		steps, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.setups)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error converting setups to attachment model: %w", err)
 		}
 		req.SetSetupResults(steps)
 	}
@@ -186,7 +186,7 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 			if link.LinkType != "" {
 				linkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
 				if err != nil {
-					logger.Error("Error converting link type", "error", err)
+					logger.Error("error converting link type", "error", err)
 				} else {
 					l.SetType(*linkType)
 				}
@@ -216,7 +216,7 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 	return []tmsclient.AutoTestResultsForTestRunModel{*req}, nil
 }
 
-func stepToAttachmentPutModelAutoTestStepResultsModel(s []step) ([]tmsclient.AttachmentPutModelAutoTestStepResultsModel, error) {
+func stepToAttachmentPutModelAutoTestStepResultsModel(s []stepresult) ([]tmsclient.AttachmentPutModelAutoTestStepResultsModel, error) {
 	steps := make([]tmsclient.AttachmentPutModelAutoTestStepResultsModel, 0, len(s))
 	for _, step := range s {
 		model := tmsclient.NewAttachmentPutModelAutoTestStepResultsModel()
@@ -318,7 +318,7 @@ func getSearchRequest(externalID, projectID string) tmsclient.ApiV2AutoTestsSear
 	return *req
 }
 
-func testToUpdateResultModel(test testResult) (tmsclient.ApiV2TestResultsIdPutRequest, error) {
+func testToUpdateResultModel(model *tmsclient.TestResultModel, test testResult) (tmsclient.ApiV2TestResultsIdPutRequest, error) {
 	tearDowns, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.teardowns)
 	if err != nil {
 		return tmsclient.ApiV2TestResultsIdPutRequest{}, err
@@ -332,6 +332,24 @@ func testToUpdateResultModel(test testResult) (tmsclient.ApiV2TestResultsIdPutRe
 	req := tmsclient.NewApiV2TestResultsIdPutRequest()
 	req.SetTeardownResults(tearDowns)
 	req.SetSetupResults(setups)
+
+	req.SetDurationInMs(model.GetDurationInMs())
+	req.SetLinks(model.GetLinks())
+	req.SetStepResults(model.GetStepResults())
+	req.SetFailureClassIds(model.GetFailureClassIds())
+	req.SetComment(model.GetComment())
+
+	if len(model.Attachments) != 0 {
+		attachs := make([]tmsclient.AttachmentPutModel, 0, len(model.Attachments))
+		for _, attach := range model.Attachments {
+			a := tmsclient.NewAttachmentPutModel(attach.Id)
+			attachs = append(attachs, *a)
+		}
+
+		req.SetAttachments(attachs)
+	}
+
+	req.SetOutcome(test.status)
 
 	return *req, nil
 }

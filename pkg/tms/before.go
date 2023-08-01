@@ -12,7 +12,7 @@ import (
 func BeforeTest(t *testing.T, m StepMetadata, f func()) {
 	testPhaseObject := getCurrentTestPhaseObject(t)
 	if testPhaseObject.test != nil {
-		logger.Error("Cannot add before to test after test has been started")
+		logger.Error("cannot add before to test after test has been started")
 	}
 	before := newBefore(m)
 	testPhaseObject.before = before
@@ -29,8 +29,6 @@ func BeforeTest(t *testing.T, m StepMetadata, f func()) {
 			before.message = fmt.Sprintf("%+v", panicObject)
 			before.trace = string(debug.Stack())
 			before.status = failed
-
-			panic(panicObject)
 		}
 	}()
 	ctxMgr.SetValues(gls.Values{

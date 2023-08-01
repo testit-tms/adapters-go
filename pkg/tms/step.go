@@ -8,42 +8,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-// TODO: rename to stepResult and move to separate file
-type step struct {
-	name          string
-	description   string
-	childrenSteps []step
-	status        string
-	startedOn     time.Time
-	completedOn   time.Time
-	duration      int64
-	attachments   []string
-	parameters    map[string]interface{}
-}
-
 type StepMetadata struct {
 	Name        string
 	Description string
 	Parameters  map[string]interface{}
 }
 
-func (s *step) getSteps() []step {
-	return s.childrenSteps
-}
-
-func (s *step) addStep(step step) {
-	s.childrenSteps = append(s.childrenSteps, step)
-}
-
-func (s *step) addStatus(status string) {
-	s.status = status
-}
-
-func (s *step) addAttachments(a string) {
-	s.attachments = append(s.attachments, a)
-}
-
-// TODO: try to use StepMetadata as a pointer
 func Step(m StepMetadata, f func()) {
 	step := newStep(m)
 
@@ -55,7 +25,7 @@ func Step(m StepMetadata, f func()) {
 			testInstanceKey,
 			func(testInstance interface{}) {
 				if panicObject != nil {
-					Fail(errors.Errorf("%+v", panicObject))
+					fail(errors.Errorf("%+v", panicObject))
 				}
 				if testInstance.(*testing.T).Failed() ||
 					panicObject != nil {
@@ -71,17 +41,13 @@ func Step(m StepMetadata, f func()) {
 			currentStep := currentStepObj.(hasSteps)
 			currentStep.addStep(*step)
 		})
-
-		if panicObject != nil {
-			panic(panicObject)
-		}
 	}()
 
 	ctxMgr.SetValues(gls.Values{nodeKey: step}, f)
 }
 
-func newStep(m StepMetadata) *step {
-	step := &step{
+func newStep(m StepMetadata) *stepresult {
+	step := &stepresult{
 		description: m.Description,
 		startedOn:   time.Now(),
 		parameters:  m.Parameters,

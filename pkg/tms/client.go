@@ -18,7 +18,7 @@ type tmsClient struct {
 	client *tmsclient.APIClient
 }
 
-func New(cfg config.Config) *tmsClient {
+func new(cfg config.Config) *tmsClient {
 	var scheme string
 
 	if strings.Contains(cfg.Url, "https") {
@@ -47,15 +47,15 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 		},
 	})
 
-	logger.Debug("searching for test", "externalId", test.externalId)
+	logger.Debug("searching for test", "externalId", test.externalId, slog.String("op", op))
 	sr := getSearchRequest(test.externalId, c.cfg.ProjectId)
 	resp, r, err := c.client.AutoTestsApi.ApiV2AutoTestsSearchPost(ctx).
 		ApiV2AutoTestsSearchPostRequest(sr).
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to search for test", "error", err, slog.String("response", respToString(r.Body)))
-		return "", err
+		logger.Error("failed to search for test", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		return "", fmt.Errorf("%s: failed to search for test: %w", op, err)
 	}
 
 	var autotestID string
@@ -67,8 +67,8 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 			Execute()
 
 		if err != nil {
-			logger.Error("failed to create new autotest", "error", err, slog.String("response", respToString(r.Body)))
-			return "", err
+			logger.Error("failed to create new autotest", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+			return "", fmt.Errorf("%s: failed to create new autotest: %w", op, err)
 		}
 
 		autotestID = *na.Id
@@ -80,8 +80,8 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 			Execute()
 
 		if err != nil {
-			logger.Error("failed to update existing autotest", "error", err, slog.String("response", respToString(r.Body)))
-			return "", err
+			logger.Error("failed to update existing autotest", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+			return "", fmt.Errorf("%s: failed to update existing autotest: %w", op, err)
 		}
 
 		autotestID = *resp[0].Id
@@ -97,14 +97,14 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 				Execute()
 		}
 		if err != nil {
-			logger.Error("failed to link autotest to workitem", "error", err, slog.String("response", respToString(r.Body)))
+			logger.Error("failed to link autotest to workitem", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
 		}
 	}
 
 	rr, err := testToResultModel(test, c.cfg.ConfigurationId)
 	if err != nil {
-		logger.Error("failed to convert test to result model", "error", err)
-		return "", err
+		logger.Error("failed to convert test to result model", "error", err, slog.String("op", op))
+		return "", fmt.Errorf("%s: failed to convert test to result model: %w", op, err)
 	}
 	logger.Debug("upload result to test run", "request", rr)
 	ids, r, err := c.client.TestRunsApi.SetAutoTestResultsForTestRun(ctx, c.cfg.TestRunId).
@@ -112,8 +112,8 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to upload result to test run", "error", err, slog.String("response", respToString(r.Body)))
-		return "", err
+		logger.Error("failed to upload result to test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		return "", fmt.Errorf("%s: failed to upload result to test run: %w", op, err)
 	}
 
 	return ids[0], nil
@@ -132,7 +132,7 @@ func (c *tmsClient) writeAttachments(paths ...string) []string {
 
 	attachmanetsIds := make([]string, 0, len(paths))
 	for _, p := range paths {
-		logger.Debug("uploading attachment", "path", p)
+		logger.Debug("uploading attachment", "path", p, slog.String("op", op))
 
 		f, err := os.Open(p)
 		if err != nil {
@@ -144,11 +144,11 @@ func (c *tmsClient) writeAttachments(paths ...string) []string {
 			Execute()
 
 		if err != nil {
-			logger.Error("failed to upload attachment", "error", err, slog.String("response", respToString(r.Body)))
+			logger.Error("failed to upload attachment", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
 			continue
 		}
 
-		logger.Debug("attachment uploaded", "id", resp.Id, "path", p)
+		logger.Debug("attachment uploaded", "id", resp.Id, "path", p, slog.String("op", op))
 
 		attachmanetsIds = append(attachmanetsIds, resp.Id)
 	}
@@ -183,8 +183,8 @@ func (c *tmsClient) updateTest(test testResult) error {
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to search for test", "error", err, slog.String("response", respToString(r.Body)))
-		return err
+		logger.Error("failed to search for test", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		return fmt.Errorf("%s: failed to search for test: %w", op, err)
 	}
 
 	ur := testToUpdateAutotestModel(test, resp[0])
@@ -194,8 +194,8 @@ func (c *tmsClient) updateTest(test testResult) error {
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to update existing autotest", "error", err, slog.String("response", respToString(r.Body)))
-		return err
+		logger.Error("failed to update existing autotest", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		return fmt.Errorf("%s: failed to update existing autotest: %w", op, err)
 	}
 
 	return nil
@@ -211,22 +211,28 @@ func (c *tmsClient) updateTestResult(resultId string, test testResult) error {
 			Prefix: "PrivateToken",
 		},
 	})
-	
-	ur, err := testToUpdateResultModel(test)
+
+	m, r, err := c.client.TestResultsApi.ApiV2TestResultsIdGet(ctx, resultId).Execute()
 	if err != nil {
-		logger.Error("failed to convert test to result model", "error", err)
-		return err
+		logger.Error("failed to get test result", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		return fmt.Errorf("%s: failed to get test result: %w", op, err)
 	}
 
-	logger.Debug("update test result", "request", ur)
+	ur, err := testToUpdateResultModel(m, test)
+	if err != nil {
+		logger.Error("failed to convert test to result model", "error", err, slog.String("op", op))
+		return fmt.Errorf("%s: failed to convert test to result model: %w", op, err)
+	}
 
-	r, err := c.client.TestResultsApi.ApiV2TestResultsIdPut(ctx, resultId).
+	logger.Debug("update test result", "request", ur, slog.String("op", op))
+
+	r, err = c.client.TestResultsApi.ApiV2TestResultsIdPut(ctx, resultId).
 		ApiV2TestResultsIdPutRequest(ur).
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to update test result", "error", err, slog.String("response", respToString(r.Body)))
-		return err
+		logger.Error("failed to update test result", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		return fmt.Errorf("%s: failed to update test result: %w", op, err)
 	}
 
 	return nil

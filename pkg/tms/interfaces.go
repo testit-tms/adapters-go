@@ -1,8 +1,8 @@
 package tms
 
 type hasSteps interface {
-	getSteps() []step
-	addStep(step step)
+	getSteps() []stepresult
+	addStep(step stepresult)
 }
 
 type hasStatus interface {
@@ -11,4 +11,10 @@ type hasStatus interface {
 
 type hasAttachments interface {
 	addAttachments(a string)
+}
+
+type hasErrorFields interface {
+	addMessage(message string)
+	addTrace(trace string)
+	addStatus(status string)
 }

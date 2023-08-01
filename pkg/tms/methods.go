@@ -33,15 +33,16 @@ func AddAtachments(paths ...string) {
 }
 
 func AddAtachmentsFromString(name, content string) {
+	const op = "AddAtachmentsFromString"
 	path, err := os.Getwd()
 	if err != nil {
-		logger.Error("cannot get executable path: %s", err, slog.With("op", "AddAtachmentsFromString"))
+		logger.Error("cannot get executable path", "error", err, slog.String("op", op))
 	}
 
 	fp := filepath.Join(path, name)
 	err = os.WriteFile(fp, []byte(content), 0644)
 	if err != nil {
-		logger.Error("cannot write file: %s", err, slog.With("op", "AddAtachmentsFromString"))
+		logger.Error("cannot write file", "error", err, slog.String("op", op))
 	}
 
 	attachs := client.writeAttachments(fp)
@@ -55,6 +56,6 @@ func AddAtachmentsFromString(name, content string) {
 
 	err = os.Remove(fp)
 	if err != nil {
-		logger.Error("cannot remove file: %s", err, slog.With("op", "AddAtachmentsFromString"))
+		logger.Error("cannot remove file", "error", err, slog.String("op", op))
 	}
 }
