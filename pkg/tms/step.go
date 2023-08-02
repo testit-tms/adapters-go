@@ -1,7 +1,6 @@
 package tms
 
 import (
-	"testing"
 	"time"
 
 	"github.com/jtolds/gls"
@@ -27,19 +26,16 @@ func Step(m StepMetadata, f func()) {
 				if panicObject != nil {
 					fail(errors.Errorf("%+v", panicObject))
 				}
-				if testInstance.(*testing.T).Failed() ||
-					panicObject != nil {
-					if step.status == "" {
-						step.status = failed
-					}
-				}
 			})
 		if step.status == "" {
 			step.status = passed
 		}
 		manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
-			currentStep := currentStepObj.(hasSteps)
-			currentStep.addStep(*step)
+			hasStep := currentStepObj.(hasSteps)
+			hasStep.addStep(*step)
+
+			hasStatus := currentStepObj.(hasStatus)
+			hasStatus.addStatus(step.status)
 		})
 	}()
 

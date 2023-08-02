@@ -15,7 +15,9 @@ func AfterTest(t *testing.T, m StepMetadata, f func()) {
 	defer func() {
 		after.completedOn = time.Now()
 		after.duration = after.completedOn.UnixMilli() - after.startedOn.UnixMilli()
-		after.status = getTestStatus(t)
+		if after.status == "" {
+			after.status = getTestStatus(t)
+		}
 
 		testPhaseObject := getCurrentTestPhaseObject(t)
 		if testPhaseObject.test == nil {

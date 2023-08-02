@@ -3,7 +3,6 @@ package examples
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/testit-tms/adapters-go/pkg/tms"
 )
 
@@ -24,11 +23,11 @@ func TestSteps_Success(t *testing.T) {
 						Description: "step 1.1 description",
 					}, func() {
 						tms.Step(tms.StepMetadata{}, func() {
-							assert.True(t, true)
+							tms.True(t, true)
 						})
-						assert.True(t, true)
+						tms.True(t, true)
 					})
-					assert.True(t, true)
+					tms.True(t, true)
 				},
 			)
 			tms.Step(
@@ -42,11 +41,11 @@ func TestSteps_Success(t *testing.T) {
 						Description: "step 2.1 description",
 					}, func() {
 						tms.Step(tms.StepMetadata{}, func() {
-							assert.True(t, true)
+							tms.True(t, true)
 						})
-						assert.True(t, true)
+						tms.True(t, true)
 					})
-					assert.True(t, true)
+					tms.True(t, true)
 				},
 			)
 		})
@@ -69,11 +68,11 @@ func TestSteps_Failed(t *testing.T) {
 						Description: "step 1.1 description",
 					}, func() {
 						tms.Step(tms.StepMetadata{}, func() {
-							assert.True(t, false)
+							tms.True(t, true)
 						})
-						assert.True(t, true)
+						tms.True(t, true)
 					})
-					assert.True(t, true)
+					tms.True(t, true)
 				},
 			)
 			tms.Step(
@@ -87,11 +86,11 @@ func TestSteps_Failed(t *testing.T) {
 						Description: "step 2.1 description",
 					}, func() {
 						tms.Step(tms.StepMetadata{}, func() {
-							assert.True(t, true)
+							tms.True(t, true)
 						})
-						assert.True(t, false)
+						tms.True(t, false)
 					})
-					assert.True(t, true)
+					tms.True(t, true)
 				},
 			)
 		})

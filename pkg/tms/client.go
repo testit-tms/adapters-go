@@ -18,7 +18,7 @@ type tmsClient struct {
 	client *tmsclient.APIClient
 }
 
-func new(cfg config.Config) *tmsClient {
+func newClient(cfg config.Config) *tmsClient {
 	var scheme string
 
 	if strings.Contains(cfg.Url, "https") {

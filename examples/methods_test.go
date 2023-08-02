@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/testit-tms/adapters-go/pkg/tms"
 )
 
@@ -16,7 +15,7 @@ func TestMethods_message_success(t *testing.T) {
 		},
 		func() {
 			tms.AddMessage("test message")
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -27,7 +26,7 @@ func TestMethods_message_failed(t *testing.T) {
 		},
 		func() {
 			tms.AddMessage("test message")
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -59,7 +58,7 @@ func TestMethods_link_success(t *testing.T) {
 				LinkType:    tms.LINKTYPE_RELATED,
 			})
 
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -91,7 +90,7 @@ func TestMethods_link_failed(t *testing.T) {
 				LinkType:    tms.LINKTYPE_RELATED,
 			})
 
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -123,7 +122,7 @@ func TestMethods_attachments_success(t *testing.T) {
 				},
 			)
 
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -154,6 +153,6 @@ func TestMethods_attachments_failed(t *testing.T) {
 					tms.AddAtachmentsFromString("myFile.txt", "content of my file")
 				},
 			)
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }

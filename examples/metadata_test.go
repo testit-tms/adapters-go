@@ -3,14 +3,13 @@ package examples
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/testit-tms/adapters-go/pkg/tms"
 )
 
 func TestMetadata_without_metadata_success(t *testing.T) {
 	tms.Test(t, tms.TestMetadata{},
 		func() {
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -18,7 +17,7 @@ func TestMetadata_without_metadata_failed(t *testing.T) {
 	tms.Test(t,
 		tms.TestMetadata{},
 		func() {
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -29,7 +28,7 @@ func TestMetadata_with_external_id_success(t *testing.T) {
 			ExternalId:  "with_external_id_success",
 		},
 		func() {
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -40,7 +39,7 @@ func TestMetadata_with_external_id_failed(t *testing.T) {
 			ExternalId:  "with_external_id_failed",
 		},
 		func() {
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -51,7 +50,7 @@ func TestMetadata_with_title_success(t *testing.T) {
 			Title:       "with title",
 		},
 		func() {
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -62,7 +61,7 @@ func TestMetadata_with_title_failed(t *testing.T) {
 			Title:       "with title",
 		},
 		func() {
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -73,7 +72,7 @@ func TestMetadata_with_work_item_ids_success(t *testing.T) {
 			WorkItemIds: []string{"12345", "54321"},
 		},
 		func() {
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -84,7 +83,7 @@ func TestMetadata_with_work_item_ids_failed(t *testing.T) {
 			WorkItemIds: []string{"12345", "54321"},
 		},
 		func() {
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -95,7 +94,7 @@ func TestMetadata_with_description_success(t *testing.T) {
 			Description: "with description",
 		},
 		func() {
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -106,7 +105,7 @@ func TestMetadata_with_description_failed(t *testing.T) {
 			Description: "with description",
 		},
 		func() {
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -117,7 +116,7 @@ func TestMetadata_with_labels_success(t *testing.T) {
 			Labels:      []string{"label01", "label02"},
 		},
 		func() {
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -128,7 +127,7 @@ func TestMetadata_with_labels_failed(t *testing.T) {
 			Labels:      []string{"label01", "label02"},
 		},
 		func() {
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -139,7 +138,7 @@ func TestMetadata_with_class_name_success(t *testing.T) {
 			ClassName:   "CustomClassName",
 		},
 		func() {
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -150,7 +149,7 @@ func TestMetadata_with_class_name_failed(t *testing.T) {
 			ClassName:   "CustomClassName",
 		},
 		func() {
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -161,7 +160,7 @@ func TestMetadata_with_name_space_success(t *testing.T) {
 			NameSpace:   "CustomNameSpace",
 		},
 		func() {
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 
 }
@@ -173,7 +172,7 @@ func TestMetadata_with_name_space_failed(t *testing.T) {
 			NameSpace:   "CustomNameSpace",
 		},
 		func() {
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -194,7 +193,7 @@ func TestMetadata_with_links_success(t *testing.T) {
 			},
 		},
 		func() {
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -215,7 +214,7 @@ func TestMetadata_with_links_failed(t *testing.T) {
 			},
 		},
 		func() {
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }
 
@@ -243,7 +242,7 @@ func TestMetadata_with_all_success(t *testing.T) {
 			},
 		},
 		func() {
-			assert.True(t, true)
+			tms.True(t, true)
 		})
 }
 
@@ -271,6 +270,6 @@ func TestMetadata_with_all_failed(t *testing.T) {
 			},
 		},
 		func() {
-			assert.True(t, false)
+			tms.True(t, false)
 		})
 }

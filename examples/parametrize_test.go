@@ -3,7 +3,6 @@ package examples
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/testit-tms/adapters-go/pkg/tms"
 )
 
@@ -53,7 +52,7 @@ func TestParameters_success(t *testing.T) {
 						Name:       tt.stepName,
 						Parameters: tt.stepParameters,
 					}, func() {
-						assert.True(t, tt.expValue)
+						tms.True(t, tt.expValue)
 					})
 			})
 		})

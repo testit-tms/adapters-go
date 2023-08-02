@@ -21,7 +21,9 @@ func BeforeTest(t *testing.T, m StepMetadata, f func()) {
 		panicObject := recover()
 
 		before.completedOn = time.Now()
-		before.status = getTestStatus(t)
+		if before.status == "" {
+			before.status = getTestStatus(t)
+		}
 		before.duration = before.completedOn.UnixMilli() - before.startedOn.UnixMilli()
 
 		if panicObject != nil {

@@ -24,7 +24,7 @@ const (
 
 func init() {
 	cfg = config.MustLoad()
-	client = new(*cfg)
+	client = newClient(*cfg)
 	logger = slog.New(
 		slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
 	)
