@@ -1,0 +1,7 @@
+{
+    "url": "URL",
+    "privateToken": "PRIVATE_TOKEN",
+    "projectId": "PROJECT_ID",
+    "configurationId": "CONFIGURATION_ID",
+    "testRunId": "TEST_RUN_ID"
+}
