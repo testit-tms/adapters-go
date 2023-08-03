@@ -2,9 +2,11 @@ package tms
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 
@@ -27,9 +29,14 @@ func newClient(cfg config.Config) *tmsClient {
 		scheme = "http"
 	}
 
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.CertValidation},
+	}
+	hc := &http.Client{Transport: tr}
 	configuration := tmsclient.NewConfiguration()
 	configuration.Host = strings.TrimPrefix(strings.TrimSuffix(cfg.Url, "/"), fmt.Sprintf("%s://", scheme))
 	configuration.Scheme = scheme
+	configuration.HTTPClient = hc
 	return &tmsClient{
 		client: tmsclient.NewAPIClient(configuration),
 		cfg:    cfg,
@@ -60,6 +67,10 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 	var autotestID string
 	if len(resp) == 0 {
 		cr := testToAutotestModel(test, c.cfg.ProjectId)
+		if c.cfg.AutomaticCreationTestCases {
+			cr.SetShouldCreateWorkItem(c.cfg.AutomaticCreationTestCases)
+		}
+
 		logger.Debug("create new autotest", "request", cr)
 		na, _, err := c.client.AutoTestsApi.CreateAutoTest(ctx).
 			CreateAutoTestRequest(cr).

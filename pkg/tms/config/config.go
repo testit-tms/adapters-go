@@ -12,12 +12,14 @@ const (
 )
 
 type Config struct {
-	Url             string `json:"url" env-required:"true" env:"TMS_URL"`
-	Token           string `json:"privateToken" env-required:"true" env:"TMS_PRIVATE_TOKEN"`
-	ProjectId       string `json:"projectId" env-required:"true" env:"TMS_PROJECT_ID"`
-	ConfigurationId string `json:"configurationId" env-required:"true" env:"TMS_CONFIGURATION_ID"`
-	TestRunId       string `json:"testRunId" env-required:"true" env:"TMS_TEST_RUN_ID"`
-	IsDebug         bool   `json:"isDebug" env:"TMS_IS_DEBUG" env-default:"false"`
+	Url                        string `json:"url" env-required:"true" env:"TMS_URL"`
+	Token                      string `json:"privateToken" env-required:"true" env:"TMS_PRIVATE_TOKEN"`
+	ProjectId                  string `json:"projectId" env-required:"true" env:"TMS_PROJECT_ID"`
+	ConfigurationId            string `json:"configurationId" env-required:"true" env:"TMS_CONFIGURATION_ID"`
+	TestRunId                  string `json:"testRunId" env-required:"true" env:"TMS_TEST_RUN_ID"`
+	IsDebug                    bool   `json:"isDebug" env:"TMS_IS_DEBUG" env-default:"false"`
+	AutomaticCreationTestCases bool   `json:"automaticCreationTestCases" env:"TMS_AUTOMATIC_CREATION_TEST_CASES" env-default:"false"`
+	CertValidation             bool   `json:"certValidation" env:"TMS_CERT_VALIDATION" env-default:"true"`
 }
 
 func MustLoad() *Config {
