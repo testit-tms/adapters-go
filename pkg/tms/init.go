@@ -26,8 +26,15 @@ func init() {
 	cfg = config.MustLoad()
 	client = newClient(*cfg)
 	logger = slog.New(
-		slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
+		slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: getLogLevel(cfg.IsDebug)}),
 	)
 	ctxMgr = gls.NewContextManager()
 	testPhaseObjects = make(map[string]*testPhaseContainer)
+}
+
+func getLogLevel(b bool) slog.Level {
+	if b {
+		return slog.LevelDebug
+	}
+	return slog.LevelInfo
 }

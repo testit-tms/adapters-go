@@ -52,7 +52,6 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 	resp, r, err := c.client.AutoTestsApi.ApiV2AutoTestsSearchPost(ctx).
 		ApiV2AutoTestsSearchPostRequest(sr).
 		Execute()
-
 	if err != nil {
 		logger.Error("failed to search for test", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
 		return "", fmt.Errorf("%s: failed to search for test: %w", op, err)
