@@ -146,7 +146,7 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel
 	}
 
 	req.SetIsFlaky(*autotest.IsFlaky.Get())
-	req.SetId(*autotest.Id)
+	req.SetId(autotest.Id)
 
 	return *req
 }
@@ -351,7 +351,12 @@ func testToUpdateResultModel(model *tmsclient.TestResultModel, test testResult) 
 		req.SetAttachments(attachs)
 	}
 
-	req.SetOutcome(test.status)
+	o, err := tmsclient.NewTestResultOutcomeFromValue(test.status)
+	if err != nil {
+		return tmsclient.ApiV2TestResultsIdPutRequest{}, err
+	}
+
+	req.SetOutcome(*o)
 
 	return *req, nil
 }
