@@ -28,6 +28,7 @@ type testResult struct {
 	startedOn   time.Time
 	completedOn time.Time
 	duration    int64
+	externalKey string
 }
 
 func (tr *testResult) addStatus(v string) {

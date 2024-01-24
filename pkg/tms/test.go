@@ -24,6 +24,7 @@ type TestMetadata struct {
 	Labels      []string
 	ExternalId  string
 	WorkItemIds []string
+	ExternalKey string
 }
 
 func Test(t *testing.T, m TestMetadata, f func()) {
@@ -85,6 +86,7 @@ func newTestResult(m TestMetadata, t *testing.T) *testResult {
 		externalId:  m.ExternalId,
 		workItemIds: m.WorkItemIds,
 		parameters:  m.Parameters,
+		externalKey: m.ExternalKey,
 	}
 
 	if testResult.displayName == "" {
@@ -99,18 +101,21 @@ func newTestResult(m TestMetadata, t *testing.T) *testResult {
 		testResult.className = t.Name()
 	}
 
-	if testResult.nameSpace == "" {
-		programCounters := make([]uintptr, 10)
-		callersCount := runtime.Callers(0, programCounters)
+	programCounters := make([]uintptr, 10)
+	callersCount := runtime.Callers(0, programCounters)
 
-		var testFile string
-		for i := 0; i < callersCount; i++ {
-			_, testFile, _, _ = runtime.Caller(i)
-			if strings.Contains(testFile, "_test.go") {
-				break
-			}
+	var testFile string
+	for i := 0; i < callersCount; i++ {
+		_, testFile, _, _ = runtime.Caller(i)
+		if strings.Contains(testFile, "_test.go") {
+			break
 		}
-		ts := strings.Split(testFile, "/")
+	}
+	ts := strings.Split(testFile, "/")
+
+	testResult.externalKey = ts[len(ts)-1] + t.Name()
+
+	if testResult.nameSpace == "" {
 		testResult.nameSpace = strings.TrimSuffix(ts[len(ts)-1], ".go")
 	}
 

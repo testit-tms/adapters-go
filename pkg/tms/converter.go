@@ -10,6 +10,7 @@ import (
 func testToAutotestModel(test testResult, projectId string) tmsclient.CreateAutoTestRequest {
 	req := tmsclient.NewCreateAutoTestRequest(test.externalId, projectId, test.displayName)
 	req.SetTitle(test.title)
+	req.SetExternalKey(test.externalKey)
 
 	if test.description != "" {
 		req.SetDescription(test.description)
@@ -36,7 +37,7 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.CreateAuto
 	if len(test.links) != 0 {
 		links := make([]tmsclient.LinkPostModel, 0, len(test.links))
 		for _, link := range test.links {
-			l := tmsclient.NewLinkPostModel(link.Url)
+			l := tmsclient.NewLinkPostModel(link.Url, true)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 
@@ -83,6 +84,7 @@ func stepToAutoTestStepModel(s []stepresult) []tmsclient.AutoTestStepModel {
 
 func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel) tmsclient.UpdateAutoTestRequest {
 	req := tmsclient.NewUpdateAutoTestRequest(test.externalId, autotest.ProjectId, test.displayName)
+	req.SetExternalKey(test.externalKey)
 
 	if test.description != "" {
 		req.SetDescription(test.description)
@@ -113,7 +115,7 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel
 	if len(test.links) != 0 {
 		links := make([]tmsclient.LinkPutModel, 0, len(test.links))
 		for _, link := range test.links {
-			l := tmsclient.NewLinkPutModel(link.Url)
+			l := tmsclient.NewLinkPutModel(link.Url, true)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 
@@ -180,7 +182,7 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 	if len(test.resultLinks) != 0 {
 		links := make([]tmsclient.LinkPostModel, 0, len(test.resultLinks))
 		for _, link := range test.resultLinks {
-			l := tmsclient.NewLinkPostModel(link.Url)
+			l := tmsclient.NewLinkPostModel(link.Url, true)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 			if link.LinkType != "" {
@@ -311,9 +313,9 @@ func getSearchRequest(externalID, projectID string) tmsclient.ApiV2AutoTestsSear
 	f.SetExternalIds([]string{externalID})
 	f.SetProjectIds([]string{projectID})
 	f.SetIsDeleted(false)
+	inc := tmsclient.NewAutotestsSelectModelIncludes(false, false, false)
 
-	req := tmsclient.NewApiV2AutoTestsSearchPostRequest()
-	req.SetFilter(*f)
+	req := tmsclient.NewApiV2AutoTestsSearchPostRequest(*f, *inc)
 
 	return *req
 }

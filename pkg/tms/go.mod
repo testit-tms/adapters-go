@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
-	github.com/testit-tms/api-client-golang v1.1.2
+	github.com/testit-tms/api-client-golang v1.3.0
 	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090
 )
 
