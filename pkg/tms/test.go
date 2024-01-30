@@ -113,7 +113,7 @@ func newTestResult(m TestMetadata, t *testing.T) *testResult {
 	}
 	ts := strings.Split(testFile, "/")
 
-	testResult.externalKey = ts[len(ts)-1] + t.Name()
+	testResult.externalKey = "^" + t.Name() + "$"
 
 	if testResult.nameSpace == "" {
 		testResult.nameSpace = strings.TrimSuffix(ts[len(ts)-1], ".go")
