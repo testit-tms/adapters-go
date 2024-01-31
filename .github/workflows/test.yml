@@ -15,7 +15,7 @@ env:
   TMS_CERT_VALIDATION: false
   TMS_PRIVATE_TOKEN: ${{ secrets.TESTIT_PRIVATE_TOKEN }}
   TMS_URL: ${{ secrets.TESTIT_URL }}
-  TMS_CONFIG_FILE: ${{ github.workflow }}/tms.config.json
+  TMS_CONFIG_FILE: ${{ github.workspace }}/tms.config.json
 jobs:
   test:
     name: ${{ matrix.project_name }}
