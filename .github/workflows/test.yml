@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-            configuration_id: GOLANG_CONFIGURATION_ID
+          - configuration_id: GOLANG_CONFIGURATION_ID
             project_id: GOLANG_PROJECT_ID
             project_name: golang
     env:
