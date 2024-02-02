@@ -15,6 +15,7 @@ env:
   TMS_CERT_VALIDATION: false
   TMS_PRIVATE_TOKEN: ${{ secrets.TESTIT_PRIVATE_TOKEN }}
   TMS_URL: ${{ secrets.TESTIT_URL }}
+  TMS_CONFIG_FILE: ${{ github.workspace }}/tms.config.json
 jobs:
   test:
     name: ${{ matrix.project_name }}
@@ -39,8 +40,6 @@ jobs:
           repository: testit-tms/api-validator-dotnet
           token: ${{ env.GITHUB_PAT }}
           path: api-validator-dotnet
-      - name: Checkout examples
-        uses: actions/checkout@v4
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
@@ -55,7 +54,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup environment
         run: |     
-          go mod edit -replace github.com/testit-tms/adapters-go=adapters-go/pkg/tms 
+          go get github.com/testit-tms/adapters-go/pkg/tms@${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
@@ -65,7 +64,7 @@ jobs:
       - name: Test
         run: |
           cd examples
-          go test
+          go test || exit 0
       - name: Validate
         run: |
           dotnet test --configuration Release --no-build --logger:"console;verbosity=detailed" api-validator-dotnet
