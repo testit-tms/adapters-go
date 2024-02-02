@@ -54,7 +54,7 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 				tr.status = getTestStatus(t)
 			}
 		}
-
+		fmt.Printf("%+v\n", tr)
 		id := tr.write()
 		if id != "" {
 			testPhaseObjects.resultID = id
