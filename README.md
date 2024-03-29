@@ -1,5 +1,13 @@
 # Test IT TMS Adapter for Golang
 
+## Getting Started
+
+### Installation
+
+```bash
+go get github.com/testit-tms/adapters-go/pkg/tms
+```
+
 ## Usage
 
 ### Configuration
