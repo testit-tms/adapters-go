@@ -121,7 +121,7 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 		AutoTestResultsForTestRunModel(rr).
 		Execute()
 
-	if err != nil {
+	if err != nil && r.Body != nil {
 		logger.Error("failed to upload result to test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
 		return "", fmt.Errorf("%s: failed to upload result to test run: %w", op, err)
 	}

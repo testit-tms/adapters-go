@@ -45,27 +45,29 @@ Create **tms.config.json** file in the project directory:
 If you specified TestRunId, then just run the command:
 
 ```bash
-$ export TMS_CONFIG_FILE=<ABSOLUTE_PATH_TO_CONFIG_FILE>
-$ go test
+export TMS_CONFIG_FILE=<ABSOLUTE_PATH_TO_CONFIG_FILE>
+cd examples
+go test
 ```
 
 To create and complete TestRun you can use the [Test IT CLI](https://docs.testit.software/user-guide/integrations/cli.html):
 
 ```bash
-$ export TMS_TOKEN=<YOUR_TOKEN>
-$ testit \
+export TMS_TOKEN=<YOUR_TOKEN>
+testit \
   --mode create
   --url https://tms.testit.software \
   --project-id 5236eb3f-7c05-46f9-a609-dc0278896464 \
   --testrun-name "New test run" \
   --output tmp/output.txt
 
-$ export TMS_TEST_RUN_ID=$(cat output.txt)  
+export TMS_TEST_RUN_ID=$(cat output.txt)  
 
-$ export TMS_CONFIG_FILE=<ABSOLUTE_PATH_TO_CONFIG_FILE>
-$ go test
+export TMS_CONFIG_FILE=<ABSOLUTE_PATH_TO_CONFIG_FILE>
+cd examples
+go test
 
-$ testit \
+testit \
   --mode finish
   --url https://tms.testit.software \
   --testrun-id $(cat tmp/output.txt) 

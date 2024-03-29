@@ -4,11 +4,15 @@ on:
   pull_request:
     paths:
       - "pkg/tms/**"
+      - "examples/**"
+      - "go.mod"
+      - "tms.config.json"
+      - ".github/**/test.yml"
   workflow_dispatch:
 env:
   DOTNET_VERSION: 8
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
-  GOLANG_VERSION: 1.21
+  GOLANG_VERSION: 1.22
   PYTHON_VERSION: 3.12
   TEMP_FILE: tmp/output.txt
   TMS_ADAPTER_MODE: 1
@@ -54,7 +58,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup environment
         run: |     
-          go get github.com/testit-tms/adapters-go/pkg/tms@${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          go get github.com/testit-tms/adapters-go/pkg/tms
           dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun
