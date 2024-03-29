@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -121,8 +120,13 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 		AutoTestResultsForTestRunModel(rr).
 		Execute()
 
-	if err != nil && r.Body != nil {
-		logger.Error("failed to upload result to test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+	if err != nil {
+		if r != nil && r.Body != nil {
+			logger.Error("failed to upload result to test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		} else {
+			logger.Error("failed to upload result to test run", "error", err, slog.String("op", op))
+		}
+
 		return "", fmt.Errorf("%s: failed to upload result to test run: %w", op, err)
 	}
 
@@ -167,7 +171,7 @@ func (c *tmsClient) writeAttachments(paths ...string) []string {
 }
 
 func respToString(r io.ReadCloser) string {
-	respBytes, err := ioutil.ReadAll(r)
+	respBytes, err := io.ReadAll(r)
 	if err != nil {
 		logger.Error("failed to read response body", "error", err)
 		return ""

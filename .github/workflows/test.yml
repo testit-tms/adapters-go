@@ -12,7 +12,7 @@ on:
 env:
   DOTNET_VERSION: 8
   GITHUB_PAT: ${{ secrets.SERVICE_ACCOUNT_TOKEN }}
-  GOLANG_VERSION: 1.2
+  GOLANG_VERSION: 1.21
   PYTHON_VERSION: 3.12
   TEMP_FILE: tmp/output.txt
   TMS_ADAPTER_MODE: 1
@@ -57,8 +57,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Setup environment
-        run: |     
-          go get github.com/testit-tms/adapters-go/pkg/tms
+        run: |
           dotnet build --configuration Release --property WarningLevel=0 api-validator-dotnet
           pip install testit-cli
       - name: Create TestRun

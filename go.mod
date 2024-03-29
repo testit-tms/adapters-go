@@ -1,16 +1,19 @@
 module github.com/testit-tms/adapters-go
 
-go 1.22
+go 1.20
 
 require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/testit-tms/api-client-golang v1.1.2
 )
 
+replace github.com/testit-tms/adapters-go/pkg/tms => ./pkg/tms
+
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/testit-tms/adapters-go/pkg/tms v0.0.0-20240131084840-12d96a19d482 // indirect
 	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 // indirect
 )
 
