@@ -3,5 +3,6 @@
     "privateToken": "PRIVATE_TOKEN",
     "projectId": "PROJECT_ID",
     "configurationId": "CONFIGURATION_ID",
-    "testRunId": "TEST_RUN_ID"
+    "testRunId": "TEST_RUN_ID",
+    "adapterMode": "ADAPTER_MODE"
 }
