@@ -71,7 +71,7 @@ func validateConfig(cfg Config) {
 	}
 
 	adapterMode, err := strconv.Atoi(cfg.AdapterMode)
-	if err == nil {
+	if err != nil {
 		panic("Adapter mode is invalid")
 	}
 
