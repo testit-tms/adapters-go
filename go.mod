@@ -13,7 +13,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/testit-tms/adapters-go/pkg/tms v0.0.0-20240131084840-12d96a19d482 // indirect
+	github.com/testit-tms/adapters-go/pkg/tms v0.0.0-20240405083110-bea9bf588d07 // indirect
 	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 // indirect
 )
 
