@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
-	github.com/testit-tms/api-client-golang v1.1.2
+	github.com/testit-tms/api-client-golang v1.4.0
 )
 
 replace github.com/testit-tms/adapters-go/pkg/tms => ./pkg/tms

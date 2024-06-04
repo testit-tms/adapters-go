@@ -20,6 +20,8 @@ github.com/testit-tms/adapters-go/pkg/tms v0.0.0-20240131084840-12d96a19d482 h1:
 github.com/testit-tms/adapters-go/pkg/tms v0.0.0-20240131084840-12d96a19d482/go.mod h1:IG8f12rZo58WCNcwdPmehiZrSQ70dTsuo4kLQ1zQt3w=
 github.com/testit-tms/api-client-golang v1.1.2 h1:hvGYLmERYNedcyRXe/+MV7i4OmdHCYThTCKcuYGFM8g=
 github.com/testit-tms/api-client-golang v1.1.2/go.mod h1:ei6jselOToVrifT9Bq3zDIFWKTBB/IWwITf4lJ3oUbs=
+github.com/testit-tms/api-client-golang v1.4.0 h1:nx43O6FzQXxqE1H3e6J3kKpQfxPOoJMav9MVFWOwmvA=
+github.com/testit-tms/api-client-golang v1.4.0/go.mod h1:ei6jselOToVrifT9Bq3zDIFWKTBB/IWwITf4lJ3oUbs=
 golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 h1:Di6/M8l0O2lCLc6VVRWhgCiApHV8MnQurBnFSHsQtNY=
 golang.org/x/exp v0.0.0-20230725093048-515e97ebf090/go.mod h1:FXUEEKJgO7OQYeo8N01OfiKP8RXMtf6e8aTskBGqWdc=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
