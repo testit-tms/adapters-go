@@ -7,11 +7,18 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/testit-tms/adapters-go/pkg/tms/config"
 	tmsclient "github.com/testit-tms/api-client-golang"
 	"golang.org/x/exp/slog"
+)
+
+const (
+	maxTries    = 10
+	waitingTime = 100
 )
 
 type tmsClient struct {
@@ -97,16 +104,54 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 	}
 
 	if len(test.workItemIds) != 0 {
+		var linkedWorkItems []tmsclient.WorkItemIdentifierModel
+		linkedWorkItems, r, err = c.client.AutoTestsApi.GetWorkItemsLinkedToAutoTest(ctx, autotestID).
+			Execute()
+
+		if err != nil {
+			logger.Error("failed to get linked workitems to autotest", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		}
+
+		for _, v := range linkedWorkItems {
+			var linkedWorkItemId string = strconv.Itoa(int(v.GetGlobalId()))
+			var index int = getIndex(test.workItemIds, linkedWorkItemId)
+
+			if index != -1 {
+				test.workItemIds = remove(test.workItemIds, index)
+
+				continue
+			}
+
+			if c.cfg.AutomaticUpdationLinksToTestCases {
+				for i := 0; i < maxTries; i++ {
+					r, err = c.client.AutoTestsApi.DeleteAutoTestLinkFromWorkItem(ctx, autotestID).
+						WorkItemId(linkedWorkItemId).
+						Execute()
+					if err != nil {
+						logger.Error("failed to unlink autotest from workitem", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+						time.Sleep(waitingTime * time.Millisecond)
+					} else {
+						break
+					}
+				}
+			}
+		}
+
 		for _, v := range test.workItemIds {
 			logger.Debug("link autotest to workitem", "workItemId", v, "autotestId", autotestID)
-			r, err = c.client.AutoTestsApi.LinkAutoTestToWorkItem(ctx, autotestID).
-				LinkAutoTestToWorkItemRequest(tmsclient.LinkAutoTestToWorkItemRequest{
-					Id: v,
-				}).
-				Execute()
-		}
-		if err != nil {
-			logger.Error("failed to link autotest to workitem", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+			for i := 0; i < maxTries; i++ {
+				r, err = c.client.AutoTestsApi.LinkAutoTestToWorkItem(ctx, autotestID).
+					LinkAutoTestToWorkItemRequest(tmsclient.LinkAutoTestToWorkItemRequest{
+						Id: v,
+					}).
+					Execute()
+				if err != nil {
+					logger.Error("failed to link autotest to workitem", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+					time.Sleep(waitingTime * time.Millisecond)
+				} else {
+					break
+				}
+			}
 		}
 	}
 
@@ -177,6 +222,19 @@ func respToString(r io.ReadCloser) string {
 		return ""
 	}
 	return string(respBytes)
+}
+
+func getIndex(list []string, item string) int {
+	for i := 0; i < len(list); i++ {
+		if item == list[i] {
+			return i
+		}
+	}
+	return -1
+}
+
+func remove(slice []string, s int) []string {
+	return append(slice[:s], slice[s+1:]...)
 }
 
 func (c *tmsClient) updateTest(test testResult) error {
