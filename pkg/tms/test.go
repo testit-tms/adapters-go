@@ -119,5 +119,7 @@ func newTestResult(m TestMetadata, t *testing.T) *testResult {
 		testResult.externalId = hex.EncodeToString(hash[:])
 	}
 
+	testResult.externalKey = t.Name()
+
 	return testResult
 }
