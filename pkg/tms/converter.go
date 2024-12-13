@@ -62,6 +62,8 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.CreateAuto
 		req.SetSetup(stepToAutoTestStepModel(test.setups))
 	}
 
+	req.SetExternalKey(test.externalKey)
+
 	return *req
 }
 
@@ -143,8 +145,9 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel
 		req.SetTeardown(stepToAutoTestStepModel(test.teardowns))
 	}
 
+	req.SetExternalKey(test.externalKey)
 	req.SetIsFlaky(*autotest.IsFlaky.Get())
-	req.SetId(*autotest.Id)
+	req.SetId(*&autotest.Id)
 
 	return *req
 }
@@ -349,7 +352,7 @@ func testToUpdateResultModel(model *tmsclient.TestResultModel, test testResult) 
 		req.SetAttachments(attachs)
 	}
 
-	req.SetOutcome(test.status)
+	req.SetOutcome(tmsclient.TestResultOutcome(test.status))
 
 	return *req, nil
 }

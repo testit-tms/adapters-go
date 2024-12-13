@@ -11,7 +11,7 @@ require (
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/ilyakaznacheev/cleanenv v1.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/testit-tms/api-client-golang v1.1.2 // indirect
+	github.com/testit-tms/api-client-golang v1.2.0 // indirect
 	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 // indirect
 )
 

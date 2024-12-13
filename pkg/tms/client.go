@@ -87,7 +87,7 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 			return "", fmt.Errorf("%s: failed to create new autotest: %w", op, err)
 		}
 
-		autotestID = *na.Id
+		autotestID = *&na.Id
 	} else {
 		ur := testToUpdateAutotestModel(test, resp[0])
 		logger.Debug("update existing autotest", "request", ur)
@@ -100,7 +100,7 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 			return "", fmt.Errorf("%s: failed to update existing autotest: %w", op, err)
 		}
 
-		autotestID = *resp[0].Id
+		autotestID = *&resp[0].Id
 	}
 
 	if len(test.workItemIds) != 0 {
