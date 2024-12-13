@@ -147,7 +147,7 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel
 
 	req.SetExternalKey(test.externalKey)
 	req.SetIsFlaky(*autotest.IsFlaky.Get())
-	req.SetId(*&autotest.Id)
+	req.SetId(autotest.Id)
 
 	return *req
 }
