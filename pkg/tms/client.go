@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/testit-tms/adapters-go/pkg/tms/config"
-	tmsclient "github.com/testit-tms/api-client-golang"
+	tmsclient "github.com/testit-tms/api-client-golang/v3"
 	"golang.org/x/exp/slog"
 )
 
@@ -63,8 +63,8 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 
 	logger.Debug("searching for test", "externalId", test.externalId, slog.String("op", op))
 	sr := getSearchRequest(test.externalId, c.cfg.ProjectId)
-	resp, r, err := c.client.AutoTestsApi.ApiV2AutoTestsSearchPost(ctx).
-		ApiV2AutoTestsSearchPostRequest(sr).
+	resp, r, err := c.client.AutoTestsAPI.ApiV2AutoTestsSearchPost(ctx).
+		AutoTestSearchApiModel(sr).
 		Execute()
 	if err != nil {
 		logger.Error("failed to search for test", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
@@ -79,8 +79,8 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 		}
 
 		logger.Debug("create new autotest", "request", cr)
-		na, _, err := c.client.AutoTestsApi.CreateAutoTest(ctx).
-			CreateAutoTestRequest(cr).
+		na, _, err := c.client.AutoTestsAPI.CreateAutoTest(ctx).
+			AutoTestPostModel(cr).
 			Execute()
 
 		if err != nil {
@@ -92,8 +92,8 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 	} else {
 		ur := testToUpdateAutotestModel(test, resp[0])
 		logger.Debug("update existing autotest", "request", ur)
-		r, err = c.client.AutoTestsApi.UpdateAutoTest(ctx).
-			UpdateAutoTestRequest(ur).
+		r, err = c.client.AutoTestsAPI.UpdateAutoTest(ctx).
+			AutoTestPutModel(ur).
 			Execute()
 
 		if err != nil {
@@ -106,7 +106,7 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 
 	if len(test.workItemIds) != 0 {
 		var linkedWorkItems []tmsclient.WorkItemIdentifierModel
-		linkedWorkItems, r, err = c.client.AutoTestsApi.GetWorkItemsLinkedToAutoTest(ctx, autotestID).
+		linkedWorkItems, r, err = c.client.AutoTestsAPI.GetWorkItemsLinkedToAutoTest(ctx, autotestID).
 			Execute()
 
 		if err != nil {
@@ -125,7 +125,7 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 
 			if c.cfg.AutomaticUpdationLinksToTestCases {
 				for i := 0; i < maxTries; i++ {
-					r, err = c.client.AutoTestsApi.DeleteAutoTestLinkFromWorkItem(ctx, autotestID).
+					r, err = c.client.AutoTestsAPI.DeleteAutoTestLinkFromWorkItem(ctx, autotestID).
 						WorkItemId(linkedWorkItemId).
 						Execute()
 					if err != nil {
@@ -141,11 +141,10 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 		for _, v := range test.workItemIds {
 			logger.Debug("link autotest to workitem", "workItemId", v, "autotestId", autotestID)
 			for i := 0; i < maxTries; i++ {
-				r, err = c.client.AutoTestsApi.LinkAutoTestToWorkItem(ctx, autotestID).
-					LinkAutoTestToWorkItemRequest(tmsclient.LinkAutoTestToWorkItemRequest{
+				r, err = c.client.AutoTestsAPI.LinkAutoTestToWorkItem(ctx, autotestID).
+					WorkItemIdModel(tmsclient.WorkItemIdModel{
 						Id: v,
-					}).
-					Execute()
+					}).Execute()
 				if err != nil {
 					logger.Error("failed to link autotest to workitem", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
 					time.Sleep(waitingTime * time.Millisecond)
@@ -162,7 +161,7 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 		return "", fmt.Errorf("%s: failed to convert test to result model: %w", op, err)
 	}
 	logger.Debug("upload result to test run", "request", rr)
-	ids, r, err := c.client.TestRunsApi.SetAutoTestResultsForTestRun(ctx, c.cfg.TestRunId).
+	ids, r, err := c.client.TestRunsAPI.SetAutoTestResultsForTestRun(ctx, c.cfg.TestRunId).
 		AutoTestResultsForTestRunModel(rr).
 		Execute()
 
@@ -199,7 +198,7 @@ func (c *tmsClient) writeAttachments(paths ...string) []string {
 			logger.Error("failed to open file", "error", err)
 			continue
 		}
-		resp, r, err := c.client.AttachmentsApi.ApiV2AttachmentsPost(ctx).
+		resp, r, err := c.client.AttachmentsAPI.ApiV2AttachmentsPost(ctx).
 			File(f).
 			Execute()
 
@@ -251,8 +250,8 @@ func (c *tmsClient) updateTest(test testResult) error {
 
 	logger.Debug("searching for test", "externalId", test.externalId)
 	sr := getSearchRequest(test.externalId, c.cfg.ProjectId)
-	resp, r, err := c.client.AutoTestsApi.ApiV2AutoTestsSearchPost(ctx).
-		ApiV2AutoTestsSearchPostRequest(sr).
+	resp, r, err := c.client.AutoTestsAPI.ApiV2AutoTestsSearchPost(ctx).
+		AutoTestSearchApiModel(sr).
 		Execute()
 
 	if err != nil {
@@ -262,8 +261,8 @@ func (c *tmsClient) updateTest(test testResult) error {
 
 	ur := testToUpdateAutotestModel(test, resp[0])
 
-	r, err = c.client.AutoTestsApi.UpdateAutoTest(ctx).
-		UpdateAutoTestRequest(ur).
+	r, err = c.client.AutoTestsAPI.UpdateAutoTest(ctx).
+		AutoTestPutModel(ur).
 		Execute()
 
 	if err != nil {
@@ -285,7 +284,7 @@ func (c *tmsClient) updateTestResult(resultId string, test testResult) error {
 		},
 	})
 
-	m, r, err := c.client.TestResultsApi.ApiV2TestResultsIdGet(ctx, resultId).Execute()
+	m, r, err := c.client.TestResultsAPI.ApiV2TestResultsIdGet(ctx, resultId).Execute()
 	if err != nil {
 		logger.Error("failed to get test result", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
 		return fmt.Errorf("%s: failed to get test result: %w", op, err)
@@ -299,8 +298,8 @@ func (c *tmsClient) updateTestResult(resultId string, test testResult) error {
 
 	logger.Debug("update test result", "request", ur, slog.String("op", op))
 
-	r, err = c.client.TestResultsApi.ApiV2TestResultsIdPut(ctx, resultId).
-		ApiV2TestResultsIdPutRequest(ur).
+	r, err = c.client.TestResultsAPI.ApiV2TestResultsIdPut(ctx, resultId).
+		TestResultUpdateV2Request(ur).
 		Execute()
 
 	if err != nil {

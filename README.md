@@ -1,5 +1,13 @@
 # Test IT TMS Adapter for Golang
 
+
+## Compatibility
+
+| Test IT | Adapters-Go |
+|---------|-------------|
+| Cloud   | v0.3.0      |
+
+
 ## Getting Started
 
 ### Installation
