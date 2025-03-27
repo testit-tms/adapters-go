@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"strconv"
 
-	tmsclient "github.com/testit-tms/api-client-golang"
+	tmsclient "github.com/testit-tms/api-client-golang/v3"
 )
 
-func testToAutotestModel(test testResult, projectId string) tmsclient.CreateAutoTestRequest {
-	req := tmsclient.NewCreateAutoTestRequest(test.externalId, projectId, test.displayName)
+// TODO: validate that hasInfo always true is correct
+const defaultHasInfo = true
+
+func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestPostModel {
+	req := tmsclient.NewAutoTestPostModel(test.externalId, projectId, test.displayName)
 	req.SetTitle(test.title)
 
 	if test.description != "" {
@@ -36,7 +39,8 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.CreateAuto
 	if len(test.links) != 0 {
 		links := make([]tmsclient.LinkPostModel, 0, len(test.links))
 		for _, link := range test.links {
-			l := tmsclient.NewLinkPostModel(link.Url)
+
+			l := tmsclient.NewLinkPostModel(link.Url, defaultHasInfo)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 
@@ -83,8 +87,8 @@ func stepToAutoTestStepModel(s []stepresult) []tmsclient.AutoTestStepModel {
 	return steps
 }
 
-func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel) tmsclient.UpdateAutoTestRequest {
-	req := tmsclient.NewUpdateAutoTestRequest(test.externalId, autotest.ProjectId, test.displayName)
+func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiResult) tmsclient.AutoTestPutModel {
+	req := tmsclient.NewAutoTestPutModel(test.externalId, autotest.ProjectId, test.displayName)
 
 	if test.description != "" {
 		req.SetDescription(test.description)
@@ -115,7 +119,7 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel
 	if len(test.links) != 0 {
 		links := make([]tmsclient.LinkPutModel, 0, len(test.links))
 		for _, link := range test.links {
-			l := tmsclient.NewLinkPutModel(link.Url)
+			l := tmsclient.NewLinkPutModel(link.Url, defaultHasInfo)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 
@@ -146,7 +150,7 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestModel
 	}
 
 	req.SetExternalKey(test.externalKey)
-	req.SetIsFlaky(*autotest.IsFlaky.Get())
+	req.SetIsFlaky(autotest.IsFlaky)
 	req.SetId(autotest.Id)
 
 	return *req
@@ -183,7 +187,7 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 	if len(test.resultLinks) != 0 {
 		links := make([]tmsclient.LinkPostModel, 0, len(test.resultLinks))
 		for _, link := range test.resultLinks {
-			l := tmsclient.NewLinkPostModel(link.Url)
+			l := tmsclient.NewLinkPostModel(link.Url, defaultHasInfo)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 			if link.LinkType != "" {
@@ -309,30 +313,30 @@ func parseValueParameter(value interface{}) string {
 	}
 }
 
-func getSearchRequest(externalID, projectID string) tmsclient.ApiV2AutoTestsSearchPostRequest {
-	f := tmsclient.NewAutotestsSelectModelFilter()
+func getSearchRequest(externalID, projectID string) tmsclient.AutoTestSearchApiModel {
+	f := tmsclient.NewAutoTestFilterApiModel()
 	f.SetExternalIds([]string{externalID})
 	f.SetProjectIds([]string{projectID})
 	f.SetIsDeleted(false)
 
-	req := tmsclient.NewApiV2AutoTestsSearchPostRequest()
+	req := tmsclient.NewAutoTestSearchApiModel()
 	req.SetFilter(*f)
 
 	return *req
 }
 
-func testToUpdateResultModel(model *tmsclient.TestResultModel, test testResult) (tmsclient.ApiV2TestResultsIdPutRequest, error) {
+func testToUpdateResultModel(model *tmsclient.TestResultResponse, test testResult) (tmsclient.TestResultUpdateV2Request, error) {
 	tearDowns, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.teardowns)
 	if err != nil {
-		return tmsclient.ApiV2TestResultsIdPutRequest{}, err
+		return tmsclient.TestResultUpdateV2Request{}, err
 	}
 
 	setups, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.setups)
 	if err != nil {
-		return tmsclient.ApiV2TestResultsIdPutRequest{}, err
+		return tmsclient.TestResultUpdateV2Request{}, err
 	}
 
-	req := tmsclient.NewApiV2TestResultsIdPutRequest()
+	req := tmsclient.NewTestResultUpdateV2Request()
 	req.SetTeardownResults(tearDowns)
 	req.SetSetupResults(setups)
 
@@ -343,9 +347,9 @@ func testToUpdateResultModel(model *tmsclient.TestResultModel, test testResult) 
 	req.SetComment(model.GetComment())
 
 	if len(model.Attachments) != 0 {
-		attachs := make([]tmsclient.AttachmentPutModel, 0, len(model.Attachments))
+		attachs := make([]tmsclient.AttachmentUpdateRequest, 0, len(model.Attachments))
 		for _, attach := range model.Attachments {
-			a := tmsclient.NewAttachmentPutModel(attach.Id)
+			a := tmsclient.NewAttachmentUpdateRequest(attach.Id)
 			attachs = append(attachs, *a)
 		}
 
