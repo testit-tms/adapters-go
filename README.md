@@ -47,7 +47,7 @@ Create **tms.config.json** file in the project directory:
   "automaticCreationTestCases": false,
   "automaticUpdationLinksToTestCases": false,
   "certValidation": true,
-  "adapterMode": 1,
+  "adapterMode": "1",
   "isDebug": true
 }
 ```
@@ -87,7 +87,7 @@ testit \
 ```
 
 ### Run with filter
-To create filter by autotests you can use the Test IT CLI (use adapterMode 1 for run with filter):
+To create filter by autotests you can use the Test IT CLI (use adapterMode "1" for run with filter):
 
 ```
 $ export TMS_TOKEN=<YOUR_TOKEN>
