@@ -178,6 +178,32 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 	return ids[0], nil
 }
 
+// return test run id
+func (c *tmsClient) createTestRun() string {
+	const op = "tmsClient.createTestRun"
+	logger := logger.With("op", op)
+
+	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
+		"Bearer or PrivateToken": {
+			Key:    c.cfg.Token,
+			Prefix: "PrivateToken",
+		},
+	})
+
+	model := tmsclient.NewCreateEmptyTestRunApiModel(c.cfg.ProjectId)
+
+	testRun, r, err := c.client.TestRunsAPI.CreateEmpty(ctx).
+		CreateEmptyTestRunApiModel(*model).
+		Execute()
+
+	if err != nil {
+		logger.Error("failed to create test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		return ""
+	}
+
+	return testRun.Id
+}
+
 func (c *tmsClient) writeAttachments(paths ...string) []string {
 	const op = "tmsClient.writeAttachment"
 	logger := logger.With("op", op)

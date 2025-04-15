@@ -24,12 +24,21 @@ const (
 
 func init() {
 	cfg = config.MustLoad()
-	client = newClient(*cfg)
 	logger = slog.New(
 		slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: getLogLevel(cfg.IsDebug)}),
 	)
+	client = newClient(*cfg)
+	if cfg.AdapterMode == "2" {
+		callCreateTestRun(client, cfg)
+	}
 	ctxMgr = gls.NewContextManager()
 	testPhaseObjects = make(map[string]*testPhaseContainer)
+}
+
+func callCreateTestRun(client *tmsClient, cfg *config.Config) {
+	cfg.TestRunId = client.createTestRun()
+	client.cfg.TestRunId = cfg.TestRunId
+	print("test run id: ", cfg.TestRunId)
 }
 
 func getLogLevel(b bool) slog.Level {
