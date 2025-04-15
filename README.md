@@ -5,7 +5,12 @@
 
 | Test IT | Adapters-Go |
 |---------|-------------|
-| Cloud   | v0.3.0      |
+| 5.2.5   | v0.3.1      |
+| Cloud   | v0.3.1      |
+
+For other versions compatibility check api-client compatibility - 
+https://github.com/testit-tms/api-client-golang  
+and previous version of adapter
 
 
 ## Getting Started
@@ -68,7 +73,7 @@ the [Test IT CLI](https://docs.testit.software/user-guide/integrations/cli.html)
 ```bash
 export TMS_TOKEN=<YOUR_TOKEN>
 testit \
-  --mode create
+  testrun create
   --url https://tms.testit.software \
   --project-id 5236eb3f-7c05-46f9-a609-dc0278896464 \
   --testrun-name "New test run" \
