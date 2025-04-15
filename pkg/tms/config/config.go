@@ -19,7 +19,7 @@ type Config struct {
 	Token                             string `json:"privateToken" env-required:"true" env:"TMS_PRIVATE_TOKEN"`
 	ProjectId                         string `json:"projectId" env-required:"true" env:"TMS_PROJECT_ID"`
 	ConfigurationId                   string `json:"configurationId" env-required:"true" env:"TMS_CONFIGURATION_ID"`
-	TestRunId                         string `json:"testRunId" env-required:"true" env:"TMS_TEST_RUN_ID"`
+	TestRunId                         string `json:"testRunId" env:"TMS_TEST_RUN_ID"`
 	AdapterMode                       string `json:"adapterMode" env:"TMS_ADAPTER_MODE" env-default:"0"`
 	IsDebug                           bool   `json:"isDebug" env:"TMS_IS_DEBUG" env-default:"false"`
 	AutomaticCreationTestCases        bool   `json:"automaticCreationTestCases" env:"TMS_AUTOMATIC_CREATION_TEST_CASES" env-default:"false"`
@@ -62,7 +62,7 @@ func validateConfig(cfg Config) {
 		panic("Private token is invalid")
 	}
 
-	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
+	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$")
 
 	if !r.MatchString(cfg.ProjectId) {
 		panic("Project id is invalid")
@@ -78,9 +78,8 @@ func validateConfig(cfg Config) {
 	}
 
 	if adapterMode == 2 {
-		if r.MatchString(cfg.TestRunId) {
-			panic("Adapter works in mode 2. Config should not contains test run id")
-		}
+		// TODO: fix adapterMode 2 results
+		panic("Unfortunately now adapter is not working well in adapterMode 2, please use 0 or 1 mode")
 	} else if adapterMode == 1 {
 		if !r.MatchString(cfg.TestRunId) {
 			panic("Adapter works in mode 1. Config should contains valid test run id")
