@@ -78,8 +78,9 @@ func validateConfig(cfg Config) {
 	}
 
 	// adapter mode 2 - test run id is created automatically
-
-	if adapterMode == 1 {
+	if adapterMode == 2 {
+		// do nothing
+	} else if adapterMode == 1 {
 		if !r.MatchString(cfg.TestRunId) {
 			panic("Adapter works in mode 1. Config should contains valid test run id")
 		}
