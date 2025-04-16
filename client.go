@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/testit-tms/adapters-go/pkg/tms/config"
+	"github.com/testit-tms/adapters-go/config"
 	tmsclient "github.com/testit-tms/api-client-golang/v3"
 	"golang.org/x/exp/slog"
 )
