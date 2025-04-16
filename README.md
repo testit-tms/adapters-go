@@ -3,10 +3,11 @@
 
 ## Compatibility
 
-| Test IT | Adapters-Go |
-|---------|-------------|
-| 5.2.5   | v0.3.2      |
-| Cloud   | v0.3.2      |
+| Test IT | Adapters-Go         |
+|---------|---------------------|
+| 5.2.5   | v0.3.2              |
+| 5.3     | v0.3.3-tms-5.3      |
+| Cloud   | v0.3.2              |
 
 For other versions compatibility check api-client compatibility - 
 https://github.com/testit-tms/api-client-golang  
