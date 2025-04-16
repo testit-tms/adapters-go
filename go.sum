@@ -16,8 +16,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
-github.com/testit-tms/api-client-golang/v3 v3.0.0 h1:xtafH3OFcBQVRkwaik3TN2UIKLIIWYHggDP2bD4bVfg=
-github.com/testit-tms/api-client-golang/v3 v3.0.0/go.mod h1:lk1QmF1QNSkSK18bzPYH2lqqhnvZzoYZJ0Vkt76HwTo=
+github.com/testit-tms/api-client-golang/v3 v3.0.1-tms-5.3 h1:oOg05WHOt0SY/DCjSPH6z9Qq16JNYjD0T3r+QAPK8lw=
+github.com/testit-tms/api-client-golang/v3 v3.0.1-tms-5.3/go.mod h1:lk1QmF1QNSkSK18bzPYH2lqqhnvZzoYZJ0Vkt76HwTo=
 golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 h1:Di6/M8l0O2lCLc6VVRWhgCiApHV8MnQurBnFSHsQtNY=
 golang.org/x/exp v0.0.0-20230725093048-515e97ebf090/go.mod h1:FXUEEKJgO7OQYeo8N01OfiKP8RXMtf6e8aTskBGqWdc=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=

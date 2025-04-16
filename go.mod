@@ -20,7 +20,7 @@ require (
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
-	github.com/testit-tms/api-client-golang/v3 v3.0.0 // indirect
+	github.com/testit-tms/api-client-golang/v3 v3.0.1-tms-5.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
