@@ -19,7 +19,7 @@ and previous version of adapter
 ### Installation
 
 ```bash
-go get github.com/testit-tms/adapters-go/pkg/tms
+go get github.com/testit-tms/adapters-go@<necessary package version>
 ```
 
 ## Usage
