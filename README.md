@@ -138,10 +138,12 @@ Description of methods:
 #### Simple test
 
 ```go
+package examples
+
 import (
 "testing"
 
-"github.com/testit-tms/adapters-go/pkg/tms"
+"github.com/testit-tms/adapters-go"
 )
 
 func TestSteps_Success(t *testing.T) {
@@ -193,10 +195,12 @@ tms.True(t, true)
 #### Parameterized test
 
 ```go
+package examples
+
 import (
 "testing"
 
-"github.com/testit-tms/adapters-go/pkg/tms"
+"github.com/testit-tms/adapters-go"
 )
 
 func TestParameters_success(t *testing.T) {
