@@ -5,9 +5,9 @@
 
 | Test IT | Adapters-Go         |
 |---------|---------------------|
-| 5.2.5   | v0.3.4              |
+| 5.2.5   | v0.3.5              |
 | 5.3     | v0.3.4-tms-5.3      |
-| Cloud   | v0.3.4              |
+| Cloud   | v0.3.5              |
 
 For other versions compatibility check api-client compatibility - 
 https://github.com/testit-tms/api-client-golang  
@@ -57,6 +57,13 @@ Create **tms.config.json** file in the project directory:
   "isDebug": true
 }
 ```
+
+Alternatively to set TMS_CONFIG_FILE you can place your `tms.config.json` file 
+
+to the folder with `_test.go` files you are want to work with, 
+
+but for multifolder structure 
+`TMS_CONFIG_FILE` is prefered.
 
 ### How to run
 

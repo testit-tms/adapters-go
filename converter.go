@@ -7,8 +7,9 @@ import (
 	tmsclient "github.com/testit-tms/api-client-golang/v3"
 )
 
-// TODO: validate that hasInfo always true is correct
-const defaultHasInfo = true
+// hasInfo is about integrations with other systems,
+// by default it is false
+const defaultHasInfo = false
 
 func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestPostModel {
 	req := tmsclient.NewAutoTestPostModel(test.externalId, projectId, test.displayName)
@@ -36,27 +37,8 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestPo
 		req.SetLabels(labels)
 	}
 
-	if len(test.links) != 0 {
-		links := make([]tmsclient.LinkPostModel, 0, len(test.links))
-		for _, link := range test.links {
-
-			l := tmsclient.NewLinkPostModel(link.Url, defaultHasInfo)
-			l.SetTitle(link.Title)
-			l.SetDescription(link.Description)
-
-			if link.LinkType != "" {
-				linkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
-				if err != nil {
-					logger.Error("error converting link type", "error", err)
-				} else {
-					l.SetType(*linkType)
-				}
-			}
-
-			links = append(links, *l)
-		}
-		req.SetLinks(links)
-	}
+	links_post_models := resultLinksToLinkPostModels(test.links)
+	req.SetLinks(links_post_models)
 
 	if len(test.steps) != 0 {
 		req.SetSteps(stepToAutoTestStepModel(test.steps))
@@ -184,24 +166,8 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 		req.SetSetupResults(steps)
 	}
 
-	if len(test.resultLinks) != 0 {
-		links := make([]tmsclient.LinkPostModel, 0, len(test.resultLinks))
-		for _, link := range test.resultLinks {
-			l := tmsclient.NewLinkPostModel(link.Url, defaultHasInfo)
-			l.SetTitle(link.Title)
-			l.SetDescription(link.Description)
-			if link.LinkType != "" {
-				linkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
-				if err != nil {
-					logger.Error("error converting link type", "error", err)
-				} else {
-					l.SetType(*linkType)
-				}
-			}
-			links = append(links, *l)
-		}
-		req.SetLinks(links)
-	}
+	links := resultLinksToLinkPostModels(test.resultLinks)
+	req.SetLinks(links)
 
 	if len(test.attachments) != 0 {
 		attachs := make([]tmsclient.AttachmentPutModel, 0, len(test.attachments))
@@ -221,6 +187,30 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 	}
 
 	return []tmsclient.AutoTestResultsForTestRunModel{*req}, nil
+}
+
+func resultLinksToLinkPostModels(source []Link) []tmsclient.LinkPostModel {
+	if len(source) == 0 {
+		return []tmsclient.LinkPostModel{}
+	}
+
+	links := make([]tmsclient.LinkPostModel, 0, len(source))
+	for _, link := range source {
+		l := tmsclient.NewLinkPostModel(link.Url, defaultHasInfo)
+		l.SetTitle(link.Title)
+		l.SetDescription(link.Description)
+		if link.LinkType != "" {
+			linkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
+			if err != nil {
+				logger.Error("error converting link type", "error", err)
+			} else {
+				l.SetType(*linkType)
+			}
+		}
+		links = append(links, *l)
+	}
+
+	return links
 }
 
 func stepToAttachmentPutModelAutoTestStepResultsModel(s []stepresult) ([]tmsclient.AttachmentPutModelAutoTestStepResultsModel, error) {

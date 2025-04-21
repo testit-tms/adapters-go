@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 
@@ -13,6 +14,15 @@ import (
 const (
 	configFile = "tms.config.json"
 )
+
+func getDefaultConfigPath() string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Cannot get current working directory: %s", err)
+	}
+
+	return filepath.Join(cwd, configFile)
+}
 
 type Config struct {
 	Url                               string `json:"url" env-required:"true" env:"TMS_URL"`
@@ -29,22 +39,25 @@ type Config struct {
 
 func MustLoad() *Config {
 	configPath := os.Getenv("TMS_CONFIG_FILE")
-	if configPath == "" {
-		log.Fatal("TMS_CONFIG_FILE is not set")
-	}
 
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		log.Fatalf("config file does not exist: %s", configPath)
+	if configPath == "" {
+		// If not provided, try to find it in current working directory
+		configPath = getDefaultConfigPath()
+
+		// Check if file exists
+		if _, err := os.Stat(configPath); os.IsNotExist(err) {
+			log.Fatalf("TMS_CONFIG_FILE is not set and config file not found in the current directory: %s", configFile)
+		}
 	}
 
 	var cfg Config
 
 	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
-		log.Fatalf("cannot read config: %s", err)
+		log.Fatalf("Cannot read config: %s", err)
 	}
 
 	if err := cleanenv.UpdateEnv(&cfg); err != nil {
-		log.Fatalf("cannot update config: %s", err)
+		log.Fatalf("Cannot update config: %s", err)
 	}
 
 	validateConfig(cfg)

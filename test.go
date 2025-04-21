@@ -20,6 +20,7 @@ type TestMetadata struct {
 	Description string
 	DisplayName string
 	Parameters  map[string]interface{}
+	// should be parsed only to testResult.resultLinks, not to testResult.links
 	Links       []Link
 	Labels      []string
 	ExternalId  string
@@ -80,7 +81,8 @@ func newTestResult(m TestMetadata, t *testing.T) *testResult {
 		nameSpace:   m.NameSpace,
 		description: m.Description,
 		title:       m.Title,
-		links:       m.Links,
+		// should be parsed only to testResult.resultLinks, not to testResult.links
+		resultLinks: m.Links,
 		labels:      m.Labels,
 		externalId:  m.ExternalId,
 		workItemIds: m.WorkItemIds,
