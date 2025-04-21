@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 
@@ -30,7 +31,12 @@ type Config struct {
 func MustLoad() *Config {
 	configPath := os.Getenv("TMS_CONFIG_FILE")
 	if configPath == "" {
-		log.Fatal("TMS_CONFIG_FILE is not set")
+		// If not provided, try to find it in current working directory
+		configPath = getDefaultConfigPath()
+		// Check if file exists
+		if _, err := os.Stat(configPath); os.IsNotExist(err) {
+			log.Fatalf("TMS_CONFIG_FILE is not set and config file not found in the current directory: %s", configFile)
+		}
 	}
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
@@ -91,4 +97,13 @@ func validateConfig(cfg Config) {
 	} else {
 		panic("Adapter mode is invalid")
 	}
+}
+
+func getDefaultConfigPath() string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Cannot get current working directory: %s", err)
+	}
+
+	return filepath.Join(cwd, configFile)
 }
