@@ -58,6 +58,14 @@ Create **tms.config.json** file in the project directory:
 }
 ```
 
+Alternatively to set TMS_CONFIG_FILE you can place your `tms.config.json` file 
+
+to the folder with `_test.go` files you are want to work with, 
+
+but for multifolder structure 
+`TMS_CONFIG_FILE` is prefered.
+
+
 ### How to run
 
 If you specified TestRunId, then just run the command:
