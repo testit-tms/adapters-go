@@ -5,9 +5,9 @@
 
 | Test IT | Adapters-Go         |
 |---------|---------------------|
-| 5.2.5   | v0.3.4              |
+| 5.2.5   | v0.3.5              |
 | 5.3     | v0.3.4-tms-5.3      |
-| Cloud   | v0.3.4              |
+| Cloud   | v0.3.5              |
 
 For other versions compatibility check api-client compatibility - 
 https://github.com/testit-tms/api-client-golang  
@@ -131,17 +131,19 @@ Description of metadata:
 * `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
 * `Description` - autotest description specified in the autotest card
 * `Labels` - tags listed in the autotest card
-* `Links` - links listed in the autotest card
+* `Links` - links listed in the autotest card ( not in the TestResult card. Additionally, there is URL validation on Link.Url and it's must be a correct URL. )
 * `Step` - the designation of the step
 
 Description of methods:
 
-* `tms.AddLinks` - add links to the autotest result.
+* `tms.AddLinks` - add links to the autotest TestResult (not the autotest card, for card see `TestMetadata.Links`. Additionally, there is URL validation on Link.Url and it's must be a correct URL. ).
 * `tms.AddAttachments` - add attachments to the autotest result.
 * `tms.AddAtachmentsFromString` - add attachments from string to the autotest result.
 * `tms.AddMessage` - add message to the autotest result.
 
 ### Examples
+
+More examples and project there: https://github.com/testit-tms/go-examples 
 
 #### Simple test
 
@@ -149,54 +151,89 @@ Description of methods:
 package examples
 
 import (
-"testing"
+  "testing"
 
-"github.com/testit-tms/adapters-go"
+  "github.com/testit-tms/adapters-go"
 )
+
 
 func TestSteps_Success(t *testing.T) {
-tms.Test(t,
-tms.TestMetadata{
-DisplayName: "steps success",
-},
-func () {
-tms.Step(
-tms.StepMetadata{
-Name:        "step 1",
-Description: "step 1 description",
-},
-func () {
-tms.Step(tms.StepMetadata{
-Name:        "step 1.1",
-Description: "step 1.1 description",
-}, func () {
-tms.Step(tms.StepMetadata{}, func () {
-tms.True(t, true)
-})
-tms.True(t, true)
-})
-tms.True(t, true)
-},
-)
-tms.Step(
-tms.StepMetadata{
-Name:        "step 2",
-Description: "step 2 description",
-},
-func () {
-tms.Step(tms.StepMetadata{
-Name:        "step 2.1",
-Description: "step 2.1 description",
-}, func () {
-tms.Step(tms.StepMetadata{}, func () {
-tms.True(t, true)
-})
-tms.True(t, true)
-})
-tms.True(t, true)
-},
-)
-})
+
+	// links at the autotest card
+	links := []tms.Link{{
+		Url:         "http://google.com",
+		Title:       "Link title",
+		Description: "Link description",
+		LinkType:    "Requirement",
+	}}
+
+	labels := []string{"Test labels"}
+	parameters := map[string]interface{}{
+		"param1": "value1",
+	}
+
+	tms.Test(t,
+		tms.TestMetadata{
+			DisplayName: "steps success",
+			// Links for autotest card
+			Links:      links,
+			Labels:     labels,
+			Parameters: parameters,
+			// other properties...
+		},
+		func() {
+
+			// for TestResult attachment
+			// tms.AddAtachments("tms.config.json")
+
+			// add links to TestResult
+			tms.AddLinks(tms.Link{
+				Url:         "https://testit.software",
+				Title:       "Link title",
+				Description: "Link description",
+				LinkType:    tms.LINKTYPE_RELATED,
+			})
+			// add message to TestResult
+			tms.AddMessage("Test Message")
+
+			// step declaration
+			tms.Step(
+				tms.StepMetadata{
+					Name:        "step 1",
+					Description: "step 1 description",
+				},
+				func() {
+					tms.Step(tms.StepMetadata{
+						Name:        "step 1.1",
+						Description: "step 1.1 description",
+					}, func() {
+						tms.Step(tms.StepMetadata{}, func() {
+							tms.True(t, true)
+						})
+						tms.True(t, true)
+					})
+					tms.True(t, true)
+				},
+			)
+			tms.Step(
+				tms.StepMetadata{
+					Name:        "step 2",
+					Description: "step 2 description",
+				},
+				func() {
+					tms.Step(tms.StepMetadata{
+						Name:        "step 2.1",
+						Description: "step 2.1 description",
+					}, func() {
+						tms.Step(tms.StepMetadata{}, func() {
+							tms.True(t, true)
+						})
+						tms.True(t, true)
+					})
+					tms.True(t, true)
+				},
+			)
+		})
 }
 ```
 
@@ -206,62 +243,62 @@ tms.True(t, true)
 package examples
 
 import (
-"testing"
+  "testing"
 
-"github.com/testit-tms/adapters-go"
+  "github.com/testit-tms/adapters-go"
 )
 
 func TestParameters_success(t *testing.T) {
-tests := []struct {
-name           string
-parameters     map[string]interface{}
-stepName       string
-stepParameters map[string]interface{}
-expValue       bool
-}{
-{
-name: "add parameters success",
-parameters: map[string]interface{}{
-"param1": "value1",
-"param2": 15,
-},
-stepName: "step1",
-stepParameters: map[string]interface{}{
-"param1": "value1",
-"param2": 15,
-},
-expValue: true,
-},
-{
-name: "add parameters failed",
-parameters: map[string]interface{}{
-"param1": "value1",
-"param2": 15,
-},
-stepName: "step1",
-stepParameters: map[string]interface{}{
-"param1": "value1",
-"param2": 15,
-},
-expValue: false,
-},
-}
-for _, tt := range tests {
-t.Run(tt.name, func (t *testing.T) {
-tms.Test(t, tms.TestMetadata{
-DisplayName: tt.name,
-Parameters:  tt.parameters,
-}, func () {
-tms.Step(
-tms.StepMetadata{
-Name:       tt.stepName,
-Parameters: tt.stepParameters,
-}, func () {
-tms.True(t, tt.expValue)
-})
-})
-})
-}
+	tests := []struct {
+		name           string
+		parameters     map[string]interface{}
+		stepName       string
+		stepParameters map[string]interface{}
+		expValue       bool
+	}{
+		{
+			name: "add parameters success",
+			parameters: map[string]interface{}{
+				"param1": "value1",
+				"param2": 15,
+			},
+			stepName: "step1",
+			stepParameters: map[string]interface{}{
+				"param1": "value1",
+				"param2": 15,
+			},
+			expValue: true,
+		},
+		{
+			name: "add parameters failed",
+			parameters: map[string]interface{}{
+				"param1": "value1",
+				"param2": 15,
+			},
+			stepName: "step1",
+			stepParameters: map[string]interface{}{
+				"param1": "value1",
+				"param2": 15,
+			},
+			expValue: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tms.Test(t, tms.TestMetadata{
+				DisplayName: tt.name,
+				Parameters:  tt.parameters,
+			}, func() {
+				tms.Step(
+					tms.StepMetadata{
+						Name:       tt.stepName,
+						Parameters: tt.stepParameters,
+					}, func() {
+						tms.True(t, tt.expValue)
+					})
+			})
+		})
+	}
 }
 ```
 
