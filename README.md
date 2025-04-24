@@ -119,6 +119,20 @@ $ export TMS_CONFIG_FILE=<ABSOLUTE_PATH_TO_CONFIG_FILE>
 $ go test -run "$(cat tmp/filter.txt)"
 ```
 
+### Asserting usage notes
+
+* You should use `tms.True` as asserts for correct TestResult generation, e.g.:
+
+```
+expectedValue := 4
+actualValue := 5 // function call you are testing
+					
+tms.True(t, actualValue == expectedValue) // its be an error and failed test, cause assert with false result.
+```
+
+* You can use `tms.True` both in tms.Test and tms.Step functions 
+
+
 ### Metadata of autotest
 
 Use metadata to specify information about autotest.
