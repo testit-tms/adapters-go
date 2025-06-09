@@ -161,7 +161,8 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 	if err != nil {
 		return nil, fmt.Errorf("error converting test status to outcome: %w", err)
 	}
-	req := tmsclient.NewAutoTestResultsForTestRunModel(confID, test.externalId, *outcome)
+	req := tmsclient.NewAutoTestResultsForTestRunModel(confID, test.externalId)
+	req.SetOutcome(*outcome)
 	req.SetDuration(test.duration)
 	req.SetMessage(test.message)
 	req.SetTraces(test.trace)
@@ -325,15 +326,59 @@ func getSearchRequest(externalID, projectID string) tmsclient.AutoTestSearchApiM
 	return *req
 }
 
+func mapAttachmentsToStepResults(attachments []tmsclient.AttachmentPutModelAutoTestStepResultsModel) ([]tmsclient.AutoTestStepResultUpdateRequest, error) {
+	results := make([]tmsclient.AutoTestStepResultUpdateRequest, len(attachments))
+	for i, attachment := range attachments {
+		result := tmsclient.NewAutoTestStepResultUpdateRequest()
+		result.SetTitle(attachment.GetTitle())
+		result.SetDescription(attachment.GetDescription())
+
+		outcome, err := tmsclient.NewAvailableTestResultOutcomeFromValue(string(attachment.GetOutcome()))
+		if err != nil {
+			return nil, err
+		}
+		result.SetOutcome(*outcome)
+		result.SetStartedOn(attachment.GetStartedOn())
+		result.SetCompletedOn(attachment.GetCompletedOn())
+		result.SetDuration(attachment.GetDuration())
+
+		// Mapping nested attachments at the step level is not supported in this model.
+		// Attachments should be linked to the test result as a whole.
+
+		if attachment.HasStepResults() {
+			nestedResults, err := mapAttachmentsToStepResults(attachment.GetStepResults())
+			if err != nil {
+				return nil, err
+			}
+			result.SetStepResults(nestedResults)
+		}
+
+		result.SetParameters(attachment.GetParameters())
+
+		results[i] = *result
+	}
+	return results, nil
+}
+
 func testToUpdateResultModel(model *tmsclient.TestResultResponse, test testResult) (tmsclient.TestResultUpdateV2Request, error) {
-	tearDowns, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.teardowns)
+	tearDownsAttachments, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.teardowns)
 	if err != nil {
 		return tmsclient.TestResultUpdateV2Request{}, err
 	}
 
-	setups, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.setups)
+	tearDowns, err := mapAttachmentsToStepResults(tearDownsAttachments)
+	if err != nil {
+		return tmsclient.TestResultUpdateV2Request{}, fmt.Errorf("error mapping tearDowns: %w", err)
+	}
+
+	setupsAttachments, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.setups)
 	if err != nil {
 		return tmsclient.TestResultUpdateV2Request{}, err
+	}
+
+	setups, err := mapAttachmentsToStepResults(setupsAttachments)
+	if err != nil {
+		return tmsclient.TestResultUpdateV2Request{}, fmt.Errorf("error mapping setups: %w", err)
 	}
 
 	req := tmsclient.NewTestResultUpdateV2Request()
@@ -356,7 +401,11 @@ func testToUpdateResultModel(model *tmsclient.TestResultResponse, test testResul
 		req.SetAttachments(attachs)
 	}
 
-	req.SetOutcome(tmsclient.TestResultOutcome(test.status))
+	outcome, err := tmsclient.NewAvailableTestResultOutcomeFromValue(test.status)
+	if err != nil {
+		return tmsclient.TestResultUpdateV2Request{}, fmt.Errorf("error converting test status to outcome: %w", err)
+	}
+	req.SetOutcome(tmsclient.TestResultOutcome(*outcome))
 
 	return *req, nil
 }
