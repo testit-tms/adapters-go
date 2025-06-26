@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/testit-tms/adapters-go/htmlutils"
 	tmsclient "github.com/testit-tms/api-client-golang/v3"
 )
 
@@ -68,6 +69,9 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestPo
 
 	req.SetExternalKey(test.externalKey)
 
+	// Apply HTML escaping to the model
+	htmlutils.EscapeHtmlInObject(req)
+
 	return *req
 }
 
@@ -83,6 +87,9 @@ func stepToAutoTestStepModel(s []stepresult) []tmsclient.AutoTestStepModel {
 
 		steps = append(steps, *model)
 	}
+
+	// Apply HTML escaping to the steps slice
+	htmlutils.EscapeHtmlInObjectSlice(steps)
 
 	return steps
 }
@@ -153,6 +160,9 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiRe
 	req.SetIsFlaky(autotest.IsFlaky)
 	req.SetId(autotest.Id)
 
+	// Apply HTML escaping to the model
+	htmlutils.EscapeHtmlInObject(req)
+
 	return *req
 }
 
@@ -221,6 +231,9 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 		req.SetParameters(params)
 	}
 
+	// Apply HTML escaping to the request
+	htmlutils.EscapeHtmlInObject(req)
+
 	return []tmsclient.AutoTestResultsForTestRunModel{*req}, nil
 }
 
@@ -266,6 +279,9 @@ func stepToAttachmentPutModelAutoTestStepResultsModel(s []stepresult) ([]tmsclie
 
 		steps = append(steps, *model)
 	}
+
+	// Apply HTML escaping to the steps slice
+	htmlutils.EscapeHtmlInObjectSlice(steps)
 
 	return steps, nil
 }
@@ -322,6 +338,9 @@ func getSearchRequest(externalID, projectID string) tmsclient.AutoTestSearchApiM
 
 	req := tmsclient.NewAutoTestSearchApiModel()
 	req.SetFilter(*f)
+
+	// Apply HTML escaping to the search request
+	htmlutils.EscapeHtmlInObject(req)
 
 	return *req
 }
@@ -406,6 +425,9 @@ func testToUpdateResultModel(model *tmsclient.TestResultResponse, test testResul
 		return tmsclient.TestResultUpdateV2Request{}, fmt.Errorf("error converting test status to outcome: %w", err)
 	}
 	req.SetOutcome(tmsclient.TestResultOutcome(*outcome))
+
+	// Apply HTML escaping to the update request
+	htmlutils.EscapeHtmlInObject(req)
 
 	return *req, nil
 }
