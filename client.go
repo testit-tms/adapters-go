@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/testit-tms/adapters-go/config"
+	"github.com/testit-tms/adapters-go/htmlutils"
 	tmsclient "github.com/testit-tms/api-client-golang/v3"
 	"golang.org/x/exp/slog"
 )
@@ -191,6 +192,9 @@ func (c *tmsClient) createTestRun() string {
 	})
 
 	model := tmsclient.NewCreateEmptyTestRunApiModel(c.cfg.ProjectId)
+
+	// Apply HTML escaping to the model
+	htmlutils.EscapeHtmlInObject(model)
 
 	testRun, r, err := c.client.TestRunsAPI.CreateEmpty(ctx).
 		CreateEmptyTestRunApiModel(*model).
