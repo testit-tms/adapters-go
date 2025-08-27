@@ -2,8 +2,7 @@ name: e2e tests
 run-name: "#${{ github.run_number }} test by ${{ github.triggering_actor }}"
 on:
   pull_request:
-    paths:
-      - "*"
+    types: [opened, labeled, unlabeled, synchronize]
   workflow_dispatch:
     inputs:
         run_tests:
