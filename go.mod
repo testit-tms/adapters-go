@@ -2,7 +2,7 @@ module github.com/testit-tms/adapters-go
 
 go 1.20
 
-require github.com/testit-tms/api-client-golang/v3 v3.2.1
+require github.com/testit-tms/api-client-golang/v3 v3.3.0
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
