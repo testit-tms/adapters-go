@@ -167,12 +167,8 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiRe
 }
 
 func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResultsForTestRunModel, error) {
-	outcome, err := tmsclient.NewAvailableTestResultOutcomeFromValue(test.status)
-	if err != nil {
-		return nil, fmt.Errorf("error converting test status to outcome: %w", err)
-	}
 	req := tmsclient.NewAutoTestResultsForTestRunModel(confID, test.externalId)
-	req.SetOutcome(*outcome)
+	req.SetStatusCode(test.status)
 	req.SetDuration(test.duration)
 	req.SetMessage(test.message)
 	req.SetTraces(test.trace)
@@ -420,11 +416,7 @@ func testToUpdateResultModel(model *tmsclient.TestResultResponse, test testResul
 		req.SetAttachments(attachs)
 	}
 
-	outcome, err := tmsclient.NewAvailableTestResultOutcomeFromValue(test.status)
-	if err != nil {
-		return tmsclient.TestResultUpdateV2Request{}, fmt.Errorf("error converting test status to outcome: %w", err)
-	}
-	req.SetOutcome(tmsclient.TestResultOutcome(*outcome))
+	req.SetStatusCode(test.status)
 
 	// Apply HTML escaping to the update request
 	htmlutils.EscapeHtmlInObject(req)
