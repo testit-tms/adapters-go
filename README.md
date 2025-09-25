@@ -95,10 +95,9 @@ export TMS_CONFIG_FILE=<ABSOLUTE_PATH_TO_CONFIG_FILE>
 cd examples
 go test
 
-testit \
-  --mode finish
+testit testrun complete
   --url https://tms.testit.software \
-  --testrun-id $(cat tmp/output.txt) 
+  --testrun-id $(cat tmp/output.txt)
 ```
 
 ### Run with filter
