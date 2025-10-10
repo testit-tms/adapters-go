@@ -73,7 +73,7 @@ If you specified TestRunId, then just run the command:
 
 ```bash
 export TMS_CONFIG_FILE=<ABSOLUTE_PATH_TO_CONFIG_FILE>
-cd examples
+cd ci_tests
 go test
 ```
 
@@ -92,7 +92,7 @@ testit \
 export TMS_TEST_RUN_ID=$(cat output.txt)  
 
 export TMS_CONFIG_FILE=<ABSOLUTE_PATH_TO_CONFIG_FILE>
-cd examples
+cd ci_tests
 go test
 
 testit testrun complete
