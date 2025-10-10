@@ -8,6 +8,7 @@
 | 5.2.5   | v0.3.5              |
 | 5.3     | v0.3.5-tms-5.3      |
 | 5.4     | v0.4.2-tms-5.4      |
+| 5.5     | v0.6.1-tms-5.5      |
 | Cloud   | v0.5.1              |
 
 For other versions compatibility check api-client compatibility - 
