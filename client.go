@@ -143,7 +143,7 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 			logger.Debug("link autotest to workitem", "workItemId", v, "autotestId", autotestID)
 			for i := 0; i < maxTries; i++ {
 				r, err = c.client.AutoTestsAPI.LinkAutoTestToWorkItem(ctx, autotestID).
-					WorkItemIdModel(tmsclient.WorkItemIdModel{
+					WorkItemIdApiModel(tmsclient.WorkItemIdApiModel{
 						Id: v,
 					}).Execute()
 				if err != nil {
