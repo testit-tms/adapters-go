@@ -192,6 +192,7 @@ func (c *tmsClient) createTestRun() string {
 	})
 
 	model := tmsclient.NewCreateEmptyTestRunApiModel(c.cfg.ProjectId)
+	model.SetName(c.cfg.TestRunName)
 
 	// Apply HTML escaping to the model
 	htmlutils.EscapeHtmlInObject(model)
@@ -206,6 +207,66 @@ func (c *tmsClient) createTestRun() string {
 	}
 
 	return testRun.Id
+}
+
+// return test run
+func (c *tmsClient) getTestRun() *tmsclient.TestRunV2ApiResult {
+	const op = "tmsClient.getTestRun"
+	logger := logger.With("op", op)
+
+	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
+		"Bearer or PrivateToken": {
+			Key:    c.cfg.Token,
+			Prefix: "PrivateToken",
+		},
+	})
+
+	testRun, r, err := c.client.TestRunsAPI.GetTestRunById(ctx, c.cfg.TestRunId).
+		Execute()
+
+	if err != nil {
+		logger.Error("failed to create test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		return nil
+	}
+
+	return testRun
+}
+
+func (c *tmsClient) updateTestRun() {
+	const op = "tmsClient.updateTestRun"
+	logger := logger.With("op", op)
+
+	if c.cfg.TestRunName == "" {
+		return
+	}
+
+	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
+		"Bearer or PrivateToken": {
+			Key:    c.cfg.Token,
+			Prefix: "PrivateToken",
+		},
+	})
+
+	testRun := c.getTestRun()
+
+	if testRun == nil || testRun.Name == c.cfg.TestRunName {
+		return
+	}
+
+	testRun.Name = c.cfg.TestRunName
+	model := buildUpdateEmptyTestRunApiModel(testRun)
+
+	// Apply HTML escaping to the model
+	htmlutils.EscapeHtmlInObject(model)
+
+	r, err := c.client.TestRunsAPI.UpdateEmpty(ctx).
+		UpdateEmptyTestRunApiModel(*model).
+		Execute()
+
+	if err != nil {
+		logger.Error("failed to update test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		return
+	}
 }
 
 func (c *tmsClient) writeAttachments(paths ...string) []string {
