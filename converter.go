@@ -423,3 +423,37 @@ func testToUpdateResultModel(model *tmsclient.TestResultResponse, test testResul
 
 	return *req, nil
 }
+
+func buildUpdateEmptyTestRunApiModel(testRun *tmsclient.TestRunV2ApiResult) *tmsclient.UpdateEmptyTestRunApiModel {
+	model := tmsclient.NewUpdateEmptyTestRunApiModel(testRun.Id, testRun.Name)
+	model.Description = testRun.Description
+	model.LaunchSource = testRun.LaunchSource
+	model.Attachments = buildAssignAttachmentApiModel(testRun.Attachments)
+	model.Links = buildUpdateLinkApiModel(testRun.Links)
+
+	return model
+}
+
+func buildAssignAttachmentApiModel(attachments []tmsclient.AttachmentApiResult) []tmsclient.AssignAttachmentApiModel {
+	updateAttachments := make([]tmsclient.AssignAttachmentApiModel, len(attachments))
+	for i, attachment := range attachments {
+		updateAttachment := tmsclient.NewAssignAttachmentApiModel(attachment.Id)
+		updateAttachments[i] = *updateAttachment
+	}
+
+	return updateAttachments
+}
+
+func buildUpdateLinkApiModel(links []tmsclient.LinkApiResult) []tmsclient.UpdateLinkApiModel {
+	updateLinks := make([]tmsclient.UpdateLinkApiModel, len(links))
+	for i, link := range links {
+		updateLink := tmsclient.NewUpdateLinkApiModel(link.Url, link.HasInfo)
+		updateLink.Id = link.Id
+		updateLink.Title = link.Title
+		updateLink.Description = link.Description
+
+		updateLinks[i] = *updateLink
+	}
+
+	return updateLinks
+}

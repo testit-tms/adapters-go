@@ -30,6 +30,8 @@ func init() {
 	client = newClient(*cfg)
 	if cfg.AdapterMode == "2" {
 		callCreateTestRun(client, cfg)
+	} else {
+		client.updateTestRun()
 	}
 	ctxMgr = gls.NewContextManager()
 	testPhaseObjects = make(map[string]*testPhaseContainer)

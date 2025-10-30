@@ -21,6 +21,7 @@ type Config struct {
 	ProjectId                         string `json:"projectId" env-required:"true" env:"TMS_PROJECT_ID"`
 	ConfigurationId                   string `json:"configurationId" env-required:"true" env:"TMS_CONFIGURATION_ID"`
 	TestRunId                         string `json:"testRunId" env:"TMS_TEST_RUN_ID"`
+	TestRunName                       string `json:"testRunName" env:"TMS_TEST_RUN_NAME"`
 	AdapterMode                       string `json:"adapterMode" env:"TMS_ADAPTER_MODE" env-default:"0"`
 	IsDebug                           bool   `json:"isDebug" env:"TMS_IS_DEBUG" env-default:"false"`
 	AutomaticCreationTestCases        bool   `json:"automaticCreationTestCases" env:"TMS_AUTOMATIC_CREATION_TEST_CASES" env-default:"false"`
