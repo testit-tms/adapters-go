@@ -41,14 +41,10 @@ func EscapeHtmlTags(text string) string {
 	result := text
 
 	// Replace unescaped < with \<
-	result = strings.ReplaceAll(result, "\\<", "TEMP_ESCAPED_LT")
-	result = strings.ReplaceAll(result, "<", "\\<")
-	result = strings.ReplaceAll(result, "TEMP_ESCAPED_LT", "\\<")
+	result = strings.ReplaceAll(result, "<", "&lt;")
 
 	// Replace unescaped > with \>
-	result = strings.ReplaceAll(result, "\\>", "TEMP_ESCAPED_GT")
-	result = strings.ReplaceAll(result, ">", "\\>")
-	result = strings.ReplaceAll(result, "TEMP_ESCAPED_GT", "\\>")
+	result = strings.ReplaceAll(result, ">", "&gt;")
 
 	return result
 }

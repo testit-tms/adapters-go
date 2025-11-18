@@ -24,32 +24,32 @@ func TestEscapeHtmlTags(t *testing.T) {
 		{
 			name:     "String with HTML tags",
 			input:    "Hello <b>world</b>",
-			expected: "Hello \\<b\\>world\\</b\\>",
+			expected: "Hello &lt;b&gt;world&lt;/b&gt;",
 		},
 		{
 			name:     "String with self-closing tag",
 			input:    "Hello <br/> world",
-			expected: "Hello \\<br/\\> world",
+			expected: "Hello \\<br/&gt; world",
 		},
 		{
 			name:     "String with already escaped characters",
 			input:    "Hello \\<b\\>world\\</b\\>",
-			expected: "Hello \\<b\\>world\\</b\\>",
+			expected: "Hello \\&lt;b\\&gt;world\\&lt;/b\\&gt;",
 		},
 		{
 			name:     "String with script tag",
 			input:    "<script>alert('xss')</script>",
-			expected: "\\<script\\>alert('xss')\\</script\\>",
+			expected: "&lt;script&gt;alert('xss')&lt;/script&gt;",
 		},
 		{
 			name:     "String with multiple tags",
 			input:    "<div><p>Hello</p></div>",
-			expected: "\\<div\\>\\<p\\>Hello\\</p\\>\\</div\\>",
+			expected: "&lt;div&gt;&lt;p&gt;Hello&lt;/p&gt;&lt;/div&gt;",
 		},
 		{
 			name:     "String with attributes",
 			input:    "<a href='http://example.com'>Link</a>",
-			expected: "\\<a href='http://example.com'\\>Link\\</a\\>",
+			expected: "&lt;a href='http://example.com'&gt;Link&lt;/a&gt;",
 		},
 		{
 			name:     "String with only < or > (no complete tags)",
@@ -100,8 +100,8 @@ func TestEscapeHtmlInObject(t *testing.T) {
 				IsActive:    true,
 			},
 			expected: &TestStruct{
-				Name:        "Test \\<b\\>Name\\</b\\>",
-				Description: "\\<script\\>alert('xss')\\</script\\>",
+				Name:        "Test &lt;b&gt;Name&lt;/b&gt;",
+				Description: "&lt;script&gt;alert('xss')&lt;/script&gt;",
 				Count:       5,
 				IsActive:    true,
 			},
@@ -178,8 +178,8 @@ func TestEscapeHtmlInObjectSlice(t *testing.T) {
 				{Name: "Test <i>2</i>", Desc: "<div>content</div>"},
 			},
 			expected: []TestStruct{
-				{Name: "Test \\<b\\>1\\</b\\>", Desc: "\\<script\\>alert(1)\\</script\\>"},
-				{Name: "Test \\<i\\>2\\</i\\>", Desc: "\\<div\\>content\\</div\\>"},
+				{Name: "Test \\<b&gt;1\\</b&gt;", Desc: "\\<script&gt;alert(1)\\</script&gt;"},
+				{Name: "Test \\<i&gt;2\\</i&gt;", Desc: "\\<div&gt;content\\</div&gt;"},
 			},
 		},
 		{
@@ -229,8 +229,8 @@ func TestEscapeHtmlWithMap(t *testing.T) {
 	}
 
 	expected := map[string]string{
-		"title":       "Test \\<b\\>Title\\</b\\>",
-		"description": "\\<script\\>alert('xss')\\</script\\>",
+		"title":       "Test &lt;b&gt;Title&lt;/b&gt;",
+		"description": "&lt;script&gt;alert('xss')&lt;/script&gt;",
 		"plain":       "Plain text",
 	}
 
@@ -287,8 +287,8 @@ func TestNestedStructs(t *testing.T) {
 
 	EscapeHtmlInObject(input)
 
-	expectedMainName := "Main \\<b\\>Name\\</b\\>"
-	expectedNestedTitle := "Nested \\<i\\>Title\\</i\\>"
+	expectedMainName := "Main &lt;b&gt;Name&lt;/b&gt;"
+	expectedNestedTitle := "Nested &lt;i&gt;Title&lt;/i&gt;"
 
 	if input.Name != expectedMainName {
 		t.Errorf("Main Name: got %q, want %q", input.Name, expectedMainName)
@@ -308,12 +308,12 @@ func TestDoubleEscapingPrevention(t *testing.T) {
 		{
 			name:     "Already escaped characters should not be double escaped",
 			input:    "Hello \\<b\\>world\\</b\\>",
-			expected: "Hello \\<b\\>world\\</b\\>",
+			expected: "Hello \\<b\\&gt;world\\</b\\&gt;",
 		},
 		{
 			name:     "Mix of escaped and unescaped",
 			input:    "Hello \\<b>world</b>",
-			expected: "Hello \\<b\\>world\\</b\\>",
+			expected: "Hello \\<b\\&gt;world\\</b\\&gt;",
 		},
 	}
 
