@@ -11,8 +11,8 @@ import (
 // TODO: validate that hasInfo always true is correct
 const defaultHasInfo = true
 
-func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestPostModel {
-	req := tmsclient.NewAutoTestPostModel(test.externalId, projectId, test.displayName)
+func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestCreateApiModel {
+	req := tmsclient.NewAutoTestCreateApiModel(projectId, test.externalId, test.displayName)
 	req.SetTitle(test.title)
 
 	if test.description != "" {
@@ -28,9 +28,9 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestPo
 	}
 
 	if len(test.labels) != 0 {
-		labels := make([]tmsclient.LabelPostModel, 0, len(test.labels))
+		labels := make([]tmsclient.LabelApiModel, 0, len(test.labels))
 		for _, label := range test.labels {
-			labels = append(labels, tmsclient.LabelPostModel{
+			labels = append(labels, tmsclient.LabelApiModel{
 				Name: label,
 			})
 		}
@@ -38,10 +38,10 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestPo
 	}
 
 	if len(test.links) != 0 {
-		links := make([]tmsclient.LinkPostModel, 0, len(test.links))
+		links := make([]tmsclient.LinkCreateApiModel, 0, len(test.links))
 		for _, link := range test.links {
 
-			l := tmsclient.NewLinkPostModel(link.Url, defaultHasInfo)
+			l := tmsclient.NewLinkCreateApiModel(link.Url, defaultHasInfo)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 
@@ -75,10 +75,10 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestPo
 	return *req
 }
 
-func stepToAutoTestStepModel(s []stepresult) []tmsclient.AutoTestStepModel {
-	steps := make([]tmsclient.AutoTestStepModel, 0, len(s))
+func stepToAutoTestStepModel(s []stepresult) []tmsclient.AutoTestStepApiModel {
+	steps := make([]tmsclient.AutoTestStepApiModel, 0, len(s))
 	for _, step := range s {
-		model := tmsclient.NewAutoTestStepModel(step.name)
+		model := tmsclient.NewAutoTestStepApiModel(step.name)
 		model.SetDescription(step.description)
 
 		if len(step.childrenSteps) != 0 {
@@ -94,8 +94,8 @@ func stepToAutoTestStepModel(s []stepresult) []tmsclient.AutoTestStepModel {
 	return steps
 }
 
-func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiResult) tmsclient.AutoTestPutModel {
-	req := tmsclient.NewAutoTestPutModel(test.externalId, autotest.ProjectId, test.displayName)
+func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiResult) tmsclient.AutoTestUpdateApiModel {
+	req := tmsclient.NewAutoTestUpdateApiModel(autotest.ProjectId, test.externalId, test.displayName)
 
 	if test.description != "" {
 		req.SetDescription(test.description)
@@ -110,9 +110,9 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiRe
 	}
 
 	if len(test.labels) != 0 {
-		labels := make([]tmsclient.LabelPostModel, 0, len(test.labels))
+		labels := make([]tmsclient.LabelApiModel, 0, len(test.labels))
 		for _, label := range test.labels {
-			labels = append(labels, tmsclient.LabelPostModel{
+			labels = append(labels, tmsclient.LabelApiModel{
 				Name: label,
 			})
 		}
@@ -124,9 +124,9 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiRe
 	}
 
 	if len(test.links) != 0 {
-		links := make([]tmsclient.LinkPutModel, 0, len(test.links))
+		links := make([]tmsclient.LinkUpdateApiModel, 0, len(test.links))
 		for _, link := range test.links {
-			l := tmsclient.NewLinkPutModel(link.Url, defaultHasInfo)
+			l := tmsclient.NewLinkUpdateApiModel(link.Url, defaultHasInfo)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 
