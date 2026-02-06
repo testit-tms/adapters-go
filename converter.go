@@ -12,7 +12,7 @@ import (
 const defaultHasInfo = true
 
 func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestCreateApiModel {
-	req := tmsclient.NewAutoTestCreateApiModel(test.externalId, projectId, test.displayName)
+	req := tmsclient.NewAutoTestCreateApiModel(projectId, test.externalId, test.displayName)
 	req.SetTitle(test.title)
 
 	if test.description != "" {
@@ -95,7 +95,7 @@ func stepToAutoTestStepModel(s []stepresult) []tmsclient.AutoTestStepApiModel {
 }
 
 func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiResult) tmsclient.AutoTestUpdateApiModel {
-	req := tmsclient.NewAutoTestUpdateApiModel(test.externalId, autotest.ProjectId, test.displayName)
+	req := tmsclient.NewAutoTestUpdateApiModel(autotest.ProjectId, test.externalId, test.displayName)
 
 	if test.description != "" {
 		req.SetDescription(test.description)
