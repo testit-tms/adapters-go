@@ -81,7 +81,7 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 
 		logger.Debug("create new autotest", "request", cr)
 		na, _, err := c.client.AutoTestsAPI.CreateAutoTest(ctx).
-			AutoTestPostModel(cr).
+			AutoTestCreateApiModel(cr).
 			Execute()
 
 		if err != nil {
@@ -94,7 +94,7 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 		ur := testToUpdateAutotestModel(test, resp[0])
 		logger.Debug("update existing autotest", "request", ur)
 		r, err = c.client.AutoTestsAPI.UpdateAutoTest(ctx).
-			AutoTestPutModel(ur).
+			AutoTestUpdateApiModel(ur).
 			Execute()
 
 		if err != nil {
@@ -106,7 +106,7 @@ func (c *tmsClient) writeTest(test testResult) (string, error) {
 	}
 
 	if len(test.workItemIds) != 0 {
-		var linkedWorkItems []tmsclient.WorkItemIdentifierModel
+		var linkedWorkItems []tmsclient.AutoTestWorkItemIdentifierApiResult
 		linkedWorkItems, r, err = c.client.AutoTestsAPI.GetWorkItemsLinkedToAutoTest(ctx, autotestID).
 			Execute()
 
@@ -353,7 +353,7 @@ func (c *tmsClient) updateTest(test testResult) error {
 	ur := testToUpdateAutotestModel(test, resp[0])
 
 	r, err = c.client.AutoTestsAPI.UpdateAutoTest(ctx).
-		AutoTestPutModel(ur).
+		AutoTestUpdateApiModel(ur).
 		Execute()
 
 	if err != nil {
