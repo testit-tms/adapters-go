@@ -37,6 +37,10 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestCr
 		req.SetLabels(labels)
 	}
 
+	if len(test.tags) != 0 {
+		req.SetTags(test.tags)
+	}
+
 	if len(test.links) != 0 {
 		links := make([]tmsclient.LinkCreateApiModel, 0, len(test.links))
 		for _, link := range test.links {
@@ -117,6 +121,10 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiRe
 			})
 		}
 		req.SetLabels(labels)
+	}
+
+	if len(test.tags) != 0 {
+		req.SetTags(test.tags)
 	}
 
 	if test.title != "" {

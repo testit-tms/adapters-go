@@ -22,6 +22,7 @@ type TestMetadata struct {
 	Parameters  map[string]interface{}
 	Links       []Link
 	Labels      []string
+	Tags        []string
 	ExternalId  string
 	WorkItemIds []string
 }
@@ -82,6 +83,7 @@ func newTestResult(m TestMetadata, t *testing.T) *testResult {
 		title:       m.Title,
 		links:       m.Links,
 		labels:      m.Labels,
+		tags:        m.Tags,
 		externalId:  m.ExternalId,
 		workItemIds: m.WorkItemIds,
 		parameters:  m.Parameters,
