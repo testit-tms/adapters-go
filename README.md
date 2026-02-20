@@ -152,7 +152,8 @@ Description of metadata:
 * `ExternalId` - unique internal autotest ID (used in Test IT)
 * `Title` - autotest name specified in the autotest card. If not specified, the name from the displayName method is used
 * `Description` - autotest description specified in the autotest card
-* `Labels` - tags listed in the autotest card
+* `Labels` - labels listed in the autotest card
+* `Tags` - tags listed in the autotest card
 * `Links` - links listed in the autotest card ( not in the TestResult card. Additionally, there is URL validation on Link.Url and it's must be a correct URL. )
 * `Step` - the designation of the step
 
@@ -190,6 +191,7 @@ func TestSteps_Success(t *testing.T) {
 	}}
 
 	labels := []string{"Test labels"}
+	tags := []string{"Test tags"}
 	parameters := map[string]interface{}{
 		"param1": "value1",
 	}
@@ -200,6 +202,7 @@ func TestSteps_Success(t *testing.T) {
 			// Links for autotest card
 			Links:      links,
 			Labels:     labels,
+			Tags:     	tags,
 			Parameters: parameters,
 			// other properties...
 		},

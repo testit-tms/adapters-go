@@ -12,6 +12,7 @@ type testResult struct {
 	title       string
 	description string
 	labels      []string
+	tags        []string
 	className   string
 	nameSpace   string
 	setups      []stepresult
