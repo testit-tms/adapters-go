@@ -21,3 +21,4 @@
 go.work
 *tms.config.json
 examples
+go.sum
