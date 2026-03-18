@@ -3,10 +3,11 @@ package tms
 import (
 	"time"
 
+	"github.com/testit-tms/adapters-go/models"
 	"golang.org/x/exp/slog"
 )
 
-type testResult struct {
+type TestResult struct {
 	externalId  string
 	displayName string
 	title       string
@@ -15,11 +16,11 @@ type testResult struct {
 	tags        []string
 	className   string
 	nameSpace   string
-	setups      []stepresult
-	steps       []stepresult
-	teardowns   []stepresult
-	links       []Link
-	resultLinks []Link
+	setups      []StepResult
+	steps       []StepResult
+	teardowns   []StepResult
+	links       []models.Link
+	resultLinks []models.Link
 	attachments []string
 	workItemIds []string
 	parameters  map[string]interface{}
@@ -32,40 +33,40 @@ type testResult struct {
 	externalKey string
 }
 
-func (tr *testResult) addStatus(v string) {
+func (tr *TestResult) addStatus(v string) {
 	tr.status = v
 }
 
-func (tr *testResult) addStep(step stepresult) {
+func (tr *TestResult) addStep(step StepResult) {
 	tr.steps = append(tr.steps, step)
 }
 
-func (tr *testResult) addBefore(step stepresult) {
+func (tr *TestResult) addBefore(step StepResult) {
 	tr.setups = append(tr.setups, step)
 }
 
-func (tr *testResult) addAfter(step stepresult) {
+func (tr *TestResult) addAfter(step StepResult) {
 	tr.teardowns = append(tr.teardowns, step)
 }
 
-func (tr *testResult) getSteps() []stepresult {
+func (tr *TestResult) getSteps() []StepResult {
 	return tr.steps
 }
 
-func (tr *testResult) addAttachments(a string) {
+func (tr *TestResult) addAttachments(a string) {
 	tr.attachments = append(tr.attachments, a)
 }
 
-func (tr *testResult) addMessage(message string) {
+func (tr *TestResult) addMessage(message string) {
 	tr.message = message
 }
 
-func (tr *testResult) addTrace(trace string) {
+func (tr *TestResult) addTrace(trace string) {
 	tr.trace = trace
 }
 
-func (tr *testResult) write() string {
-	const op = "tms.testResult.write"
+func (tr *TestResult) write() string {
+	const op = "tms.TestResult.write"
 	id, err := client.writeTest(*tr)
 	if err != nil {
 		logger.Error("error writing test result", "error", err, slog.String("op", op))
@@ -74,8 +75,8 @@ func (tr *testResult) write() string {
 	return id
 }
 
-func (tr *testResult) update(resultID string) {
-	const op = "tms.testResult.update"
+func (tr *TestResult) update(resultID string) {
+	const op = "tms.TestResult.update"
 	err := client.updateTest(*tr)
 	if err != nil {
 		logger.Error("failed to update test", "error", err, slog.String("op", op))

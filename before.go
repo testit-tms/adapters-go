@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jtolds/gls"
+	"github.com/testit-tms/adapters-go/models"
 )
 
 func BeforeTest(t *testing.T, m StepMetadata, f func()) {
@@ -22,7 +23,7 @@ func BeforeTest(t *testing.T, m StepMetadata, f func()) {
 
 		before.completedOn = time.Now()
 		if before.status == "" {
-			before.status = getTestStatus(t)
+			before.status = models.GetTestStatus(t)
 		}
 		before.duration = before.completedOn.UnixMilli() - before.startedOn.UnixMilli()
 
@@ -30,7 +31,7 @@ func BeforeTest(t *testing.T, m StepMetadata, f func()) {
 			t.Fail()
 			before.message = fmt.Sprintf("%+v", panicObject)
 			before.trace = string(debug.Stack())
-			before.status = failed
+			before.status = models.Failed
 		}
 	}()
 	ctxMgr.SetValues(gls.Values{

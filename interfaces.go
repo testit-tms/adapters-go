@@ -1,8 +1,8 @@
 package tms
 
 type hasSteps interface {
-	getSteps() []stepresult
-	addStep(step stepresult)
+	getSteps() []StepResult
+	addStep(step StepResult)
 }
 
 type hasStatus interface {

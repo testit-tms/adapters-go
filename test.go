@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/jtolds/gls"
+	"github.com/testit-tms/adapters-go/models"
 )
 
 type TestMetadata struct {
@@ -20,7 +21,7 @@ type TestMetadata struct {
 	Description string
 	DisplayName string
 	Parameters  map[string]interface{}
-	Links       []Link
+	Links       []models.Link
 	Labels      []string
 	Tags        []string
 	ExternalId  string
@@ -47,12 +48,12 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 		}
 
 		if tr.status == "" {
-			if testPhaseObjects.before != nil && testPhaseObjects.before.status == failed {
-				tr.status = failed
+			if testPhaseObjects.before != nil && testPhaseObjects.before.status == models.Failed {
+				tr.status = models.Failed
 				tr.message = testPhaseObjects.before.message
 				tr.trace = testPhaseObjects.before.trace
 			} else {
-				tr.status = getTestStatus(t)
+				tr.status = models.GetTestStatus(t)
 			}
 		}
 
@@ -62,7 +63,7 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 		}
 	}()
 
-	if testPhaseObjects.before != nil && testPhaseObjects.before.status == failed {
+	if testPhaseObjects.before != nil && testPhaseObjects.before.status == models.Failed {
 		return
 	}
 
@@ -73,8 +74,8 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 	}, f)
 }
 
-func newTestResult(m TestMetadata, t *testing.T) *testResult {
-	testResult := &testResult{
+func newTestResult(m TestMetadata, t *testing.T) *TestResult {
+	TestResult := &TestResult{
 		startedOn:   time.Now(),
 		displayName: m.DisplayName,
 		className:   m.ClassName,
@@ -89,19 +90,19 @@ func newTestResult(m TestMetadata, t *testing.T) *testResult {
 		parameters:  m.Parameters,
 	}
 
-	if testResult.displayName == "" {
-		testResult.displayName = "Test"
+	if TestResult.displayName == "" {
+		TestResult.displayName = "Test"
 	}
 
-	if testResult.title == "" {
-		testResult.title = testResult.displayName
+	if TestResult.title == "" {
+		TestResult.title = TestResult.displayName
 	}
 
-	if testResult.className == "" {
-		testResult.className = t.Name()
+	if TestResult.className == "" {
+		TestResult.className = t.Name()
 	}
 
-	if testResult.nameSpace == "" {
+	if TestResult.nameSpace == "" {
 		programCounters := make([]uintptr, 10)
 		callersCount := runtime.Callers(0, programCounters)
 
@@ -113,15 +114,15 @@ func newTestResult(m TestMetadata, t *testing.T) *testResult {
 			}
 		}
 		ts := strings.Split(testFile, "/")
-		testResult.nameSpace = strings.TrimSuffix(ts[len(ts)-1], ".go")
+		TestResult.nameSpace = strings.TrimSuffix(ts[len(ts)-1], ".go")
 	}
 
-	if testResult.externalId == "" {
-		hash := md5.Sum([]byte(fmt.Sprintf("%s%s%s", testResult.displayName, testResult.className, testResult.nameSpace)))
-		testResult.externalId = hex.EncodeToString(hash[:])
+	if TestResult.externalId == "" {
+		hash := md5.Sum([]byte(fmt.Sprintf("%s%s%s", TestResult.displayName, TestResult.className, TestResult.nameSpace)))
+		TestResult.externalId = hex.EncodeToString(hash[:])
 	}
 
-	testResult.externalKey = t.Name()
+	TestResult.externalKey = t.Name()
 
-	return testResult
+	return TestResult
 }

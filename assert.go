@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/testit-tms/adapters-go/models"
 )
 
 func True(t *testing.T, value bool, msgAndArgs ...interface{}) {
@@ -362,13 +363,13 @@ func setTestMessage(msg string) {
 			testStatusDetails := test.(hasErrorFields)
 			testStatusDetails.addTrace(getTrace())
 			testStatusDetails.addMessage(msg)
-			testStatusDetails.addStatus(failed)
+			testStatusDetails.addStatus(models.Failed)
 		})
 	manipulateOnObjectFromCtx(
 		nodeKey,
 		func(node interface{}) {
 			n := node.(hasStatus)
-			n.addStatus(failed)
+			n.addStatus(models.Failed)
 		})
 }
 

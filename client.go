@@ -51,7 +51,7 @@ func newClient(cfg config.Config) *tmsClient {
 }
 
 // TODO: Refactoring is needed
-func (c *tmsClient) writeTest(test testResult) (string, error) {
+func (c *tmsClient) writeTest(test TestResult) (string, error) {
 	const op = "tmsClient.writeTest"
 	logger := logger.With("op", op)
 
@@ -328,7 +328,7 @@ func remove(slice []string, s int) []string {
 	return append(slice[:s], slice[s+1:]...)
 }
 
-func (c *tmsClient) updateTest(test testResult) error {
+func (c *tmsClient) updateTest(test TestResult) error {
 	const op = "tmsClient.updateTest"
 	logger := logger.With("op", op)
 
@@ -364,7 +364,7 @@ func (c *tmsClient) updateTest(test testResult) error {
 	return nil
 }
 
-func (c *tmsClient) updateTestResult(resultId string, test testResult) error {
+func (c *tmsClient) updateTestResult(resultId string, test TestResult) error {
 	const op = "tmsClient.updateTestResult"
 	logger := logger.With("op", op)
 

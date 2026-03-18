@@ -5,6 +5,7 @@ import (
 
 	"github.com/jtolds/gls"
 	"github.com/pkg/errors"
+	"github.com/testit-tms/adapters-go/models"
 )
 
 type StepMetadata struct {
@@ -18,8 +19,8 @@ func Step(m StepMetadata, f func()) {
 
 	defer func() {
 		panicObject := recover()
-		step.completedOn = time.Now()
-		step.duration = step.completedOn.UnixMilli() - step.startedOn.UnixMilli()
+		step.CompletedOn = time.Now()
+		step.Duration = step.CompletedOn.UnixMilli() - step.StartedOn.UnixMilli()
 		manipulateOnObjectFromCtx(
 			testInstanceKey,
 			func(testInstance interface{}) {
@@ -27,31 +28,31 @@ func Step(m StepMetadata, f func()) {
 					fail(errors.Errorf("%+v", panicObject))
 				}
 			})
-		if step.status == "" {
-			step.status = passed
+		if step.Status == "" {
+			step.Status = models.Passed
 		}
 		manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
 			hasStep := currentStepObj.(hasSteps)
 			hasStep.addStep(*step)
 
 			hasStatus := currentStepObj.(hasStatus)
-			hasStatus.addStatus(step.status)
+			hasStatus.addStatus(step.Status)
 		})
 	}()
 
 	ctxMgr.SetValues(gls.Values{nodeKey: step}, f)
 }
 
-func newStep(m StepMetadata) *stepresult {
-	step := &stepresult{
-		description: m.Description,
-		startedOn:   time.Now(),
-		parameters:  m.Parameters,
-		name:        m.Name,
+func newStep(m StepMetadata) *StepResult {
+	step := &StepResult{
+		Description: m.Description,
+		StartedOn:   time.Now(),
+		Parameters:  m.Parameters,
+		Name:        m.Name,
 	}
 
-	if step.name == "" {
-		step.name = "Step"
+	if step.Name == "" {
+		step.Name = "Step"
 	}
 
 	return step

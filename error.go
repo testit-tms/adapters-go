@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"runtime/debug"
 	"testing"
+
+	"github.com/testit-tms/adapters-go/models"
 )
 
 func fail(err error) {
-	addError(err, failed, false)
+	addError(err, models.Failed, false)
 }
 
 func addError(err error, status string, now bool) {
