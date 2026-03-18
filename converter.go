@@ -424,8 +424,7 @@ func testToUpdateResultModel(model *tmsclient.TestResultResponse, test TestResul
 	req := tmsclient.NewTestResultUpdateV2Request()
 	req.SetTeardownResults(tearDowns)
 	req.SetSetupResults(setups)
-
-	req.SetDuration(model.GetDurationInMs() * 1000)
+	req.SetDuration(model.GetDurationInMs())
 	req.SetLinks(model.GetLinks())
 	req.SetStepResults(model.GetStepResults())
 	req.SetFailureClassIds(model.GetFailureClassIds())
