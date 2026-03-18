@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jtolds/gls"
+	"github.com/testit-tms/adapters-go/models"
 )
 
 func AfterTest(t *testing.T, m StepMetadata, f func()) {
@@ -16,7 +17,7 @@ func AfterTest(t *testing.T, m StepMetadata, f func()) {
 		after.completedOn = time.Now()
 		after.duration = after.completedOn.UnixMilli() - after.startedOn.UnixMilli()
 		if after.status == "" {
-			after.status = getTestStatus(t)
+			after.status = models.GetTestStatus(t)
 		}
 
 		testPhaseObject := getCurrentTestPhaseObject(t)
@@ -29,8 +30,8 @@ func AfterTest(t *testing.T, m StepMetadata, f func()) {
 		panicObject := recover()
 		if panicObject != nil {
 			t.Fail()
-			after.status = failed
-			tr.status = failed
+			after.status = models.Failed
+			tr.status = models.Failed
 			tr.message = fmt.Sprintf("%+v", panicObject)
 			tr.trace = string(debug.Stack())
 		}

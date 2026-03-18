@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	tms "github.com/testit-tms/adapters-go"
+	"github.com/testit-tms/adapters-go/models"
 )
 
 func TestMetadata_without_metadata_success(t *testing.T) {
@@ -180,7 +181,7 @@ func TestMetadata_with_links_success(t *testing.T) {
 	tms.Test(t,
 		tms.TestMetadata{
 			DisplayName: "with links success",
-			Links: []tms.Link{
+			Links: []models.Link{
 				{
 					Url: "http://google.com",
 				},
@@ -188,7 +189,7 @@ func TestMetadata_with_links_success(t *testing.T) {
 					Url:         "http://google.com",
 					Title:       "Google",
 					Description: "Google search engine",
-					LinkType:    tms.LINKTYPE_RELATED,
+					LinkType:    models.LINKTYPE_RELATED,
 				},
 			},
 		},
@@ -201,7 +202,7 @@ func TestMetadata_with_links_failed(t *testing.T) {
 	tms.Test(t,
 		tms.TestMetadata{
 			DisplayName: "with links failed",
-			Links: []tms.Link{
+			Links: []models.Link{
 				{
 					Url: "http://google.com",
 				},
@@ -209,7 +210,7 @@ func TestMetadata_with_links_failed(t *testing.T) {
 					Url:         "http://google.com",
 					Title:       "Google",
 					Description: "Google search engine",
-					LinkType:    tms.LINKTYPE_RELATED,
+					LinkType:    models.LINKTYPE_RELATED,
 				},
 			},
 		},
@@ -229,7 +230,7 @@ func TestMetadata_with_all_success(t *testing.T) {
 			Labels:      []string{"label01", "label02"},
 			ClassName:   "CustomClassName",
 			NameSpace:   "CustomNameSpace",
-			Links: []tms.Link{
+			Links: []models.Link{
 				{
 					Url: "http://google.com",
 				},
@@ -237,7 +238,7 @@ func TestMetadata_with_all_success(t *testing.T) {
 					Url:         "http://google.com",
 					Title:       "Google",
 					Description: "Google search engine",
-					LinkType:    tms.LINKTYPE_RELATED,
+					LinkType:    models.LINKTYPE_RELATED,
 				},
 			},
 		},
@@ -257,7 +258,7 @@ func TestMetadata_with_all_failed(t *testing.T) {
 			Labels:      []string{"label01", "label02"},
 			ClassName:   "CustomClassName",
 			NameSpace:   "CustomNameSpace",
-			Links: []tms.Link{
+			Links: []models.Link{
 				{
 					Url: "http://google.com",
 				},
@@ -265,7 +266,7 @@ func TestMetadata_with_all_failed(t *testing.T) {
 					Url:         "http://google.com",
 					Title:       "Google",
 					Description: "Google search engine",
-					LinkType:    tms.LINKTYPE_RELATED,
+					LinkType:    models.LINKTYPE_RELATED,
 				},
 			},
 		},

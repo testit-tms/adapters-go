@@ -3,6 +3,7 @@ package tms
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/testit-tms/adapters-go/htmlutils"
 	tmsclient "github.com/testit-tms/api-client-golang/v3"
@@ -11,7 +12,7 @@ import (
 // TODO: validate that hasInfo always true is correct
 const defaultHasInfo = true
 
-func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestCreateApiModel {
+func testToAutotestModel(test TestResult, projectId string) tmsclient.AutoTestCreateApiModel {
 	req := tmsclient.NewAutoTestCreateApiModel(projectId, test.externalId, test.displayName)
 	req.SetTitle(test.title)
 
@@ -79,14 +80,14 @@ func testToAutotestModel(test testResult, projectId string) tmsclient.AutoTestCr
 	return *req
 }
 
-func stepToAutoTestStepModel(s []stepresult) []tmsclient.AutoTestStepApiModel {
+func stepToAutoTestStepModel(s []StepResult) []tmsclient.AutoTestStepApiModel {
 	steps := make([]tmsclient.AutoTestStepApiModel, 0, len(s))
 	for _, step := range s {
-		model := tmsclient.NewAutoTestStepApiModel(step.name)
-		model.SetDescription(step.description)
+		model := tmsclient.NewAutoTestStepApiModel(step.Name)
+		model.SetDescription(step.Description)
 
-		if len(step.childrenSteps) != 0 {
-			model.SetSteps(stepToAutoTestStepModel(step.childrenSteps))
+		if len(step.ChildrenSteps) != 0 {
+			model.SetSteps(stepToAutoTestStepModel(step.ChildrenSteps))
 		}
 
 		steps = append(steps, *model)
@@ -98,7 +99,7 @@ func stepToAutoTestStepModel(s []stepresult) []tmsclient.AutoTestStepApiModel {
 	return steps
 }
 
-func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiResult) tmsclient.AutoTestUpdateApiModel {
+func testToUpdateAutotestModel(test TestResult, autotest tmsclient.AutoTestApiResult) tmsclient.AutoTestUpdateApiModel {
 	req := tmsclient.NewAutoTestUpdateApiModel(autotest.ProjectId, test.externalId, test.displayName)
 
 	if test.description != "" {
@@ -174,9 +175,25 @@ func testToUpdateAutotestModel(test testResult, autotest tmsclient.AutoTestApiRe
 	return *req
 }
 
-func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResultsForTestRunModel, error) {
+// passed failed skipped from framework
+func mapType(status string) tmsclient.TestStatusType {
+	status = strings.ToLower(status)
+	switch status {
+	case "passed":
+		return tmsclient.TESTSTATUSTYPE_SUCCEEDED
+	case "failed":
+		return tmsclient.TESTSTATUSTYPE_FAILED
+	case "skipped":
+		return tmsclient.TESTSTATUSTYPE_INCOMPLETE
+	case "inprogress":
+		return tmsclient.TESTSTATUSTYPE_IN_PROGRESS
+	}
+	return tmsclient.TESTSTATUSTYPE_INCOMPLETE
+}
+
+func testToResultModel(test TestResult, confID string) ([]tmsclient.AutoTestResultsForTestRunModel, error) {
 	req := tmsclient.NewAutoTestResultsForTestRunModel(confID, test.externalId)
-	req.SetStatusCode(test.status)
+	req.SetStatusType(mapType(test.status))
 	req.SetDuration(test.duration)
 	req.SetMessage(test.message)
 	req.SetTraces(test.trace)
@@ -241,41 +258,41 @@ func testToResultModel(test testResult, confID string) ([]tmsclient.AutoTestResu
 	return []tmsclient.AutoTestResultsForTestRunModel{*req}, nil
 }
 
-func stepToAttachmentPutModelAutoTestStepResultsModel(s []stepresult) ([]tmsclient.AttachmentPutModelAutoTestStepResultsModel, error) {
+func stepToAttachmentPutModelAutoTestStepResultsModel(s []StepResult) ([]tmsclient.AttachmentPutModelAutoTestStepResultsModel, error) {
 	steps := make([]tmsclient.AttachmentPutModelAutoTestStepResultsModel, 0, len(s))
 	for _, step := range s {
 		model := tmsclient.NewAttachmentPutModelAutoTestStepResultsModel()
-		model.SetTitle(step.name)
-		model.SetDescription(step.description)
-		outcome, err := tmsclient.NewAvailableTestResultOutcomeFromValue(step.status)
+		model.SetTitle(step.Name)
+		model.SetDescription(step.Description)
+		outcome, err := tmsclient.NewAvailableTestResultOutcomeFromValue(step.Status)
 		if err != nil {
 			return nil, err
 		}
 		model.SetOutcome(*outcome)
-		model.SetStartedOn(step.startedOn)
-		model.SetCompletedOn(step.completedOn)
-		model.SetDuration(step.duration)
+		model.SetStartedOn(step.StartedOn)
+		model.SetCompletedOn(step.CompletedOn)
+		model.SetDuration(step.Duration)
 
-		if len(step.attachments) != 0 {
-			attachs := make([]tmsclient.AttachmentPutModel, 0, len(step.attachments))
-			for _, attach := range step.attachments {
+		if len(step.Attachments) != 0 {
+			attachs := make([]tmsclient.AttachmentPutModel, 0, len(step.Attachments))
+			for _, attach := range step.Attachments {
 				a := tmsclient.NewAttachmentPutModel(attach)
 				attachs = append(attachs, *a)
 			}
 			model.SetAttachments(attachs)
 		}
 
-		if len(step.childrenSteps) != 0 {
-			cs, err := stepToAttachmentPutModelAutoTestStepResultsModel(step.childrenSteps)
+		if len(step.ChildrenSteps) != 0 {
+			cs, err := stepToAttachmentPutModelAutoTestStepResultsModel(step.ChildrenSteps)
 			if err != nil {
 				return nil, err
 			}
 			model.SetStepResults(cs)
 		}
 
-		if len(step.parameters) != 0 {
-			params := make(map[string]string, len(step.parameters))
-			for k, v := range step.parameters {
+		if len(step.Parameters) != 0 {
+			params := make(map[string]string, len(step.Parameters))
+			for k, v := range step.Parameters {
 				params[k] = parseValueParameter(v)
 			}
 			model.SetParameters(params)
@@ -383,7 +400,7 @@ func mapAttachmentsToStepResults(attachments []tmsclient.AttachmentPutModelAutoT
 	return results, nil
 }
 
-func testToUpdateResultModel(model *tmsclient.TestResultResponse, test testResult) (tmsclient.TestResultUpdateV2Request, error) {
+func testToUpdateResultModel(model *tmsclient.TestResultResponse, test TestResult) (tmsclient.TestResultUpdateV2Request, error) {
 	tearDownsAttachments, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.teardowns)
 	if err != nil {
 		return tmsclient.TestResultUpdateV2Request{}, err
@@ -408,7 +425,7 @@ func testToUpdateResultModel(model *tmsclient.TestResultResponse, test testResul
 	req.SetTeardownResults(tearDowns)
 	req.SetSetupResults(setups)
 
-	req.SetDurationInMs(model.GetDurationInMs())
+	req.SetDuration(model.GetDurationInMs() * 1000)
 	req.SetLinks(model.GetLinks())
 	req.SetStepResults(model.GetStepResults())
 	req.SetFailureClassIds(model.GetFailureClassIds())
@@ -424,7 +441,7 @@ func testToUpdateResultModel(model *tmsclient.TestResultResponse, test testResul
 		req.SetAttachments(attachs)
 	}
 
-	req.SetStatusCode(test.status)
+	req.SetStatusType(mapType(test.status))
 
 	// Apply HTML escaping to the update request
 	htmlutils.EscapeHtmlInObject(req)

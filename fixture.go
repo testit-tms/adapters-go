@@ -1,11 +1,13 @@
 package tms
 
-import "time"
+import (
+	"time"
+)
 
 type fixture struct {
 	name          string
 	description   string
-	childrenSteps []stepresult
+	childrenSteps []StepResult
 	status        string
 	startedOn     time.Time
 	completedOn   time.Time
@@ -16,11 +18,11 @@ type fixture struct {
 	trace         string
 }
 
-func (b *fixture) getSteps() []stepresult {
+func (b *fixture) getSteps() []StepResult {
 	return b.childrenSteps
 }
 
-func (b *fixture) addStep(step stepresult) {
+func (b *fixture) addStep(step StepResult) {
 	b.childrenSteps = append(b.childrenSteps, step)
 }
 
@@ -40,16 +42,16 @@ func (b *fixture) addTrace(trace string) {
 	b.trace = trace
 }
 
-func (b *fixture) convertToStepResult() stepresult {
-	return stepresult{
-		name:          b.name,
-		description:   b.description,
-		childrenSteps: b.childrenSteps,
-		status:        b.status,
-		startedOn:     b.startedOn,
-		completedOn:   b.completedOn,
-		duration:      b.duration,
-		attachments:   b.attachments,
-		parameters:    b.parameters,
+func (b *fixture) convertToStepResult() StepResult {
+	return StepResult{
+		Name:          b.name,
+		Description:   b.description,
+		ChildrenSteps: b.childrenSteps,
+		Status:        b.status,
+		StartedOn:     b.startedOn,
+		CompletedOn:   b.completedOn,
+		Duration:      b.duration,
+		Attachments:   b.attachments,
+		Parameters:    b.parameters,
 	}
 }

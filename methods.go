@@ -4,19 +4,20 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/testit-tms/adapters-go/models"
 	"golang.org/x/exp/slog"
 )
 
 func AddMessage(m string) {
 	if node, ok := ctxMgr.GetValue(testResultKey); ok {
-		tr := node.(*testResult)
+		tr := node.(*TestResult)
 		tr.message = m
 	}
 }
 
-func AddLinks(l Link) {
+func AddLinks(l models.Link) {
 	if node, ok := ctxMgr.GetValue(testResultKey); ok {
-		tr := node.(*testResult)
+		tr := node.(*TestResult)
 		tr.resultLinks = append(tr.resultLinks, l)
 	}
 }

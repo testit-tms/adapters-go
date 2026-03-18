@@ -1,10 +1,12 @@
 package tms
 
-import "testing"
+import (
+	"testing"
+)
 
 type testPhaseContainer struct {
 	before   *fixture
-	test     *testResult
+	test     *TestResult
 	resultID string
 	after    *fixture
 }

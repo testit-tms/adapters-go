@@ -2,30 +2,30 @@ package tms
 
 import "time"
 
-type stepresult struct {
-	name          string
-	description   string
-	childrenSteps []stepresult
-	status        string
-	startedOn     time.Time
-	completedOn   time.Time
-	duration      int64
-	attachments   []string
-	parameters    map[string]interface{}
+type StepResult struct {
+	Name          string
+	Description   string
+	ChildrenSteps []StepResult
+	Status        string
+	StartedOn     time.Time
+	CompletedOn   time.Time
+	Duration      int64
+	Attachments   []string
+	Parameters    map[string]interface{}
 }
 
-func (s *stepresult) getSteps() []stepresult {
-	return s.childrenSteps
+func (s *StepResult) getSteps() []StepResult {
+	return s.ChildrenSteps
 }
 
-func (s *stepresult) addStep(step stepresult) {
-	s.childrenSteps = append(s.childrenSteps, step)
+func (s *StepResult) addStep(step StepResult) {
+	s.ChildrenSteps = append(s.ChildrenSteps, step)
 }
 
-func (s *stepresult) addStatus(status string) {
-	s.status = status
+func (s *StepResult) addStatus(status string) {
+	s.Status = status
 }
 
-func (s *stepresult) addAttachments(a string) {
-	s.attachments = append(s.attachments, a)
+func (s *StepResult) addAttachments(a string) {
+	s.Attachments = append(s.Attachments, a)
 }
