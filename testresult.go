@@ -4,8 +4,11 @@ import (
 	"time"
 
 	"github.com/testit-tms/adapters-go/models"
+	"github.com/testit-tms/adapters-go/syncstorage"
 	"golang.org/x/exp/slog"
 )
+
+const inProgressLiteral = "InProgress"
 
 type TestResult struct {
 	externalId  string
@@ -67,12 +70,66 @@ func (tr *TestResult) addTrace(trace string) {
 
 func (tr *TestResult) write() string {
 	const op = "tms.TestResult.write"
+
+	// Sync Storage integration: if master and no in-progress → send to sync-storage first
+	if isSyncStorageActive() && isMasterAndNoInProgress() {
+		ok := tr.onMasterNoAlreadyInProgress()
+		if ok {
+			return ""
+		}
+		// Fallback to normal processing on failure.
+	}
+
 	id, err := client.writeTest(*tr)
 	if err != nil {
 		logger.Error("error writing test result", "error", err, slog.String("op", op))
 	}
 
 	return id
+}
+
+// onMasterNoAlreadyInProgress handles the sync-storage master logic:
+// send a cut model to sync-storage, mark as InProgress, write to TestIT.
+func (tr *TestResult) onMasterNoAlreadyInProgress() bool {
+	const op = "tms.TestResult.onMasterNoAlreadyInProgress"
+
+	cutModel := syncstorage.TestResultCutModel{
+		AutoTestExternalID: tr.externalId,
+		StatusCode:         tr.status,
+		StartedOn:          tr.startedOn.Format(time.RFC3339),
+	}
+
+	logger.Debug("Sending in-progress test result to Sync Storage",
+		"externalId", tr.externalId, "status", tr.status, slog.String("op", op))
+
+	if !syncRunner.SendInProgressTestResult(cutModel) {
+		return false
+	}
+
+	// Write the test result with InProgress status to TestIT.
+	originalStatus := tr.status
+	tr.status = inProgressLiteral
+
+	_, err := client.writeTest(*tr)
+	if err != nil {
+		logger.Warn("Error writing InProgress test result, falling back to normal processing",
+			"error", err, slog.String("op", op))
+		tr.status = originalStatus
+		syncRunner.SetAlreadyInProgress(false)
+		return false
+	}
+
+	return true
+}
+
+// isSyncStorageActive checks if sync-storage runner is initialized and running.
+func isSyncStorageActive() bool {
+	return syncRunner != nil && syncRunner.IsRunning()
+}
+
+// isMasterAndNoInProgress checks if current worker is master and no test is in progress.
+func isMasterAndNoInProgress() bool {
+	return syncRunner.IsMaster() && !syncRunner.IsAlreadyInProgress()
 }
 
 func (tr *TestResult) update(resultID string) {
