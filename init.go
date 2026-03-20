@@ -5,6 +5,7 @@ import (
 
 	"github.com/jtolds/gls"
 	"github.com/testit-tms/adapters-go/config"
+	"github.com/testit-tms/adapters-go/syncstorage"
 
 	"golang.org/x/exp/slog"
 )
@@ -15,6 +16,7 @@ var (
 	logger           *slog.Logger
 	ctxMgr           *gls.ContextManager
 	testPhaseObjects map[string]*testPhaseContainer
+	syncRunner       *syncstorage.Runner
 )
 
 const (
@@ -36,6 +38,9 @@ func init() {
 	}
 	ctxMgr = gls.NewContextManager()
 	testPhaseObjects = make(map[string]*testPhaseContainer)
+
+	// Initialize Sync Storage
+	initSyncStorage()
 }
 
 func callCreateTestRun(client *tmsClient, cfg *config.Config) {
@@ -49,4 +54,27 @@ func getLogLevel(b bool) slog.Level {
 		return slog.LevelDebug
 	}
 	return slog.LevelInfo
+}
+
+func initSyncStorage() {
+	testRunID := cfg.TestRunId
+	if testRunID == "" {
+		logger.Warn("No test run ID available, skipping Sync Storage initialization")
+		return
+	}
+
+	runner := syncstorage.NewRunner(
+		testRunID,
+		cfg.SyncStoragePort,
+		cfg.Url,
+		cfg.Token,
+		logger,
+	)
+
+	if runner.Start() {
+		syncRunner = runner
+		logger.Info("Sync Storage initialized successfully")
+	} else {
+		logger.Warn("Failed to start Sync Storage, continuing without it")
+	}
 }
