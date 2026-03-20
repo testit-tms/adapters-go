@@ -33,6 +33,10 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 	testPhaseObjects := getCurrentTestPhaseObject(t)
 	testPhaseObjects.test = tr
 
+	// Sync Storage: notify running started and reset in-progress flag for each test.
+	OnRunningStarted()
+	ResetInProgressFlag()
+
 	defer func() {
 		panicObject := recover()
 		tr.completedOn = time.Now()
