@@ -67,6 +67,30 @@ func (tr *TestResult) addTrace(trace string) {
 
 func (tr *TestResult) write() string {
 	const op = "tms.TestResult.write"
+
+	// Sync Storage integration: if master and not already in progress,
+	// send cut result to sync-storage and write with InProgress status
+	if syncStorageRunner != nil && syncStorageRunner.IsRunning() &&
+		syncStorageRunner.IsMaster() && !syncStorageRunner.IsAlreadyInProgress() {
+
+		startedOnStr := tr.startedOn.Format(time.RFC3339)
+		if syncStorageRunner.SendInProgressTestResult(tr.externalId, tr.status, startedOnStr) {
+			// Write to TMS with InProgress status
+			originalStatus := tr.status
+			tr.status = "InProgress"
+			id, err := client.writeTest(*tr)
+			if err != nil {
+				logger.Error("error writing in-progress test result", "error", err, slog.String("op", op))
+				// Fallback: restore status and write normally
+				tr.status = originalStatus
+				syncStorageRunner.SetAlreadyInProgress(false)
+			} else {
+				return id
+			}
+		}
+	}
+
+	// Normal write path
 	id, err := client.writeTest(*tr)
 	if err != nil {
 		logger.Error("error writing test result", "error", err, slog.String("op", op))
