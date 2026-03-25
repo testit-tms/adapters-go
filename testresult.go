@@ -90,7 +90,16 @@ func (tr *TestResult) write() string {
 		}
 	}
 
-	// Normal write path
+	// If importRealtime is false, buffer the result for later flush
+	if !cfg.ImportRealtime {
+		logger.Debug("Buffering test result (importRealtime=false)",
+			"externalId", tr.externalId,
+			slog.String("op", op))
+		addPendingResult(*tr)
+		return ""
+	}
+
+	// Normal realtime write path
 	id, err := client.writeTest(*tr)
 	if err != nil {
 		logger.Error("error writing test result", "error", err, slog.String("op", op))
