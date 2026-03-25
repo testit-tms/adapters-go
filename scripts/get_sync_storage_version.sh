@@ -1,3 +1,1 @@
-# TODO: update
-echo v0.1.21
-         
+grep 'syncStorageVersion\s*=' syncstorage/runner.go | sed 's/.*= "\([^"]*\)".*/\1/'
