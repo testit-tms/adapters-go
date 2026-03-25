@@ -73,7 +73,7 @@ func (tr *TestResult) write() string {
 	if syncStorageRunner != nil && syncStorageRunner.IsRunning() &&
 		syncStorageRunner.IsMaster() && !syncStorageRunner.IsAlreadyInProgress() {
 
-		startedOnStr := tr.startedOn.Format(time.RFC3339)
+		startedOnStr := tr.startedOn.UTC().Format(time.RFC3339)
 		if syncStorageRunner.SendInProgressTestResult(tr.externalId, tr.status, startedOnStr) {
 			// Write to TMS with InProgress status
 			originalStatus := tr.status

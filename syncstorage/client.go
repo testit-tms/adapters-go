@@ -45,9 +45,9 @@ type SetWorkerStatusRequest struct {
 
 // TestResultCutModel represents a cut-down test result for sync storage.
 type TestResultCutModel struct {
-	AutoTestExternalID string `json:"auto_test_external_id"`
-	StatusCode         string `json:"status_code"`
-	StartedOn          string `json:"started_on"`
+	AutoTestExternalID string `json:"autoTestExternalId"`
+	StatusCode         string `json:"statusCode"`
+	StartedOn          string `json:"startedOn"`
 }
 
 // HealthCheck checks if the sync storage service is running.
