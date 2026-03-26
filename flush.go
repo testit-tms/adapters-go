@@ -3,15 +3,16 @@ package tms
 import (
 	"sync"
 	"sync/atomic"
+	"testing"
 	"time"
 
 	"golang.org/x/exp/slog"
 )
 
 const (
-	// flushDebounceDelay is the time to wait after the last test finishes
-	// before automatically flushing pending results.
-	flushDebounceDelay = 2 * time.Second
+	// flushSettleDelay is a short pause to let parallel tests that finish
+	// nearly simultaneously to be captured before flushing.
+	flushSettleDelay = 100 * time.Millisecond
 )
 
 var (
@@ -27,15 +28,25 @@ var (
 
 	// flushOnce ensures flush is only executed once.
 	flushOnce sync.Once
-
-	// debounceTimer is the current debounce timer (can be reset).
-	debounceTimer *time.Timer
-	debounceMu    sync.Mutex
 )
 
+// Run is the recommended way to use the adapter with importRealtime=false.
+// Call it from TestMain to guarantee all buffered results are flushed:
+//
+//	func TestMain(m *testing.M) {
+//	    os.Exit(tms.Run(m))
+//	}
+func Run(m *testing.M) int {
+	code := m.Run()
+	if !cfg.ImportRealtime {
+		Flush()
+	}
+	return code
+}
+
 // Flush writes all pending test results to TMS and notifies sync-storage.
-// Call this explicitly from TestMain after m.Run() for guaranteed behavior,
-// or rely on automatic flush triggered 2 seconds after the last test completes.
+// Call this explicitly from TestMain (via Run) after m.Run() for guaranteed
+// behavior, or rely on automatic flush triggered when the last test completes.
 func Flush() {
 	flushOnce.Do(doFlush)
 }
@@ -96,28 +107,16 @@ func trackTestStart() {
 	atomic.AddInt64(&totalTests, 1)
 }
 
-// trackTestEnd decrements the active test counter and schedules
-// a debounced flush if no tests are running.
+// trackTestEnd decrements the active test counter and flushes synchronously
+// when all tests have completed. The flush runs inside the test's defer,
+// which blocks m.Run() from returning and prevents os.Exit before completion.
 func trackTestEnd() {
 	current := atomic.AddInt64(&activeTests, -1)
 	if current == 0 && atomic.LoadInt64(&totalTests) > 0 && !cfg.ImportRealtime {
-		scheduleFlush()
-	}
-}
-
-// scheduleFlush starts or resets the debounce timer for auto-flush.
-func scheduleFlush() {
-	debounceMu.Lock()
-	defer debounceMu.Unlock()
-
-	if debounceTimer != nil {
-		debounceTimer.Stop()
-	}
-
-	debounceTimer = time.AfterFunc(flushDebounceDelay, func() {
-		// Double-check no new tests started during the delay
+		// Brief pause to catch parallel tests finishing nearly simultaneously
+		time.Sleep(flushSettleDelay)
 		if atomic.LoadInt64(&activeTests) == 0 {
 			Flush()
 		}
-	})
+	}
 }
