@@ -95,12 +95,14 @@ func addPendingResult(tr TestResult) {
 }
 
 // trackTestStart increments the active test counter.
-func trackTestStart() {
+// deprecated Not used
+func _trackTestStart() {
 	atomic.AddInt64(&activeTests, 1)
 	atomic.AddInt64(&totalTests, 1)
 }
 
 // trackTestEnd decrements the active test counter.
-func trackTestEnd() {
+// deprecated Not used
+func _trackTestEnd() {
 	atomic.AddInt64(&activeTests, -1)
 }

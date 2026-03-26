@@ -34,7 +34,7 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 	testPhaseObjects.test = tr
 
 	// Track active tests for auto-flush
-	trackTestStart()
+	//trackTestStart()
 
 	// Notify sync-storage that test execution started
 	onRunningStarted()
@@ -75,7 +75,7 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 		}
 
 		// Track test end — may trigger debounced auto-flush
-		trackTestEnd()
+		//trackTestEnd()
 	}()
 
 	if testPhaseObjects.before != nil && testPhaseObjects.before.status == models.Failed {
