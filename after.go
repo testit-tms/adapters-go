@@ -37,7 +37,9 @@ func AfterTest(t *testing.T, m StepMetadata, f func()) {
 		}
 
 		tr.addAfter(after.convertToStepResult())
-		tr.update(testPhaseObject.resultID)
+		if testPhaseObject.resultID != "" {
+			tr.update(testPhaseObject.resultID)
+		}
 	}()
 	ctxMgr.SetValues(gls.Values{
 		testResultKey:   after,
