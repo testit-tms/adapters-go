@@ -85,7 +85,10 @@ jobs:
           curl -v http://127.0.0.1:49152/health || true
 
           cd ci_tests
-          go test -parallel 4 ./... || true
+
+          # -p is for binaries in the same time
+          # -parallel is for packages in the same time
+          go test -parallel 4 -p 4 || true
           sleep 1
           curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} || true
       - name: Validate

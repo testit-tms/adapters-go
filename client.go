@@ -1,6 +1,7 @@
 package tms
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"io"
@@ -50,13 +51,21 @@ func newClient(cfg config.Config) *tmsClient {
 	}
 }
 
-// TODO: Refactoring is needed
 func (c *tmsClient) writeTest(test TestResult) (string, error) {
 	const op = "tmsClient.writeTest"
 	logger := logger.With("op", op)
 
 	ctx := client_helpers.AuthContext(c.cfg.Token)
 
+	autotestID, err := c.writeTestEnsureAutotest(ctx, logger, op, test)
+	if err != nil {
+		return "", err
+	}
+	test = c.writeTestSyncWorkItemLinks(ctx, logger, op, test, autotestID)
+	return c.writeTestUploadResult(ctx, logger, op, test)
+}
+
+func (c *tmsClient) writeTestEnsureAutotest(ctx context.Context, logger *slog.Logger, op string, test TestResult) (string, error) {
 	logger.Debug("searching for test", "externalId", test.externalId, slog.String("op", op))
 	sr := getSearchRequest(test.externalId, c.cfg.ProjectId)
 	resp, r, err := c.client.AutoTestsAPI.ApiV2AutoTestsSearchPost(ctx).
@@ -66,7 +75,6 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 		return "", client_helpers.LogAndWrapAPIError(logger, op, "failed to search for test", err, r)
 	}
 
-	var autotestID string
 	if len(resp) == 0 {
 		cr := testToAutotestModel(test, c.cfg.ProjectId)
 		if c.cfg.AutomaticCreationTestCases {
@@ -82,68 +90,77 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 			return "", client_helpers.LogAndWrapAPIError(logger, op, "failed to create new autotest", err, createResp)
 		}
 
-		autotestID = na.Id
-	} else {
-		ur := testToUpdateAutotestModel(test, resp[0])
-		logger.Debug("update existing autotest", "request", ur)
-		r, err = c.client.AutoTestsAPI.UpdateAutoTest(ctx).
-			AutoTestUpdateApiModel(ur).
-			Execute()
-
-		if err != nil {
-			return "", client_helpers.LogAndWrapAPIError(logger, op, "failed to update existing autotest", err, r)
-		}
-
-		autotestID = resp[0].Id
+		return na.Id, nil
 	}
 
-	if len(test.workItemIds) != 0 {
-		var linkedWorkItems []tmsclient.AutoTestWorkItemIdentifierApiResult
-		linkedWorkItems, r, err = c.client.AutoTestsAPI.GetWorkItemsLinkedToAutoTest(ctx, autotestID).
-			Execute()
+	ur := testToUpdateAutotestModel(test, resp[0])
+	logger.Debug("update existing autotest", "request", ur)
+	r, err = c.client.AutoTestsAPI.UpdateAutoTest(ctx).
+		AutoTestUpdateApiModel(ur).
+		Execute()
 
-		if err != nil {
-			_ = client_helpers.LogAndWrapAPIError(logger, op, "failed to get linked workitems to autotest", err, r)
+	if err != nil {
+		return "", client_helpers.LogAndWrapAPIError(logger, op, "failed to update existing autotest", err, r)
+	}
+
+	return resp[0].Id, nil
+}
+
+func (c *tmsClient) writeTestSyncWorkItemLinks(ctx context.Context, logger *slog.Logger, op string, test TestResult, autotestID string) TestResult {
+	if len(test.workItemIds) == 0 {
+		return test
+	}
+
+	var linkedWorkItems []tmsclient.AutoTestWorkItemIdentifierApiResult
+	var r *http.Response
+	var err error
+	linkedWorkItems, r, err = c.client.AutoTestsAPI.GetWorkItemsLinkedToAutoTest(ctx, autotestID).
+		Execute()
+
+	if err != nil {
+		_ = client_helpers.LogAndWrapAPIError(logger, op, "failed to get linked workitems to autotest", err, r)
+	}
+
+	for _, v := range linkedWorkItems {
+		linkedWorkItemId := strconv.Itoa(int(v.GetGlobalId()))
+		index := getIndex(test.workItemIds, linkedWorkItemId)
+
+		if index != -1 {
+			test.workItemIds = remove(test.workItemIds, index)
+			continue
 		}
 
-		for _, v := range linkedWorkItems {
-			var linkedWorkItemId string = strconv.Itoa(int(v.GetGlobalId()))
-			var index int = getIndex(test.workItemIds, linkedWorkItemId)
-
-			if index != -1 {
-				test.workItemIds = remove(test.workItemIds, index)
-
-				continue
-			}
-
-			if c.cfg.AutomaticUpdationLinksToTestCases {
-				_ = client_helpers.Retry(maxTries, waitingTime*time.Millisecond, func() error {
-					r, err = c.client.AutoTestsAPI.DeleteAutoTestLinkFromWorkItem(ctx, autotestID).
-						WorkItemId(linkedWorkItemId).
-						Execute()
-					if err != nil {
-						_ = client_helpers.LogAndWrapAPIError(logger, op, "failed to unlink autotest from workitem", err, r)
-					}
-					return err
-				})
-			}
-		}
-
-		for _, v := range test.workItemIds {
-			logger.Debug("link autotest to workitem", "workItemId", v, "autotestId", autotestID)
+		if c.cfg.AutomaticUpdationLinksToTestCases {
 			_ = client_helpers.Retry(maxTries, waitingTime*time.Millisecond, func() error {
-				r, err = c.client.AutoTestsAPI.LinkAutoTestToWorkItem(ctx, autotestID).
-					WorkItemIdApiModel(tmsclient.WorkItemIdApiModel{
-						Id: v,
-					}).Execute()
+				r, err = c.client.AutoTestsAPI.DeleteAutoTestLinkFromWorkItem(ctx, autotestID).
+					WorkItemId(linkedWorkItemId).
+					Execute()
 				if err != nil {
-					_ = client_helpers.LogAndWrapAPIError(logger, op, "failed to link autotest to workitem", err, r)
+					_ = client_helpers.LogAndWrapAPIError(logger, op, "failed to unlink autotest from workitem", err, r)
 				}
 				return err
 			})
 		}
 	}
 
+	for _, v := range test.workItemIds {
+		logger.Debug("link autotest to workitem", "workItemId", v, "autotestId", autotestID)
+		_ = client_helpers.Retry(maxTries, waitingTime*time.Millisecond, func() error {
+			r, err = c.client.AutoTestsAPI.LinkAutoTestToWorkItem(ctx, autotestID).
+				WorkItemIdApiModel(tmsclient.WorkItemIdApiModel{
+					Id: v,
+				}).Execute()
+			if err != nil {
+				_ = client_helpers.LogAndWrapAPIError(logger, op, "failed to link autotest to workitem", err, r)
+			}
+			return err
+		})
+	}
+
+	return test
+}
+
+func (c *tmsClient) writeTestUploadResult(ctx context.Context, logger *slog.Logger, op string, test TestResult) (string, error) {
 	rr, err := testToResultModel(test, c.cfg.ConfigurationId)
 	if err != nil {
 		logger.Error("failed to convert test to result model", "error", err, slog.String("op", op))
