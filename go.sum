@@ -28,6 +28,8 @@ github.com/testit-tms/api-client-golang/v3 v3.6.1 h1:AW9ufVkVDE3sBhpRrX9DdHPz9pd
 github.com/testit-tms/api-client-golang/v3 v3.6.1/go.mod h1:ZKwLHGDR6qLzyULhXrCuNJZWo+KDrcOt4Uj0Nf1fwLc=
 github.com/testit-tms/api-client-golang/v3 v3.6.3 h1:4RddmnbAAmIBLaE4HTmj4AWr2erOj61AiSvBBuePOvk=
 github.com/testit-tms/api-client-golang/v3 v3.6.3/go.mod h1:ZKwLHGDR6qLzyULhXrCuNJZWo+KDrcOt4Uj0Nf1fwLc=
+github.com/testit-tms/api-client-golang/v3 v3.6.4 h1:OFa/ikzTyyDE7W5DfGA+viyzVw6twKBEpKuieYJZetE=
+github.com/testit-tms/api-client-golang/v3 v3.6.4/go.mod h1:ZKwLHGDR6qLzyULhXrCuNJZWo+KDrcOt4Uj0Nf1fwLc=
 golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 h1:Di6/M8l0O2lCLc6VVRWhgCiApHV8MnQurBnFSHsQtNY=
 golang.org/x/exp v0.0.0-20230725093048-515e97ebf090/go.mod h1:FXUEEKJgO7OQYeo8N01OfiKP8RXMtf6e8aTskBGqWdc=
 golang.org/x/exp v0.0.0-20260312153236-7ab1446f8b90 h1:jiDhWWeC7jfWqR9c/uplMOqJ0sbNlNWv0UkzE0vX1MA=
