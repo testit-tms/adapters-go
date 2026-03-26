@@ -1,7 +1,6 @@
 package tms
 
 import (
-	"context"
 	"crypto/tls"
 	"fmt"
 	"io"
@@ -55,12 +54,7 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 	const op = "tmsClient.writeTest"
 	logger := logger.With("op", op)
 
-	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
-		"Bearer or PrivateToken": {
-			Key:    c.cfg.Token,
-			Prefix: "PrivateToken",
-		},
-	})
+	ctx := c.authContext()
 
 	logger.Debug("searching for test", "externalId", test.externalId, slog.String("op", op))
 	sr := getSearchRequest(test.externalId, c.cfg.ProjectId)
@@ -68,8 +62,7 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 		AutoTestSearchApiModel(sr).
 		Execute()
 	if err != nil {
-		logger.Error("failed to search for test", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
-		return "", fmt.Errorf("%s: failed to search for test: %w", op, err)
+		return "", logAndWrapAPIError(logger, op, "failed to search for test", err, r)
 	}
 
 	var autotestID string
@@ -80,13 +73,12 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 		}
 
 		logger.Debug("create new autotest", "request", cr)
-		na, _, err := c.client.AutoTestsAPI.CreateAutoTest(ctx).
+		na, createResp, err := c.client.AutoTestsAPI.CreateAutoTest(ctx).
 			AutoTestCreateApiModel(cr).
 			Execute()
 
 		if err != nil {
-			logger.Error("failed to create new autotest", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
-			return "", fmt.Errorf("%s: failed to create new autotest: %w", op, err)
+			return "", logAndWrapAPIError(logger, op, "failed to create new autotest", err, createResp)
 		}
 
 		autotestID = na.Id
@@ -98,8 +90,7 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 			Execute()
 
 		if err != nil {
-			logger.Error("failed to update existing autotest", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
-			return "", fmt.Errorf("%s: failed to update existing autotest: %w", op, err)
+			return "", logAndWrapAPIError(logger, op, "failed to update existing autotest", err, r)
 		}
 
 		autotestID = resp[0].Id
@@ -111,7 +102,7 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 			Execute()
 
 		if err != nil {
-			logger.Error("failed to get linked workitems to autotest", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+			_ = logAndWrapAPIError(logger, op, "failed to get linked workitems to autotest", err, r)
 		}
 
 		for _, v := range linkedWorkItems {
@@ -130,7 +121,7 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 						WorkItemId(linkedWorkItemId).
 						Execute()
 					if err != nil {
-						logger.Error("failed to unlink autotest from workitem", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+						_ = logAndWrapAPIError(logger, op, "failed to unlink autotest from workitem", err, r)
 						time.Sleep(waitingTime * time.Millisecond)
 					} else {
 						break
@@ -147,7 +138,7 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 						Id: v,
 					}).Execute()
 				if err != nil {
-					logger.Error("failed to link autotest to workitem", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+					_ = logAndWrapAPIError(logger, op, "failed to link autotest to workitem", err, r)
 					time.Sleep(waitingTime * time.Millisecond)
 				} else {
 					break
@@ -167,15 +158,12 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 		Execute()
 
 	if err != nil {
-		if r != nil && r.Body != nil {
-			logger.Error("failed to upload result to test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
-		} else {
-			logger.Error("failed to upload result to test run", "error", err, slog.String("op", op))
-		}
-
-		return "", fmt.Errorf("%s: failed to upload result to test run: %w", op, err)
+		return "", logAndWrapAPIError(logger, op, "failed to upload result to test run", err, r)
 	}
 
+	if len(ids) == 0 {
+		return "", fmt.Errorf("%s: failed to upload result to test run: empty result id list", op)
+	}
 	return ids[0], nil
 }
 
@@ -184,12 +172,7 @@ func (c *tmsClient) createTestRun() string {
 	const op = "tmsClient.createTestRun"
 	logger := logger.With("op", op)
 
-	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
-		"Bearer or PrivateToken": {
-			Key:    c.cfg.Token,
-			Prefix: "PrivateToken",
-		},
-	})
+	ctx := c.authContext()
 
 	model := tmsclient.NewCreateEmptyTestRunApiModel(c.cfg.ProjectId)
 	model.SetName(c.cfg.TestRunName)
@@ -202,7 +185,7 @@ func (c *tmsClient) createTestRun() string {
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to create test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		_ = logAndWrapAPIError(logger, op, "failed to create test run", err, r)
 		return ""
 	}
 
@@ -214,18 +197,13 @@ func (c *tmsClient) getTestRun() *tmsclient.TestRunV2ApiResult {
 	const op = "tmsClient.getTestRun"
 	logger := logger.With("op", op)
 
-	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
-		"Bearer or PrivateToken": {
-			Key:    c.cfg.Token,
-			Prefix: "PrivateToken",
-		},
-	})
+	ctx := c.authContext()
 
 	testRun, r, err := c.client.TestRunsAPI.GetTestRunById(ctx, c.cfg.TestRunId).
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to create test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		_ = logAndWrapAPIError(logger, op, "failed to get test run", err, r)
 		return nil
 	}
 
@@ -240,12 +218,7 @@ func (c *tmsClient) updateTestRun() {
 		return
 	}
 
-	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
-		"Bearer or PrivateToken": {
-			Key:    c.cfg.Token,
-			Prefix: "PrivateToken",
-		},
-	})
+	ctx := c.authContext()
 
 	testRun := c.getTestRun()
 
@@ -264,7 +237,7 @@ func (c *tmsClient) updateTestRun() {
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to update test run", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+		_ = logAndWrapAPIError(logger, op, "failed to update test run", err, r)
 		return
 	}
 }
@@ -273,12 +246,7 @@ func (c *tmsClient) writeAttachments(paths ...string) []string {
 	const op = "tmsClient.writeAttachment"
 	logger := logger.With("op", op)
 
-	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
-		"Bearer or PrivateToken": {
-			Key:    c.cfg.Token,
-			Prefix: "PrivateToken",
-		},
-	})
+	ctx := c.authContext()
 
 	attachmanetsIds := make([]string, 0, len(paths))
 	for _, p := range paths {
@@ -294,7 +262,7 @@ func (c *tmsClient) writeAttachments(paths ...string) []string {
 			Execute()
 
 		if err != nil {
-			logger.Error("failed to upload attachment", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
+			_ = logAndWrapAPIError(logger, op, "failed to upload attachment", err, r)
 			continue
 		}
 
@@ -332,12 +300,7 @@ func (c *tmsClient) updateTest(test TestResult) error {
 	const op = "tmsClient.updateTest"
 	logger := logger.With("op", op)
 
-	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
-		"Bearer or PrivateToken": {
-			Key:    c.cfg.Token,
-			Prefix: "PrivateToken",
-		},
-	})
+	ctx := c.authContext()
 
 	logger.Debug("searching for test", "externalId", test.externalId)
 	sr := getSearchRequest(test.externalId, c.cfg.ProjectId)
@@ -346,8 +309,7 @@ func (c *tmsClient) updateTest(test TestResult) error {
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to search for test", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
-		return fmt.Errorf("%s: failed to search for test: %w", op, err)
+		return logAndWrapAPIError(logger, op, "failed to search for test", err, r)
 	}
 
 	ur := testToUpdateAutotestModel(test, resp[0])
@@ -357,8 +319,7 @@ func (c *tmsClient) updateTest(test TestResult) error {
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to update existing autotest", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
-		return fmt.Errorf("%s: failed to update existing autotest: %w", op, err)
+		return logAndWrapAPIError(logger, op, "failed to update existing autotest", err, r)
 	}
 
 	return nil
@@ -366,19 +327,18 @@ func (c *tmsClient) updateTest(test TestResult) error {
 
 func (c *tmsClient) updateTestResult(resultId string, test TestResult) error {
 	const op = "tmsClient.updateTestResult"
-	logger := logger.With("op", op)
+	logger := logger.With(
+		"op", op,
+		"resultId", resultId,
+		"externalId", test.externalId,
+	)
 
-	ctx := context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
-		"Bearer or PrivateToken": {
-			Key:    c.cfg.Token,
-			Prefix: "PrivateToken",
-		},
-	})
+	ctx := c.authContext()
 
+	logger.Debug("getting test result", "resultId", resultId, slog.String("op", op))
 	m, r, err := c.client.TestResultsAPI.ApiV2TestResultsIdGet(ctx, resultId).Execute()
 	if err != nil {
-		logger.Error("failed to get test result", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
-		return fmt.Errorf("%s: failed to get test result: %w", op, err)
+		return logAndWrapAPIError(logger, op, "failed to get test result", err, r)
 	}
 
 	ur, err := testToUpdateResultModel(m, test)
@@ -394,8 +354,7 @@ func (c *tmsClient) updateTestResult(resultId string, test TestResult) error {
 		Execute()
 
 	if err != nil {
-		logger.Error("failed to update test result", "error", err, slog.String("response", respToString(r.Body)), slog.String("op", op))
-		return fmt.Errorf("%s: failed to update test result: %w", op, err)
+		return logAndWrapAPIError(logger, op, "failed to update test result", err, r)
 	}
 
 	return nil

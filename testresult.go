@@ -118,6 +118,12 @@ func (tr *TestResult) update(resultID string) {
 	//
 	err = client.updateTestResult(resultID, *tr)
 	if err != nil {
-		logger.Error("failed to update test result", "error", err, slog.String("op", op))
+		logger.Error(
+			"failed to update test result",
+			"error", err,
+			"resultId", resultID,
+			"externalId", tr.externalId,
+			slog.String("op", op),
+		)
 	}
 }
