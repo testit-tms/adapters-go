@@ -33,6 +33,9 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 	testPhaseObjects := getCurrentTestPhaseObject(t)
 	testPhaseObjects.test = tr
 
+	// Notify sync-storage that test execution started
+	onRunningStarted()
+
 	defer func() {
 		panicObject := recover()
 		tr.completedOn = time.Now()
@@ -61,6 +64,9 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 		if id != "" {
 			testPhaseObjects.resultID = id
 		}
+
+		// Notify sync-storage that test block completed
+		onBlockCompleted()
 	}()
 
 	if testPhaseObjects.before != nil && testPhaseObjects.before.status == models.Failed {

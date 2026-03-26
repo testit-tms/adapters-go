@@ -27,6 +27,8 @@ type Config struct {
 	AutomaticCreationTestCases        bool   `json:"automaticCreationTestCases" env:"TMS_AUTOMATIC_CREATION_TEST_CASES" env-default:"false"`
 	AutomaticUpdationLinksToTestCases bool   `json:"automaticUpdationLinksToTestCases" env:"TMS_AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES" env-default:"false"`
 	CertValidation                    bool   `json:"certValidation" env:"TMS_CERT_VALIDATION" env-default:"true"`
+	SyncStoragePort                   string `json:"syncStoragePort" env:"TMS_SYNC_STORAGE_PORT" env-default:"49152"`
+	ImportRealtime                    bool   `json:"importRealtime" env:"TMS_IMPORT_REALTIME" env-default:"false"`
 }
 
 func MustLoad() *Config {

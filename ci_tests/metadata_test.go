@@ -8,6 +8,7 @@ import (
 )
 
 func TestMetadata_without_metadata_success(t *testing.T) {
+	t.Parallel()
 	tms.Test(t, tms.TestMetadata{},
 		func() {
 			tms.True(t, true)
@@ -15,6 +16,7 @@ func TestMetadata_without_metadata_success(t *testing.T) {
 }
 
 func TestMetadata_without_metadata_failed(t *testing.T) {
+	t.Parallel()
 	tms.Test(t,
 		tms.TestMetadata{},
 		func() {

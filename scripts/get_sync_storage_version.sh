@@ -1,0 +1,1 @@
+grep 'syncStorageVersion\s*=' syncstorage/runner.go | sed 's/.*= "\([^"]*\)".*/\1/'
