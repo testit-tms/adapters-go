@@ -7,6 +7,7 @@ import (
 )
 
 func TestFixture_success(t *testing.T) {
+	t.Parallel()
 	tms.BeforeTest(t,
 		tms.StepMetadata{
 			Name:        "before test",
@@ -55,6 +56,7 @@ func TestFixture_success(t *testing.T) {
 }
 
 func TestFixture_failed(t *testing.T) {
+	t.Parallel()
 	tms.BeforeTest(t,
 		tms.StepMetadata{
 			Name:        "before test",
