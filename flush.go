@@ -10,7 +10,9 @@ import (
 
 var (
 	// pendingResults stores test results when importRealtime is false.
-	pendingResults   []TestResult
+	// Pointers are used so that mutations (e.g. AfterTest adding teardowns)
+	// after buffering are reflected at flush time.
+	pendingResults   []*TestResult
 	pendingResultsMu sync.Mutex
 
 	// activeTests tracks the number of currently running tests.
@@ -48,7 +50,7 @@ func doFlush() {
 	const op = "tms.doFlush"
 
 	pendingResultsMu.Lock()
-	results := make([]TestResult, len(pendingResults))
+	results := make([]*TestResult, len(pendingResults))
 	copy(results, pendingResults)
 	pendingResults = nil
 	pendingResultsMu.Unlock()
@@ -63,19 +65,19 @@ func doFlush() {
 		slog.Int("count", len(results)),
 		slog.String("op", op))
 
-	for i := range results {
-		id, err := client.writeTest(results[i])
+	for _, tr := range results {
+		id, err := client.writeTest(*tr)
 		if err != nil {
 			logger.Error("error writing pending test result",
 				"error", err,
-				"externalId", results[i].externalId,
+				"externalId", tr.externalId,
 				slog.String("op", op))
 			continue
 		}
 
 		// Update testPhaseObjects with the result ID if available
 		if id != "" {
-			if tpo, ok := testPhaseObjects[results[i].externalKey]; ok {
+			if tpo, ok := testPhaseObjects[tr.externalKey]; ok {
 				tpo.resultID = id
 			}
 		}
@@ -88,7 +90,9 @@ func doFlush() {
 }
 
 // addPendingResult adds a test result to the pending buffer.
-func addPendingResult(tr TestResult) {
+// A pointer is stored so that later mutations (e.g. teardowns added
+// by AfterTest) are visible when Flush() reads the results.
+func addPendingResult(tr *TestResult) {
 	pendingResultsMu.Lock()
 	pendingResults = append(pendingResults, tr)
 	pendingResultsMu.Unlock()

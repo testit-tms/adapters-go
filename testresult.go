@@ -95,7 +95,7 @@ func (tr *TestResult) write() string {
 		logger.Debug("Buffering test result (importRealtime=false)",
 			"externalId", tr.externalId,
 			slog.String("op", op))
-		addPendingResult(*tr)
+		addPendingResult(tr)
 		return ""
 	}
 
