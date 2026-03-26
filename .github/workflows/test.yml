@@ -37,6 +37,7 @@ jobs:
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
       TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
       TMS_IS_DEBUG: true
+      TMS_IMPORT_REALTIME: false
     steps:
       - name: Checkout adapters-go
         uses: actions/checkout@v4
