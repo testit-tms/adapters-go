@@ -4,15 +4,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
-	"time"
 
 	"golang.org/x/exp/slog"
-)
-
-const (
-	// flushSettleDelay is a short pause to let parallel tests that finish
-	// nearly simultaneously to be captured before flushing.
-	flushSettleDelay = 100 * time.Millisecond
 )
 
 var (
@@ -107,16 +100,7 @@ func trackTestStart() {
 	atomic.AddInt64(&totalTests, 1)
 }
 
-// trackTestEnd decrements the active test counter and flushes synchronously
-// when all tests have completed. The flush runs inside the test's defer,
-// which blocks m.Run() from returning and prevents os.Exit before completion.
+// trackTestEnd decrements the active test counter.
 func trackTestEnd() {
-	current := atomic.AddInt64(&activeTests, -1)
-	if current == 0 && atomic.LoadInt64(&totalTests) > 0 && !cfg.ImportRealtime {
-		// Brief pause to catch parallel tests finishing nearly simultaneously
-		time.Sleep(flushSettleDelay)
-		if atomic.LoadInt64(&activeTests) == 0 {
-			Flush()
-		}
-	}
+	atomic.AddInt64(&activeTests, -1)
 }
