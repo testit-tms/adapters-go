@@ -55,6 +55,28 @@ curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID
 5. You can read the sync-storage logs from the service.log file.
 
 
+### How to use new importRealtime: false (true by default)?
+
+You should prepare your tests for it, add `TestMain` method to each test package:
+
+```golang
+
+package examples
+
+import (
+	"os"
+	"testing"
+
+	tms "github.com/testit-tms/adapters-go"
+)
+
+// add this one for correct importRealtime=false behavior:
+
+func TestMain(m *testing.M) {
+	os.Exit(tms.Run(m))
+}
+```
+
 
 ## Getting Started
 
