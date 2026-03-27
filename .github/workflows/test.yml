@@ -37,6 +37,7 @@ jobs:
       TMS_PROJECT_ID: ${{ secrets[matrix.project_id] }}
       TMS_TEST_RUN_NAME: ${{ matrix.project_name }} TestRun
       TMS_IS_DEBUG: true
+      TMS_IMPORT_REALTIME: false
     steps:
       - name: Checkout adapters-go
         uses: actions/checkout@v4
@@ -85,7 +86,10 @@ jobs:
           curl -v http://127.0.0.1:49152/health || true
 
           cd ci_tests
-          go test -parallel 4 ./... || true
+
+          # -p is for binaries in the same time
+          # -parallel is for packages in the same time
+          go test -parallel 4 -p 4 || true
           sleep 1
           curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} || true
       - name: Validate

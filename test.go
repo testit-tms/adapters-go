@@ -33,6 +33,9 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 	testPhaseObjects := getCurrentTestPhaseObject(t)
 	testPhaseObjects.test = tr
 
+	// Track active tests for auto-flush
+	//trackTestStart()
+
 	// Notify sync-storage that test execution started
 	onRunningStarted()
 
@@ -65,8 +68,14 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 			testPhaseObjects.resultID = id
 		}
 
-		// Notify sync-storage that test block completed
-		onBlockCompleted()
+		// In realtime mode, notify sync-storage per test.
+		// In non-realtime mode, onBlockCompleted is called once during Flush().
+		if cfg.ImportRealtime {
+			onBlockCompleted()
+		}
+
+		// Track test end — may trigger debounced auto-flush
+		//trackTestEnd()
 	}()
 
 	if testPhaseObjects.before != nil && testPhaseObjects.before.status == models.Failed {

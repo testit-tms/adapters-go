@@ -55,6 +55,31 @@ curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID
 5. You can read the sync-storage logs from the service.log file.
 
 
+### How to use new importRealtime: false (true by default)?
+
+You should prepare your tests for it, add `TestMain` method to each test package:
+
+```golang
+
+package examples
+
+import (
+	"os"
+	"testing"
+
+	tms "github.com/testit-tms/adapters-go"
+)
+
+// add this one for correct importRealtime=false behavior:
+
+func TestMain(m *testing.M) {
+	os.Exit(tms.Run(m))
+}
+```
+
+You can check our Golang example here: 
+
+https://github.com/testit-tms/go-examples/tree/main/examples
 
 ## Getting Started
 
@@ -82,7 +107,7 @@ go get github.com/testit-tms/adapters-go@<necessary package version>
 | Mode of automatic updation links to test cases (**It's optional**). Default value - false. The adapter supports following modes:<br/>true - in this mode, the adapter will update links to test cases<br/>false - in this mode, the adapter will not update link to test cases                                      | automaticUpdationLinksToTestCases | TMS_AUTOMATIC_UPDATION_LINKS_TO_TEST_CASES |
 | Enable debug logs (**It's optional**). Default value - false                                                                                                                                                                                                                                                        | isDebug                           | TMS_IS_DEBUG                               |
 | Sync storage port (**It's optional, 49152 by default**)                                                                                                                                                                                                                                                             | syncStoragePort                   | TMS_SYNC_STORAGE_PORT                      | 
-| Mode of import type selection when launching autotests (**It's optional**). Default value - false. The adapter supports following modes:<br/>true - in this mode, the adapter will create/update each autotest in real time<br/>false - in this mode, the adapter will create/update multiple autotests             | importRealtime                    | TMS_IMPORT_REALTIME                        |
+| Mode of import type selection when launching autotests (**It's optional**). Default value - true. The adapter supports following modes:<br/>true - in this mode, the adapter will create/update each autotest in real time<br/>false - in this mode, the adapter will create/update multiple autotests              | importRealtime                    | TMS_IMPORT_REALTIME                        |
 
 #### File
 
