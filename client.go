@@ -21,6 +21,7 @@ import (
 const (
 	maxTries    = 10
 	waitingTime = 100
+	batchSize   = 100
 )
 
 type tmsClient struct {
@@ -63,6 +64,108 @@ func (c *tmsClient) writeTest(test TestResult) (string, error) {
 	}
 	test = c.writeTestSyncWorkItemLinks(ctx, logger, op, test, autotestID)
 	return c.writeTestUploadResult(ctx, logger, op, test)
+}
+
+// writeTests is used for buffered flush mode and uploads results in batches.
+func (c *tmsClient) writeTests(tests []TestResult) (map[string]string, error) {
+	const op = "tmsClient.writeTests"
+	logger := logger.With("op", op)
+	ctx := client_helpers.AuthContext(c.cfg.Token)
+
+	prepared := make([]TestResult, 0, len(tests))
+	var firstErr error
+
+	for _, test := range tests {
+		autotestID, err := c.writeTestEnsureAutotest(ctx, logger, op, test)
+		if err != nil {
+			if firstErr == nil {
+				firstErr = err
+			}
+			logger.Error("failed to prepare autotest for batch upload", "externalId", test.externalId, "error", err, slog.String("op", op))
+			continue
+		}
+		prepared = append(prepared, c.writeTestSyncWorkItemLinks(ctx, logger, op, test, autotestID))
+	}
+
+	idsByExternalID, err := c.writeTestUploadResultsBatch(ctx, logger, op, prepared)
+	if err != nil && firstErr == nil {
+		firstErr = err
+	}
+	return idsByExternalID, firstErr
+}
+
+func (c *tmsClient) writeTestUploadResultsBatch(ctx context.Context, logger *slog.Logger, op string, tests []TestResult) (map[string]string, error) {
+	idsByExternalID := make(map[string]string, len(tests))
+	var firstErr error
+
+	for start := 0; start < len(tests); start += batchSize {
+		end := start + batchSize
+		if end > len(tests) {
+			end = len(tests)
+		}
+		chunk := tests[start:end]
+
+		req := make([]tmsclient.AutoTestResultsForTestRunModel, 0, len(chunk))
+		externalIDs := make([]string, 0, len(chunk))
+		for _, test := range chunk {
+			rr, err := testToResultModel(test, c.cfg.ConfigurationId)
+			if err != nil {
+				if firstErr == nil {
+					firstErr = fmt.Errorf("%s: failed to convert test to result model: %w", op, err)
+				}
+				logger.Error("failed to convert test to result model", "externalId", test.externalId, "error", err, slog.String("op", op))
+				continue
+			}
+
+			if len(rr) == 0 {
+				if firstErr == nil {
+					firstErr = fmt.Errorf("%s: failed to convert test to result model: empty payload for externalId=%s", op, test.externalId)
+				}
+				logger.Error("empty result payload for test", "externalId", test.externalId, slog.String("op", op))
+				continue
+			}
+
+			// Keep 1:1 request-to-id mapping for batch response.
+			req = append(req, rr[0])
+			externalIDs = append(externalIDs, test.externalId)
+		}
+
+		if len(req) == 0 {
+			continue
+		}
+
+		ids, r, err := c.client.TestRunsAPI.SetAutoTestResultsForTestRun(ctx, c.cfg.TestRunId).
+			AutoTestResultsForTestRunModel(req).
+			Execute()
+		if err != nil {
+			if firstErr == nil {
+				firstErr = client_helpers.LogAndWrapAPIError(logger, op, "failed to upload result batch to test run", err, r)
+			} else {
+				_ = client_helpers.LogAndWrapAPIError(logger, op, "failed to upload result batch to test run", err, r)
+			}
+			continue
+		}
+
+		if len(ids) != len(externalIDs) {
+			logger.Error("result ids count mismatch after batch upload",
+				"expected", len(externalIDs),
+				"actual", len(ids),
+				slog.String("op", op))
+			if firstErr == nil {
+				firstErr = fmt.Errorf("%s: result ids count mismatch after batch upload", op)
+			}
+		}
+
+		limit := len(ids)
+		if limit > len(externalIDs) {
+			limit = len(externalIDs)
+		}
+		for i := 0; i < limit; i++ {
+			idsByExternalID[externalIDs[i]] = ids[i]
+		}
+	}
+
+	return idsByExternalID, firstErr
 }
 
 func (c *tmsClient) writeTestEnsureAutotest(ctx context.Context, logger *slog.Logger, op string, test TestResult) (string, error) {

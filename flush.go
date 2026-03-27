@@ -65,21 +65,25 @@ func doFlush() {
 		slog.Int("count", len(results)),
 		slog.String("op", op))
 
+	tests := make([]TestResult, 0, len(results))
 	for _, tr := range results {
-		id, err := client.writeTest(*tr)
-		if err != nil {
-			logger.Error("error writing pending test result",
-				"error", err,
-				"externalId", tr.externalId,
-				slog.String("op", op))
+		tests = append(tests, *tr)
+	}
+
+	idsByExternalID, err := client.writeTests(tests)
+	if err != nil {
+		logger.Error("error writing pending test results in batch",
+			"error", err,
+			slog.String("op", op))
+	}
+
+	for _, tr := range results {
+		id := idsByExternalID[tr.externalId]
+		if id == "" {
 			continue
 		}
-
-		// Update testPhaseObjects with the result ID if available
-		if id != "" {
-			if tpo, ok := testPhaseObjects[tr.externalKey]; ok {
-				tpo.resultID = id
-			}
+		if tpo, ok := testPhaseObjects[tr.externalKey]; ok {
+			tpo.resultID = id
 		}
 	}
 
