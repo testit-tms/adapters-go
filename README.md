@@ -77,6 +77,9 @@ func TestMain(m *testing.M) {
 }
 ```
 
+You can check our Golang example here: 
+
+https://github.com/testit-tms/go-examples/tree/main/examples
 
 ## Getting Started
 
