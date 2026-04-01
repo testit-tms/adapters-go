@@ -1,5 +1,5 @@
 # Test IT TMS Adapter for Golang
-
+![Test IT](https://raw.githubusercontent.com/testit-tms/adapters-go/main/images/banner.png)
 
 ## Compatibility
 
