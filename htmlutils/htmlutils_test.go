@@ -29,7 +29,7 @@ func TestEscapeHtmlTags(t *testing.T) {
 		{
 			name:     "String with self-closing tag",
 			input:    "Hello <br/> world",
-			expected: "Hello \\<br/&gt; world",
+			expected: "Hello &lt;br/&gt; world",
 		},
 		{
 			name:     "String with already escaped characters",
@@ -75,10 +75,12 @@ func TestEscapeHtmlTags(t *testing.T) {
 
 func TestEscapeHtmlInObject(t *testing.T) {
 	type TestStruct struct {
-		Name        string
-		Description string
-		Count       int
-		IsActive    bool
+		Name              string
+		Description       string
+		ExternalId        string
+		AutoTestExternalId string
+		Count             int
+		IsActive          bool
 	}
 
 	tests := []struct {
@@ -96,12 +98,16 @@ func TestEscapeHtmlInObject(t *testing.T) {
 			input: &TestStruct{
 				Name:        "Test <b>Name</b>",
 				Description: "<script>alert('xss')</script>",
+				ExternalId:  "<test>",
+				AutoTestExternalId: "<auto>",
 				Count:       5,
 				IsActive:    true,
 			},
 			expected: &TestStruct{
 				Name:        "Test &lt;b&gt;Name&lt;/b&gt;",
 				Description: "&lt;script&gt;alert('xss')&lt;/script&gt;",
+				ExternalId:  "<test>",
+				AutoTestExternalId: "<auto>",
 				Count:       5,
 				IsActive:    true,
 			},
@@ -111,12 +117,16 @@ func TestEscapeHtmlInObject(t *testing.T) {
 			input: &TestStruct{
 				Name:        "Test Name",
 				Description: "Simple description",
+				ExternalId:  "<test>",
+				AutoTestExternalId: "<auto>",
 				Count:       5,
 				IsActive:    true,
 			},
 			expected: &TestStruct{
 				Name:        "Test Name",
 				Description: "Simple description",
+				ExternalId:  "<test>",
+				AutoTestExternalId: "<auto>",
 				Count:       5,
 				IsActive:    true,
 			},
@@ -143,6 +153,12 @@ func TestEscapeHtmlInObject(t *testing.T) {
 				}
 				if inputStruct.Description != expectedStruct.Description {
 					t.Errorf("Description: got %q, want %q", inputStruct.Description, expectedStruct.Description)
+				}
+				if inputStruct.ExternalId != expectedStruct.ExternalId {
+					t.Errorf("ExternalId: got %q, want %q", inputStruct.ExternalId, expectedStruct.ExternalId)
+				}
+				if inputStruct.AutoTestExternalId != expectedStruct.AutoTestExternalId {
+					t.Errorf("AutoTestExternalId: got %q, want %q", inputStruct.AutoTestExternalId, expectedStruct.AutoTestExternalId)
 				}
 				if inputStruct.Count != expectedStruct.Count {
 					t.Errorf("Count: got %d, want %d", inputStruct.Count, expectedStruct.Count)
@@ -178,8 +194,8 @@ func TestEscapeHtmlInObjectSlice(t *testing.T) {
 				{Name: "Test <i>2</i>", Desc: "<div>content</div>"},
 			},
 			expected: []TestStruct{
-				{Name: "Test \\<b&gt;1\\</b&gt;", Desc: "\\<script&gt;alert(1)\\</script&gt;"},
-				{Name: "Test \\<i&gt;2\\</i&gt;", Desc: "\\<div&gt;content\\</div&gt;"},
+				{Name: "Test &lt;b&gt;1&lt;/b&gt;", Desc: "&lt;script&gt;alert(1)&lt;/script&gt;"},
+				{Name: "Test &lt;i&gt;2&lt;/i&gt;", Desc: "&lt;div&gt;content&lt;/div&gt;"},
 			},
 		},
 		{
@@ -308,12 +324,12 @@ func TestDoubleEscapingPrevention(t *testing.T) {
 		{
 			name:     "Already escaped characters should not be double escaped",
 			input:    "Hello \\<b\\>world\\</b\\>",
-			expected: "Hello \\<b\\&gt;world\\</b\\&gt;",
+			expected: "Hello \\&lt;b\\&gt;world\\&lt;/b\\&gt;",
 		},
 		{
 			name:     "Mix of escaped and unescaped",
 			input:    "Hello \\<b>world</b>",
-			expected: "Hello \\<b\\&gt;world\\</b\\&gt;",
+			expected: "Hello \\&lt;b&gt;world&lt;/b&gt;",
 		},
 	}
 

@@ -145,6 +145,13 @@ func processStruct(structValue reflect.Value) {
 			continue
 		}
 
+		// Never escape identifier-like fields; they are not user-facing HTML and
+		// escaping them can create duplicates (e.g. externalId "<x>" vs "&lt;x&gt;").
+		switch fieldType.Name {
+		case "ExternalId", "AutoTestExternalId":
+			continue
+		}
+
 		processValue(field)
 	}
 }
