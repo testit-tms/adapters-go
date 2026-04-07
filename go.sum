@@ -28,6 +28,7 @@ github.com/testit-tms/api-client-golang/v3 v3.6.1 h1:AW9ufVkVDE3sBhpRrX9DdHPz9pd
 github.com/testit-tms/api-client-golang/v3 v3.6.1/go.mod h1:ZKwLHGDR6qLzyULhXrCuNJZWo+KDrcOt4Uj0Nf1fwLc=
 github.com/testit-tms/api-client-golang/v3 v3.6.3 h1:4RddmnbAAmIBLaE4HTmj4AWr2erOj61AiSvBBuePOvk=
 github.com/testit-tms/api-client-golang/v3 v3.6.3/go.mod h1:ZKwLHGDR6qLzyULhXrCuNJZWo+KDrcOt4Uj0Nf1fwLc=
+github.com/testit-tms/api-client-golang/v3 v3.6.4-tms-5.7/go.mod h1:ZKwLHGDR6qLzyULhXrCuNJZWo+KDrcOt4Uj0Nf1fwLc=
 github.com/testit-tms/api-client-golang/v3 v3.6.4 h1:OFa/ikzTyyDE7W5DfGA+viyzVw6twKBEpKuieYJZetE=
 github.com/testit-tms/api-client-golang/v3 v3.6.4/go.mod h1:ZKwLHGDR6qLzyULhXrCuNJZWo+KDrcOt4Uj0Nf1fwLc=
 golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 h1:Di6/M8l0O2lCLc6VVRWhgCiApHV8MnQurBnFSHsQtNY=
