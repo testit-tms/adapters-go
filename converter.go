@@ -11,6 +11,7 @@ import (
 
 // TODO: validate that hasInfo always true is correct
 const defaultHasInfo = true
+const defaultLinkType = tmsclient.LINKTYPE_RELATED
 
 func testToAutotestModel(test TestResult, projectId string) tmsclient.AutoTestCreateApiModel {
 	req := tmsclient.NewAutoTestCreateApiModel(projectId, test.externalId, test.displayName)
@@ -50,14 +51,16 @@ func testToAutotestModel(test TestResult, projectId string) tmsclient.AutoTestCr
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 
+			linkType := defaultLinkType
 			if link.LinkType != "" {
-				linkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
+				parsedLinkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
 				if err != nil {
 					logger.Error("error converting link type", "error", err)
 				} else {
-					l.SetType(*linkType)
+					linkType = *parsedLinkType
 				}
 			}
+			l.SetType(linkType)
 
 			links = append(links, *l)
 		}
@@ -139,14 +142,16 @@ func testToUpdateAutotestModel(test TestResult, autotest tmsclient.AutoTestApiRe
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 
+			linkType := defaultLinkType
 			if link.LinkType != "" {
-				linkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
+				parsedLinkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
 				if err != nil {
 					logger.Error("error converting link type", "error", err)
 				} else {
-					l.SetType(*linkType)
+					linkType = *parsedLinkType
 				}
 			}
+			l.SetType(linkType)
 
 			links = append(links, *l)
 		}
@@ -222,14 +227,16 @@ func testToResultModel(test TestResult, confID string) ([]tmsclient.AutoTestResu
 			l := tmsclient.NewLinkPostModel(link.Url, defaultHasInfo)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
+			linkType := defaultLinkType
 			if link.LinkType != "" {
-				linkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
+				parsedLinkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
 				if err != nil {
 					logger.Error("error converting link type", "error", err)
 				} else {
-					l.SetType(*linkType)
+					linkType = *parsedLinkType
 				}
 			}
+			l.SetType(linkType)
 			links = append(links, *l)
 		}
 		req.SetLinks(links)
