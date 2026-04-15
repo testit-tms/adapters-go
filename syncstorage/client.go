@@ -45,8 +45,10 @@ type SetWorkerStatusRequest struct {
 
 // TestResultCutModel represents a cut-down test result for sync storage.
 type TestResultCutModel struct {
+	ProjectID          string `json:"projectId"`
 	AutoTestExternalID string `json:"autoTestExternalId"`
 	StatusCode         string `json:"statusCode"`
+	StatusType         string `json:"statusType"`
 	StartedOn          string `json:"startedOn"`
 }
 

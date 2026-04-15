@@ -74,7 +74,8 @@ func (tr *TestResult) write() string {
 		syncStorageRunner.IsMaster() && !syncStorageRunner.IsAlreadyInProgress() {
 
 		startedOnStr := tr.startedOn.UTC().Format(time.RFC3339)
-		if syncStorageRunner.SendInProgressTestResult(tr.externalId, tr.status, startedOnStr) {
+		statusType := mapType(tr.status)
+		if syncStorageRunner.SendInProgressTestResult(cfg.ProjectId, tr.externalId, tr.status, string(statusType), startedOnStr) {
 			// Write to TMS with InProgress status
 			originalStatus := tr.status
 			tr.status = "InProgress"

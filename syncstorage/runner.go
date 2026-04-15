@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	syncStorageVersion        = "v0.1.21"
+	syncStorageVersion        = "v0.3.0"
 	syncStorageRepoURL        = "https://github.com/testit-tms/sync-storage-public/releases/download/"
 	defaultPort               = "49152"
 	startupTimeout            = 30 * time.Second
@@ -171,7 +171,7 @@ func (r *Runner) SetTestRunID(id string) {
 }
 
 // SendInProgressTestResult sends test result to sync storage if this worker is master.
-func (r *Runner) SendInProgressTestResult(externalID, statusCode, startedOn string) bool {
+func (r *Runner) SendInProgressTestResult(projectID, externalID, statusCode, statusType, startedOn string) bool {
 	if !r.isMaster {
 		r.logger.Debug("Not master worker, skipping send to sync storage")
 		return false
@@ -183,8 +183,10 @@ func (r *Runner) SendInProgressTestResult(externalID, statusCode, startedOn stri
 	}
 
 	model := TestResultCutModel{
+		ProjectID:          projectID,
 		AutoTestExternalID: externalID,
 		StatusCode:         statusCode,
+		StatusType:         statusType,
 		StartedOn:          startedOn,
 	}
 
