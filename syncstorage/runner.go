@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	syncStorageVersion        = "v0.3.0"
+	syncStorageVersion        = "v0.3.2"
 	syncStorageRepoURL        = "https://github.com/testit-tms/sync-storage-public/releases/download/"
 	defaultPort               = "49152"
 	startupTimeout            = 30 * time.Second
@@ -123,7 +123,7 @@ func (r *Runner) Start() bool {
 	}
 
 	// Read output in background
-	go r.readOutput(stdout)
+	//go r.readOutput(stdout)
 
 	// Wait for startup
 	if !r.waitForStartup() {
