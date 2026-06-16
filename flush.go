@@ -2,7 +2,6 @@ package tms
 
 import (
 	"sync"
-	"sync/atomic"
 	"testing"
 
 	"golang.org/x/exp/slog"
@@ -14,12 +13,6 @@ var (
 	// after buffering are reflected at flush time.
 	pendingResults   []*TestResult
 	pendingResultsMu sync.Mutex
-
-	// activeTests tracks the number of currently running tests.
-	activeTests int64
-
-	// totalTests tracks total tests that have been started (to avoid premature flush).
-	totalTests int64
 
 	// flushOnce ensures flush is only executed once.
 	flushOnce sync.Once
@@ -40,8 +33,11 @@ func Run(m *testing.M) int {
 }
 
 // Flush writes all pending test results to TMS and notifies sync-storage.
-// Call this explicitly from TestMain (via Run) after m.Run() for guaranteed
-// behavior, or rely on automatic flush triggered when the last test completes.
+// With importRealtime=false, call it from TestMain via Run after m.Run():
+//
+//	func TestMain(m *testing.M) {
+//	    os.Exit(tms.Run(m))
+//	}
 func Flush() {
 	flushOnce.Do(doFlush)
 }
@@ -100,17 +96,4 @@ func addPendingResult(tr *TestResult) {
 	pendingResultsMu.Lock()
 	pendingResults = append(pendingResults, tr)
 	pendingResultsMu.Unlock()
-}
-
-// trackTestStart increments the active test counter.
-// deprecated Not used
-func _trackTestStart() {
-	atomic.AddInt64(&activeTests, 1)
-	atomic.AddInt64(&totalTests, 1)
-}
-
-// trackTestEnd decrements the active test counter.
-// deprecated Not used
-func _trackTestEnd() {
-	atomic.AddInt64(&activeTests, -1)
 }

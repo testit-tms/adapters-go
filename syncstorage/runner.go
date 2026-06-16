@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"sync"
 	"time"
 
@@ -16,7 +15,7 @@ import (
 )
 
 const (
-	syncStorageVersion        = "v0.3.2"
+	syncStorageVersion        = "v0.3.7-tms-5.7"
 	syncStorageRepoURL        = "https://github.com/testit-tms/sync-storage-public/releases/download/"
 	defaultPort               = "49152"
 	startupTimeout            = 30 * time.Second
@@ -109,21 +108,10 @@ func (r *Runner) Start() bool {
 	r.process = exec.Command(executablePath, args...)
 	r.process.Dir = filepath.Dir(executablePath)
 
-	// Capture stdout/stderr for logging
-	stdout, err := r.process.StdoutPipe()
-	if err != nil {
-		r.logger.Error("Failed to create stdout pipe", "error", err)
-		return false
-	}
-	r.process.Stderr = r.process.Stdout
-
 	if err := r.process.Start(); err != nil {
 		r.logger.Error("Failed to start SyncStorage process", "error", err)
 		return false
 	}
-
-	// Read output in background
-	//go r.readOutput(stdout)
 
 	// Wait for startup
 	if !r.waitForStartup() {
@@ -248,19 +236,6 @@ func (r *Runner) waitForStartup() bool {
 		time.Sleep(startupCheckInterval)
 	}
 	return false
-}
-
-func (r *Runner) readOutput(reader io.Reader) {
-	buf := make([]byte, 4096)
-	for {
-		n, err := reader.Read(buf)
-		if n > 0 {
-			r.logger.Info("SyncStorage", "output", strings.TrimSpace(string(buf[:n])))
-		}
-		if err != nil {
-			break
-		}
-	}
 }
 
 func (r *Runner) prepareExecutable() (string, error) {
