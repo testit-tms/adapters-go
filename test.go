@@ -33,9 +33,6 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 	testPhaseObjects := getCurrentTestPhaseObject(t)
 	testPhaseObjects.test = tr
 
-	// Track active tests for auto-flush
-	//trackTestStart()
-
 	// Notify sync-storage that test execution started
 	onRunningStarted()
 
@@ -73,9 +70,6 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 		if cfg.ImportRealtime {
 			onBlockCompleted()
 		}
-
-		// Track test end — may trigger debounced auto-flush
-		//trackTestEnd()
 	}()
 
 	if testPhaseObjects.before != nil && testPhaseObjects.before.status == models.Failed {
