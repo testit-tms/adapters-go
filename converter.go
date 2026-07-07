@@ -47,7 +47,7 @@ func testToAutotestModel(test TestResult, projectId string) tmsclient.AutoTestCr
 		links := make([]tmsclient.LinkCreateApiModel, 0, len(test.links))
 		for _, link := range test.links {
 
-			l := tmsclient.NewLinkCreateApiModel(link.Url, defaultHasInfo)
+			l := tmsclient.NewLinkCreateApiModel(link.Url, tmsclient.LinkType(link.LinkType), defaultHasInfo)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 
@@ -138,7 +138,7 @@ func testToUpdateAutotestModel(test TestResult, autotest tmsclient.AutoTestApiRe
 	if len(test.links) != 0 {
 		links := make([]tmsclient.LinkUpdateApiModel, 0, len(test.links))
 		for _, link := range test.links {
-			l := tmsclient.NewLinkUpdateApiModel(link.Url, defaultHasInfo)
+			l := tmsclient.NewLinkUpdateApiModel(link.Url, tmsclient.LinkType(link.LinkType), defaultHasInfo)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 
@@ -224,7 +224,7 @@ func testToResultModel(test TestResult, confID string) ([]tmsclient.AutoTestResu
 	if len(test.resultLinks) != 0 {
 		links := make([]tmsclient.LinkPostModel, 0, len(test.resultLinks))
 		for _, link := range test.resultLinks {
-			l := tmsclient.NewLinkPostModel(link.Url, defaultHasInfo)
+			l := tmsclient.NewLinkPostModel(link.Url, tmsclient.LinkType(link.LinkType), defaultHasInfo)
 			l.SetTitle(link.Title)
 			l.SetDescription(link.Description)
 			linkType := defaultLinkType
@@ -432,7 +432,7 @@ func testToUpdateResultModel(model *tmsclient.TestResultResponse, test TestResul
 	req.SetTeardownResults(tearDowns)
 	req.SetSetupResults(setups)
 	req.SetDuration(model.GetDurationInMs())
-	req.SetLinks(model.GetLinks())
+	req.SetLinks(buildCreateLinkApiModel(model.GetLinks()))
 	req.SetStepResults(model.GetStepResults())
 	req.SetFailureClassIds(model.GetFailureClassIds())
 	req.SetComment(model.GetComment())
@@ -478,7 +478,7 @@ func buildAssignAttachmentApiModel(attachments []tmsclient.AttachmentApiResult) 
 func buildUpdateLinkApiModel(links []tmsclient.LinkApiResult) []tmsclient.UpdateLinkApiModel {
 	updateLinks := make([]tmsclient.UpdateLinkApiModel, len(links))
 	for i, link := range links {
-		updateLink := tmsclient.NewUpdateLinkApiModel(link.Url, link.HasInfo)
+		updateLink := tmsclient.NewUpdateLinkApiModel(link.Url, link.Type, link.HasInfo)
 		updateLink.Id = link.Id
 		updateLink.Title = link.Title
 		updateLink.Description = link.Description
@@ -487,4 +487,17 @@ func buildUpdateLinkApiModel(links []tmsclient.LinkApiResult) []tmsclient.Update
 	}
 
 	return updateLinks
+}
+
+func buildCreateLinkApiModel(links []tmsclient.LinkApiResult) []tmsclient.CreateLinkApiModel {
+	createLinks := make([]tmsclient.CreateLinkApiModel, len(links))
+	for i, link := range links {
+		createLink := tmsclient.NewCreateLinkApiModel(link.Url, link.Type, link.HasInfo)
+		createLink.Title = link.Title
+		createLink.Description = link.Description
+
+		createLinks[i] = *createLink
+	}
+
+	return createLinks
 }
