@@ -13,7 +13,7 @@ import (
 
 func AuthContext(token string) context.Context {
 	return context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
-		"Bearer or PrivateToken": {
+		"PrivateToken": {
 			Key:    token,
 			Prefix: "PrivateToken",
 		},
