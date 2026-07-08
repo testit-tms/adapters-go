@@ -11,6 +11,7 @@
 | 5.5     | v0.6.1-tms-5.5      |
 | 5.6     | v0.7.0-tms-5.6      |
 | 5.7     | v1.0.0-tms-5.7      |
+| 5.8     | v1.1.0-tms-5.8      |
 | Cloud   | v1.0.0 +            |
 
 1. For current versions, see the releases tab. 
