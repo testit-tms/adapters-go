@@ -18,10 +18,6 @@
 2. Starting with 5.2, we have added a TMS postscript, which means that the utility is compatible with a specific enterprise version. 
 3. If you are in doubt about which version to use, check with the support staff. support@yoonion.ru
 
-For other versions compatibility check api-client compatibility - 
-https://github.com/testit-tms/api-client-golang  
-and previous version of adapter
-
 
 ## What's new in v1.0.0?
 
