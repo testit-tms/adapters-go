@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"time"
 
-	tmsclient "github.com/testit-tms/api-client-golang/v3"
+	tmsclient "github.com/testit-tms/adapters-go/v2/adaptersapi"
 	"golang.org/x/exp/slog"
 )
 
 func AuthContext(token string) context.Context {
 	return context.WithValue(context.Background(), tmsclient.ContextAPIKeys, map[string]tmsclient.APIKey{
-		"Bearer or PrivateToken": {
+		"PrivateToken": {
 			Key:    token,
 			Prefix: "PrivateToken",
 		},

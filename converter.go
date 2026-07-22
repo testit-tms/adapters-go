@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/testit-tms/adapters-go/htmlutils"
-	tmsclient "github.com/testit-tms/api-client-golang/v3"
+	"github.com/testit-tms/adapters-go/v2/htmlutils"
+	tmsclient "github.com/testit-tms/adapters-go/v2/adaptersapi"
 )
 
 // TODO: validate that hasInfo always true is correct
@@ -46,11 +46,6 @@ func testToAutotestModel(test TestResult, projectId string) tmsclient.AutoTestCr
 	if len(test.links) != 0 {
 		links := make([]tmsclient.LinkCreateApiModel, 0, len(test.links))
 		for _, link := range test.links {
-
-			l := tmsclient.NewLinkCreateApiModel(link.Url, defaultHasInfo)
-			l.SetTitle(link.Title)
-			l.SetDescription(link.Description)
-
 			linkType := defaultLinkType
 			if link.LinkType != "" {
 				parsedLinkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
@@ -60,7 +55,10 @@ func testToAutotestModel(test TestResult, projectId string) tmsclient.AutoTestCr
 					linkType = *parsedLinkType
 				}
 			}
-			l.SetType(linkType)
+
+			l := tmsclient.NewLinkCreateApiModel(link.Url, linkType)
+			l.SetTitle(link.Title)
+			l.SetDescription(link.Description)
 
 			links = append(links, *l)
 		}
@@ -138,10 +136,6 @@ func testToUpdateAutotestModel(test TestResult, autotest tmsclient.AutoTestApiRe
 	if len(test.links) != 0 {
 		links := make([]tmsclient.LinkUpdateApiModel, 0, len(test.links))
 		for _, link := range test.links {
-			l := tmsclient.NewLinkUpdateApiModel(link.Url, defaultHasInfo)
-			l.SetTitle(link.Title)
-			l.SetDescription(link.Description)
-
 			linkType := defaultLinkType
 			if link.LinkType != "" {
 				parsedLinkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
@@ -151,7 +145,10 @@ func testToUpdateAutotestModel(test TestResult, autotest tmsclient.AutoTestApiRe
 					linkType = *parsedLinkType
 				}
 			}
-			l.SetType(linkType)
+
+			l := tmsclient.NewLinkUpdateApiModel(link.Url, linkType)
+			l.SetTitle(link.Title)
+			l.SetDescription(link.Description)
 
 			links = append(links, *l)
 		}
@@ -224,9 +221,6 @@ func testToResultModel(test TestResult, confID string) ([]tmsclient.AutoTestResu
 	if len(test.resultLinks) != 0 {
 		links := make([]tmsclient.LinkPostModel, 0, len(test.resultLinks))
 		for _, link := range test.resultLinks {
-			l := tmsclient.NewLinkPostModel(link.Url, defaultHasInfo)
-			l.SetTitle(link.Title)
-			l.SetDescription(link.Description)
 			linkType := defaultLinkType
 			if link.LinkType != "" {
 				parsedLinkType, err := tmsclient.NewLinkTypeFromValue(string(link.LinkType))
@@ -236,7 +230,10 @@ func testToResultModel(test TestResult, confID string) ([]tmsclient.AutoTestResu
 					linkType = *parsedLinkType
 				}
 			}
-			l.SetType(linkType)
+
+			l := tmsclient.NewLinkPostModel(link.Url, linkType, defaultHasInfo)
+			l.SetTitle(link.Title)
+			l.SetDescription(link.Description)
 			links = append(links, *l)
 		}
 		req.SetLinks(links)
@@ -407,32 +404,32 @@ func mapAttachmentsToStepResults(attachments []tmsclient.AttachmentPutModelAutoT
 	return results, nil
 }
 
-func testToUpdateResultModel(model *tmsclient.TestResultResponse, test TestResult) (tmsclient.TestResultUpdateV2Request, error) {
+func testToUpdateResultModel(model *tmsclient.TestResultResponse, test TestResult) (tmsclient.TestResultUpdateRequest, error) {
 	tearDownsAttachments, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.teardowns)
 	if err != nil {
-		return tmsclient.TestResultUpdateV2Request{}, err
+		return tmsclient.TestResultUpdateRequest{}, err
 	}
 
 	tearDowns, err := mapAttachmentsToStepResults(tearDownsAttachments)
 	if err != nil {
-		return tmsclient.TestResultUpdateV2Request{}, fmt.Errorf("error mapping tearDowns: %w", err)
+		return tmsclient.TestResultUpdateRequest{}, fmt.Errorf("error mapping tearDowns: %w", err)
 	}
 
 	setupsAttachments, err := stepToAttachmentPutModelAutoTestStepResultsModel(test.setups)
 	if err != nil {
-		return tmsclient.TestResultUpdateV2Request{}, err
+		return tmsclient.TestResultUpdateRequest{}, err
 	}
 
 	setups, err := mapAttachmentsToStepResults(setupsAttachments)
 	if err != nil {
-		return tmsclient.TestResultUpdateV2Request{}, fmt.Errorf("error mapping setups: %w", err)
+		return tmsclient.TestResultUpdateRequest{}, fmt.Errorf("error mapping setups: %w", err)
 	}
 
-	req := tmsclient.NewTestResultUpdateV2Request()
+	req := tmsclient.NewTestResultUpdateRequest()
 	req.SetTeardownResults(tearDowns)
 	req.SetSetupResults(setups)
 	req.SetDuration(model.GetDurationInMs())
-	req.SetLinks(model.GetLinks())
+	req.SetLinks(mapLinkApiResultsToCreateLinkApiModels(model.GetLinks()))
 	req.SetStepResults(model.GetStepResults())
 	req.SetFailureClassIds(model.GetFailureClassIds())
 	req.SetComment(model.GetComment())
@@ -455,10 +452,23 @@ func testToUpdateResultModel(model *tmsclient.TestResultResponse, test TestResul
 	return *req, nil
 }
 
-func buildUpdateEmptyTestRunApiModel(testRun *tmsclient.TestRunV2ApiResult) *tmsclient.UpdateEmptyTestRunApiModel {
+func mapLinkApiResultsToCreateLinkApiModels(links []tmsclient.LinkApiResult) []tmsclient.CreateLinkApiModel {
+	result := make([]tmsclient.CreateLinkApiModel, 0, len(links))
+	for _, link := range links {
+		m := tmsclient.NewCreateLinkApiModel(link.Url, link.Type)
+		if link.Title.IsSet() {
+			m.SetTitle(link.GetTitle())
+		}
+		if link.Description.IsSet() {
+			m.SetDescription(link.GetDescription())
+		}
+		result = append(result, *m)
+	}
+	return result
+}
+
+func buildUpdateEmptyTestRunApiModel(testRun *tmsclient.TestRunApiResult) *tmsclient.UpdateEmptyTestRunApiModel {
 	model := tmsclient.NewUpdateEmptyTestRunApiModel(testRun.Id, testRun.Name)
-	model.Description = testRun.Description
-	model.LaunchSource = testRun.LaunchSource
 	model.Attachments = buildAssignAttachmentApiModel(testRun.Attachments)
 	model.Links = buildUpdateLinkApiModel(testRun.Links)
 
@@ -478,10 +488,16 @@ func buildAssignAttachmentApiModel(attachments []tmsclient.AttachmentApiResult) 
 func buildUpdateLinkApiModel(links []tmsclient.LinkApiResult) []tmsclient.UpdateLinkApiModel {
 	updateLinks := make([]tmsclient.UpdateLinkApiModel, len(links))
 	for i, link := range links {
-		updateLink := tmsclient.NewUpdateLinkApiModel(link.Url, link.HasInfo)
-		updateLink.Id = link.Id
-		updateLink.Title = link.Title
-		updateLink.Description = link.Description
+		updateLink := tmsclient.NewUpdateLinkApiModel(link.Url, link.Type)
+		if link.Id.IsSet() {
+			updateLink.SetId(link.GetId())
+		}
+		if link.Title.IsSet() {
+			updateLink.SetTitle(link.GetTitle())
+		}
+		if link.Description.IsSet() {
+			updateLink.SetDescription(link.GetDescription())
+		}
 
 		updateLinks[i] = *updateLink
 	}

@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/jtolds/gls"
-	"github.com/testit-tms/adapters-go/models"
+	"github.com/testit-tms/adapters-go/v2/models"
 )
 
 type TestMetadata struct {

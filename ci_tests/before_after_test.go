@@ -3,7 +3,7 @@ package examples
 import (
 	"testing"
 
-	tms "github.com/testit-tms/adapters-go"
+	tms "github.com/testit-tms/adapters-go/v2"
 )
 
 func TestFixture_success(t *testing.T) {

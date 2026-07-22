@@ -3,8 +3,8 @@ package examples
 import (
 	"testing"
 
-	tms "github.com/testit-tms/adapters-go"
-	"github.com/testit-tms/adapters-go/models"
+	tms "github.com/testit-tms/adapters-go/v2"
+	"github.com/testit-tms/adapters-go/v2/models"
 )
 
 func TestMetadata_without_metadata_success(t *testing.T) {

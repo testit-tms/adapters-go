@@ -1,6 +1,6 @@
 package tms
 
-import "github.com/testit-tms/adapters-go/models"
+import "github.com/testit-tms/adapters-go/v2/models"
 
 type Link = models.Link
 type LinkType = models.LinkType
