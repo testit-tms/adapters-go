@@ -1,4 +1,4 @@
-module github.com/testit-tms/adapters-go
+module github.com/testit-tms/adapters-go/v2
 
 go 1.25.0
 
