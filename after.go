@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/jtolds/gls"
-	"github.com/testit-tms/adapters-go/models"
+	"github.com/testit-tms/adapters-go/v2/models"
 )
 
 func AfterTest(t *testing.T, m StepMetadata, f func()) {

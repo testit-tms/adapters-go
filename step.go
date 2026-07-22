@@ -5,7 +5,7 @@ import (
 
 	"github.com/jtolds/gls"
 	"github.com/pkg/errors"
-	"github.com/testit-tms/adapters-go/models"
+	"github.com/testit-tms/adapters-go/v2/models"
 )
 
 type StepMetadata struct {

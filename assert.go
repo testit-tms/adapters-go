@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/testit-tms/adapters-go/models"
+	"github.com/testit-tms/adapters-go/v2/models"
 )
 
 func True(t *testing.T, value bool, msgAndArgs ...interface{}) {

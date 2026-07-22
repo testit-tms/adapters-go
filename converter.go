@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/testit-tms/adapters-go/htmlutils"
-	tmsclient "github.com/testit-tms/adapters-go/adaptersapi"
+	"github.com/testit-tms/adapters-go/v2/htmlutils"
+	tmsclient "github.com/testit-tms/adapters-go/v2/adaptersapi"
 )
 
 // TODO: validate that hasInfo always true is correct

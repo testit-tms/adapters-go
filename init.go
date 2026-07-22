@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/jtolds/gls"
-	"github.com/testit-tms/adapters-go/config"
-	"github.com/testit-tms/adapters-go/syncstorage"
+	"github.com/testit-tms/adapters-go/v2/config"
+	"github.com/testit-tms/adapters-go/v2/syncstorage"
 
 	"golang.org/x/exp/slog"
 )

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	tmsclient "github.com/testit-tms/adapters-go/adaptersapi"
+	tmsclient "github.com/testit-tms/adapters-go/v2/adaptersapi"
 	"golang.org/x/exp/slog"
 )
 

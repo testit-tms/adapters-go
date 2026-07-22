@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/testit-tms/adapters-go/client_helpers"
-	"github.com/testit-tms/adapters-go/config"
-	"github.com/testit-tms/adapters-go/htmlutils"
-	tmsclient "github.com/testit-tms/adapters-go/adaptersapi"
+	"github.com/testit-tms/adapters-go/v2/client_helpers"
+	"github.com/testit-tms/adapters-go/v2/config"
+	"github.com/testit-tms/adapters-go/v2/htmlutils"
+	tmsclient "github.com/testit-tms/adapters-go/v2/adaptersapi"
 	"golang.org/x/exp/slog"
 )
 

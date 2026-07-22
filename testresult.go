@@ -3,7 +3,7 @@ package tms
 import (
 	"time"
 
-	"github.com/testit-tms/adapters-go/models"
+	"github.com/testit-tms/adapters-go/v2/models"
 	"golang.org/x/exp/slog"
 )
 
