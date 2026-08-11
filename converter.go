@@ -5,8 +5,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/testit-tms/adapters-go/v2/htmlutils"
 	tmsclient "github.com/testit-tms/adapters-go/v2/adaptersapi"
+	"github.com/testit-tms/adapters-go/v2/config"
+	"github.com/testit-tms/adapters-go/v2/htmlutils"
 )
 
 // TODO: validate that hasInfo always true is correct
@@ -503,4 +504,52 @@ func buildUpdateLinkApiModel(links []tmsclient.LinkApiResult) []tmsclient.Update
 	}
 
 	return updateLinks
+}
+
+func configLinksToCreateLinkApiModels(links []config.TestRunLink) []tmsclient.CreateLinkApiModel {
+	result := make([]tmsclient.CreateLinkApiModel, 0, len(links))
+	for _, link := range links {
+		createLink, ok := configLinkToCreateLinkApiModel(link)
+		if !ok {
+			continue
+		}
+		result = append(result, createLink)
+	}
+	return result
+}
+
+func configLinkToCreateLinkApiModel(link config.TestRunLink) (tmsclient.CreateLinkApiModel, bool) {
+	linkType, err := tmsclient.NewLinkTypeFromValue(link.Type)
+	if err != nil {
+		linkType = tmsclient.LINKTYPE_RELATED.Ptr()
+	}
+	if link.Url == "" || linkType == nil {
+		return tmsclient.CreateLinkApiModel{}, false
+	}
+	m := tmsclient.NewCreateLinkApiModel(link.Url, *linkType)
+	if link.Title != "" {
+		m.SetTitle(link.Title)
+	}
+	if link.Description != "" {
+		m.SetDescription(link.Description)
+	}
+	return *m, true
+}
+
+func configLinkToUpdateLinkApiModel(link config.TestRunLink) (tmsclient.UpdateLinkApiModel, bool) {
+	linkType, err := tmsclient.NewLinkTypeFromValue(link.Type)
+	if err != nil {
+		linkType = tmsclient.LINKTYPE_RELATED.Ptr()
+	}
+	if link.Url == "" || linkType == nil {
+		return tmsclient.UpdateLinkApiModel{}, false
+	}
+	m := tmsclient.NewUpdateLinkApiModel(link.Url, *linkType)
+	if link.Title != "" {
+		m.SetTitle(link.Title)
+	}
+	if link.Description != "" {
+		m.SetDescription(link.Description)
+	}
+	return *m, true
 }
