@@ -106,6 +106,44 @@ go get github.com/testit-tms/adapters-go@<necessary package version>
 | Enable debug logs (**It's optional**). Default value - false                                                                                                                                                                                                                                                        | isDebug                           | TMS_IS_DEBUG                               |
 | Sync storage port (**It's optional, 49152 by default**)                                                                                                                                                                                                                                                             | syncStoragePort                   | TMS_SYNC_STORAGE_PORT                      | 
 | Mode of import type selection when launching autotests (**It's optional**). Default value - true. The adapter supports following modes:<br/>true - in this mode, the adapter will create/update each autotest in real time<br/>false - in this mode, the adapter will create/update multiple autotests              | importRealtime                    | TMS_IMPORT_REALTIME                        |
+| Tags for the **test run** (**It's optional**). Comma-separated string or JSON array. Empty/omitted — do not change existing tags. These are run-level tags, not autotest `@Tags`                                                                                                                                   | testRunTags                       | TMS_TEST_RUN_TAGS                          |
+| Links for the **test run** (**It's optional**). JSON array of objects with `url` (required), optional `title`, `description`, `type`. Applied on create or merged early into an existing run so a CI job URL is visible while status is still In progress                                                          | testRunLinks                      | TMS_TEST_RUN_LINKS                         |
+
+#### Test run link types
+
+Allowed values for `type` in `testRunLinks` (default: `Related`):
+
+| Type | Value |
+|------|-------|
+| Related | `Related` |
+| Blocked by | `BlockedBy` |
+| Defect | `Defect` |
+| Issue | `Issue` |
+| Requirement | `Requirement` |
+| Repository | `Repository` |
+
+Examples:
+
+```bash
+export TMS_TEST_RUN_TAGS=smoke,nightly
+export TMS_TEST_RUN_LINKS='[{"url":"https://gitlab.example.com/group/project/-/jobs/12345","title":"CI Job","type":"Related"}]'
+```
+
+```json
+{
+  "testRunTags": ["smoke", "nightly"],
+  "testRunLinks": [
+    {
+      "url": "https://gitlab.example.com/group/project/-/jobs/12345",
+      "title": "CI Job",
+      "type": "Related"
+    }
+  ]
+}
+```
+
+- **adapterMode=2** (create run): tags/links are sent in the create request.
+- **adapterMode=0/1** (existing run): tags/links are merged into the run at adapter startup (existing UI/API items are kept; duplicates by tag name / link URL are skipped).
 
 #### File
 
@@ -123,7 +161,15 @@ Create **tms.config.json** file in the project directory:
   "automaticUpdationLinksToTestCases": false,
   "certValidation": true,
   "adapterMode": "1",
-  "isDebug": true
+  "isDebug": true,
+  "testRunTags": ["smoke", "nightly"],
+  "testRunLinks": [
+    {
+      "url": "https://gitlab.example.com/group/project/-/jobs/12345",
+      "title": "CI Job",
+      "type": "Related"
+    }
+  ]
 }
 ```
 

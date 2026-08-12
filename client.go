@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
+	tmsclient "github.com/testit-tms/adapters-go/v2/adaptersapi"
 	"github.com/testit-tms/adapters-go/v2/client_helpers"
 	"github.com/testit-tms/adapters-go/v2/config"
 	"github.com/testit-tms/adapters-go/v2/htmlutils"
-	tmsclient "github.com/testit-tms/adapters-go/v2/adaptersapi"
 	"golang.org/x/exp/slog"
 )
 
@@ -294,6 +294,13 @@ func (c *tmsClient) createTestRun() string {
 	model := tmsclient.NewCreateEmptyTestRunApiModel(c.cfg.ProjectId)
 	model.SetName(c.cfg.TestRunName)
 
+	if len(c.cfg.TestRunTags) > 0 {
+		model.SetTags(append([]string(nil), c.cfg.TestRunTags...))
+	}
+	if links := configLinksToCreateLinkApiModels(c.cfg.TestRunLinks); len(links) > 0 {
+		model.SetLinks(links)
+	}
+
 	// Apply HTML escaping to the model
 	htmlutils.EscapeHtmlInObject(model)
 
@@ -305,6 +312,12 @@ func (c *tmsClient) createTestRun() string {
 		_ = client_helpers.LogAndWrapAPIError(logger, op, "failed to create test run", err, r)
 		return ""
 	}
+
+	logger.Info("created test run",
+		"testRunId", testRun.Id,
+		"tags", c.cfg.TestRunTags,
+		"linksCount", len(c.cfg.TestRunLinks),
+	)
 
 	return testRun.Id
 }
@@ -331,20 +344,71 @@ func (c *tmsClient) updateTestRun() {
 	const op = "tmsClient.updateTestRun"
 	logger := logger.With("op", op)
 
-	if c.cfg.TestRunName == "" {
+	wantNameUpdate := c.cfg.TestRunName != ""
+	wantMetaUpdate := len(c.cfg.TestRunTags) > 0 || len(c.cfg.TestRunLinks) > 0
+	if !wantNameUpdate && !wantMetaUpdate {
 		return
 	}
 
 	ctx := client_helpers.AuthContext(c.cfg.Token)
 
 	testRun := c.getTestRun()
-
-	if testRun == nil || testRun.Name == c.cfg.TestRunName {
+	if testRun == nil {
 		return
 	}
 
-	testRun.Name = c.cfg.TestRunName
+	nameChanged := wantNameUpdate && testRun.Name != c.cfg.TestRunName
+	if nameChanged {
+		testRun.Name = c.cfg.TestRunName
+	}
+
+	mergedTags := testRun.Tags
+	tagsChanged := false
+	if len(c.cfg.TestRunTags) > 0 {
+		mergedTags = config.MergeTags(testRun.Tags, c.cfg.TestRunTags)
+		tagsChanged = len(mergedTags) != len(testRun.Tags)
+		if !tagsChanged {
+			for i := range mergedTags {
+				if mergedTags[i] != testRun.Tags[i] {
+					tagsChanged = true
+					break
+				}
+			}
+		}
+	}
+
+	mergedLinks := buildUpdateLinkApiModel(testRun.Links)
+	linksChanged := false
+	if len(c.cfg.TestRunLinks) > 0 {
+		existingURLs := make([]string, 0, len(testRun.Links))
+		for _, link := range testRun.Links {
+			existingURLs = append(existingURLs, link.Url)
+		}
+		for _, link := range c.cfg.TestRunLinks {
+			if config.HasLinkURL(existingURLs, link.Url) {
+				continue
+			}
+			updateLink, ok := configLinkToUpdateLinkApiModel(link)
+			if !ok {
+				logger.Warn("skipping invalid test run link", "url", link.Url, "type", link.Type)
+				continue
+			}
+			mergedLinks = append(mergedLinks, updateLink)
+			existingURLs = append(existingURLs, link.Url)
+			linksChanged = true
+		}
+	}
+
+	if !nameChanged && !tagsChanged && !linksChanged {
+		return
+	}
+
 	model := buildUpdateEmptyTestRunApiModel(testRun)
+	if tagsChanged || len(c.cfg.TestRunTags) > 0 {
+		// Always send merged tags when config tags are present so API gets the full set.
+		model.SetTags(mergedTags)
+	}
+	model.SetLinks(mergedLinks)
 
 	// Apply HTML escaping to the model
 	htmlutils.EscapeHtmlInObject(model)
@@ -357,6 +421,15 @@ func (c *tmsClient) updateTestRun() {
 		_ = client_helpers.LogAndWrapAPIError(logger, op, "failed to update test run", err, r)
 		return
 	}
+
+	logger.Info("updated test run metadata",
+		"testRunId", c.cfg.TestRunId,
+		"nameChanged", nameChanged,
+		"tagsChanged", tagsChanged,
+		"linksChanged", linksChanged,
+		"tags", mergedTags,
+		"linksCount", len(mergedLinks),
+	)
 }
 
 func (c *tmsClient) writeAttachments(paths ...string) []string {

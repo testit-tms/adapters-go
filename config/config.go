@@ -29,6 +29,9 @@ type Config struct {
 	CertValidation                    bool   `json:"certValidation" env:"TMS_CERT_VALIDATION" env-default:"true"`
 	SyncStoragePort                   string `json:"syncStoragePort" env:"TMS_SYNC_STORAGE_PORT" env-default:"49152"`
 	ImportRealtime                    bool   `json:"importRealtime" env:"TMS_IMPORT_REALTIME" env-default:"true"`
+	// Test run metadata (not autotest/result metadata). Empty means "do not change".
+	TestRunTags                       TestRunTags  `json:"testRunTags" env:"TMS_TEST_RUN_TAGS"`
+	TestRunLinks                      TestRunLinks `json:"testRunLinks" env:"TMS_TEST_RUN_LINKS"`
 }
 
 func MustLoad() *Config {
