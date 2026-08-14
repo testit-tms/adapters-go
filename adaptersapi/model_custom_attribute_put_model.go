@@ -23,7 +23,7 @@ var _ MappedNullable = &CustomAttributePutModel{}
 type CustomAttributePutModel struct {
 	// Unique ID of the attribute
 	Id string `json:"id"`
-	// Collection of the attribute options      Available for attributes of type `options` and `multiple options` only
+	// Collection of the attribute options   Available for attributes of type `options` and `multiple options` only
 	Options []CustomAttributeOptionModel `json:"options,omitempty"`
 	// Type of the attribute
 	Type CustomAttributeTypesEnum `json:"type"`

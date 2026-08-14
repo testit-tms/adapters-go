@@ -33,6 +33,7 @@ type TestResultResponse struct {
 	Attachments []AttachmentApiResult `json:"attachments,omitempty"`
 	AutoTestId NullableString `json:"autoTestId,omitempty"`
 	ConfigurationId string `json:"configurationId"`
+	TestPointId string `json:"testPointId"`
 	DurationInMs NullableInt64 `json:"durationInMs,omitempty"`
 	Traces NullableString `json:"traces,omitempty"`
 	FailureType NullableString `json:"failureType,omitempty"`
@@ -52,11 +53,12 @@ type _TestResultResponse TestResultResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTestResultResponse(id string, failureClassIds []string, configurationId string, testRunId string) *TestResultResponse {
+func NewTestResultResponse(id string, failureClassIds []string, configurationId string, testPointId string, testRunId string) *TestResultResponse {
 	this := TestResultResponse{}
 	this.Id = id
 	this.FailureClassIds = failureClassIds
 	this.ConfigurationId = configurationId
+	this.TestPointId = testPointId
 	this.TestRunId = testRunId
 	return &this
 }
@@ -442,6 +444,30 @@ func (o *TestResultResponse) GetConfigurationIdOk() (*string, bool) {
 // SetConfigurationId sets field value
 func (o *TestResultResponse) SetConfigurationId(v string) {
 	o.ConfigurationId = v
+}
+
+// GetTestPointId returns the TestPointId field value
+func (o *TestResultResponse) GetTestPointId() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.TestPointId
+}
+
+// GetTestPointIdOk returns a tuple with the TestPointId field value
+// and a boolean to check if the value has been set.
+func (o *TestResultResponse) GetTestPointIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.TestPointId, true
+}
+
+// SetTestPointId sets field value
+func (o *TestResultResponse) SetTestPointId(v string) {
+	o.TestPointId = v
 }
 
 // GetDurationInMs returns the DurationInMs field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -880,6 +906,7 @@ func (o TestResultResponse) ToMap() (map[string]interface{}, error) {
 		toSerialize["autoTestId"] = o.AutoTestId.Get()
 	}
 	toSerialize["configurationId"] = o.ConfigurationId
+	toSerialize["testPointId"] = o.TestPointId
 	if o.DurationInMs.IsSet() {
 		toSerialize["durationInMs"] = o.DurationInMs.Get()
 	}
@@ -922,6 +949,7 @@ func (o *TestResultResponse) UnmarshalJSON(data []byte) (err error) {
 		"id",
 		"failureClassIds",
 		"configurationId",
+		"testPointId",
 		"testRunId",
 	}
 
