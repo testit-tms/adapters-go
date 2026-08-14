@@ -36,7 +36,7 @@ type AutoTestStepResult struct {
 	Outcome NullableAvailableTestResultOutcome `json:"outcome,omitempty"`
 	// Nested step results. The maximum nesting level is 15.
 	StepResults []AutoTestStepResult `json:"stepResults,omitempty"`
-	// /// <summary>  Specifies an attachment GUID. Multiple values can be sent.  </summary>
+	// /// <summary> Specifies an attachment GUID. Multiple values can be sent. </summary>
 	Attachments []AttachmentApiResult `json:"attachments,omitempty"`
 	// \"<b>parameter</b>\": \"<b>value</b>\" pair with arbitrary custom parameters. Multiple parameters can be sent.
 	Parameters map[string]string `json:"parameters,omitempty"`

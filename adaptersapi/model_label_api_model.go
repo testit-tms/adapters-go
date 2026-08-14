@@ -23,8 +23,6 @@ var _ MappedNullable = &LabelApiModel{}
 type LabelApiModel struct {
 	// Name of the label
 	Name string `json:"name"`
-	// Global ID of the label
-	GlobalId int64 `json:"globalId"`
 }
 
 type _LabelApiModel LabelApiModel
@@ -33,10 +31,9 @@ type _LabelApiModel LabelApiModel
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewLabelApiModel(name string, globalId int64) *LabelApiModel {
+func NewLabelApiModel(name string) *LabelApiModel {
 	this := LabelApiModel{}
 	this.Name = name
-	this.GlobalId = globalId
 	return &this
 }
 
@@ -72,30 +69,6 @@ func (o *LabelApiModel) SetName(v string) {
 	o.Name = v
 }
 
-// GetGlobalId returns the GlobalId field value
-func (o *LabelApiModel) GetGlobalId() int64 {
-	if o == nil {
-		var ret int64
-		return ret
-	}
-
-	return o.GlobalId
-}
-
-// GetGlobalIdOk returns a tuple with the GlobalId field value
-// and a boolean to check if the value has been set.
-func (o *LabelApiModel) GetGlobalIdOk() (*int64, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.GlobalId, true
-}
-
-// SetGlobalId sets field value
-func (o *LabelApiModel) SetGlobalId(v int64) {
-	o.GlobalId = v
-}
-
 func (o LabelApiModel) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -107,7 +80,6 @@ func (o LabelApiModel) MarshalJSON() ([]byte, error) {
 func (o LabelApiModel) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["name"] = o.Name
-	toSerialize["globalId"] = o.GlobalId
 	return toSerialize, nil
 }
 
@@ -117,7 +89,6 @@ func (o *LabelApiModel) UnmarshalJSON(data []byte) (err error) {
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
 		"name",
-		"globalId",
 	}
 
 	allProperties := make(map[string]interface{})

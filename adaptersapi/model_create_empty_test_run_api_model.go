@@ -21,7 +21,7 @@ var _ MappedNullable = &CreateEmptyTestRunApiModel{}
 
 // CreateEmptyTestRunApiModel struct for CreateEmptyTestRunApiModel
 type CreateEmptyTestRunApiModel struct {
-	// Project unique identifier                This property is to link test run with a project
+	// Project unique identifier              This property is to link test run with a project
 	ProjectId string `json:"projectId"`
 	// Test run name
 	Name NullableString `json:"name,omitempty"`
