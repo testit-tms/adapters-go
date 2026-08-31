@@ -28,6 +28,8 @@ type TestResultsFilterApiModel struct {
 	StatusCodes []string `json:"statusCodes,omitempty"`
 	// Specifies a test result status types to search for
 	StatusTypes []TestStatusApiType `json:"statusTypes,omitempty"`
+	// Specifies a test result failure categories to search for
+	FailureCategories []FailureCategoryModel `json:"failureCategories,omitempty"`
 	// Specifies a test result namespace to search for
 	Namespace NullableString `json:"namespace,omitempty"`
 	// Specifies a test result class name to search for
@@ -196,6 +198,39 @@ func (o *TestResultsFilterApiModel) HasStatusTypes() bool {
 // SetStatusTypes gets a reference to the given []TestStatusApiType and assigns it to the StatusTypes field.
 func (o *TestResultsFilterApiModel) SetStatusTypes(v []TestStatusApiType) {
 	o.StatusTypes = v
+}
+
+// GetFailureCategories returns the FailureCategories field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *TestResultsFilterApiModel) GetFailureCategories() []FailureCategoryModel {
+	if o == nil {
+		var ret []FailureCategoryModel
+		return ret
+	}
+	return o.FailureCategories
+}
+
+// GetFailureCategoriesOk returns a tuple with the FailureCategories field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *TestResultsFilterApiModel) GetFailureCategoriesOk() ([]FailureCategoryModel, bool) {
+	if o == nil || IsNil(o.FailureCategories) {
+		return nil, false
+	}
+	return o.FailureCategories, true
+}
+
+// HasFailureCategories returns a boolean if a field has been set.
+func (o *TestResultsFilterApiModel) HasFailureCategories() bool {
+	if o != nil && !IsNil(o.FailureCategories) {
+		return true
+	}
+
+	return false
+}
+
+// SetFailureCategories gets a reference to the given []FailureCategoryModel and assigns it to the FailureCategories field.
+func (o *TestResultsFilterApiModel) SetFailureCategories(v []FailureCategoryModel) {
+	o.FailureCategories = v
 }
 
 // GetNamespace returns the Namespace field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -519,6 +554,9 @@ func (o TestResultsFilterApiModel) ToMap() (map[string]interface{}, error) {
 	}
 	if o.StatusTypes != nil {
 		toSerialize["statusTypes"] = o.StatusTypes
+	}
+	if o.FailureCategories != nil {
+		toSerialize["failureCategories"] = o.FailureCategories
 	}
 	if o.Namespace.IsSet() {
 		toSerialize["namespace"] = o.Namespace.Get()

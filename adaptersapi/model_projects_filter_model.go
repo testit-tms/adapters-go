@@ -26,13 +26,13 @@ type ProjectsFilterModel struct {
 	// Specifies a project deleted status to search for
 	IsDeleted NullableBool `json:"isDeleted,omitempty"`
 	// Specifies a project range of test cases count to search for
-	TestCasesCount NullableInt32RangeSelectorModel `json:"testCasesCount,omitempty"`
+	TestCasesCount NullableInt64RangeSelectorModel `json:"testCasesCount,omitempty"`
 	// Specifies a project range of checklists count to search for
-	ChecklistsCount NullableInt32RangeSelectorModel `json:"checklistsCount,omitempty"`
+	ChecklistsCount NullableInt64RangeSelectorModel `json:"checklistsCount,omitempty"`
 	// Specifies a project range of shared steps count to search for
-	SharedStepsCount NullableInt32RangeSelectorModel `json:"sharedStepsCount,omitempty"`
+	SharedStepsCount NullableInt64RangeSelectorModel `json:"sharedStepsCount,omitempty"`
 	// Specifies a project range of autotests count to search for
-	AutotestsCount NullableInt32RangeSelectorModel `json:"autotestsCount,omitempty"`
+	AutotestsCount NullableInt64RangeSelectorModel `json:"autotestsCount,omitempty"`
 	// Specifies a project global IDs to search for
 	GlobalIds []int64 `json:"globalIds,omitempty"`
 	// Specifies a project range of creation date to search for
@@ -187,9 +187,9 @@ func (o *ProjectsFilterModel) UnsetIsDeleted() {
 }
 
 // GetTestCasesCount returns the TestCasesCount field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ProjectsFilterModel) GetTestCasesCount() Int32RangeSelectorModel {
+func (o *ProjectsFilterModel) GetTestCasesCount() Int64RangeSelectorModel {
 	if o == nil || IsNil(o.TestCasesCount.Get()) {
-		var ret Int32RangeSelectorModel
+		var ret Int64RangeSelectorModel
 		return ret
 	}
 	return *o.TestCasesCount.Get()
@@ -198,7 +198,7 @@ func (o *ProjectsFilterModel) GetTestCasesCount() Int32RangeSelectorModel {
 // GetTestCasesCountOk returns a tuple with the TestCasesCount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ProjectsFilterModel) GetTestCasesCountOk() (*Int32RangeSelectorModel, bool) {
+func (o *ProjectsFilterModel) GetTestCasesCountOk() (*Int64RangeSelectorModel, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -214,8 +214,8 @@ func (o *ProjectsFilterModel) HasTestCasesCount() bool {
 	return false
 }
 
-// SetTestCasesCount gets a reference to the given NullableInt32RangeSelectorModel and assigns it to the TestCasesCount field.
-func (o *ProjectsFilterModel) SetTestCasesCount(v Int32RangeSelectorModel) {
+// SetTestCasesCount gets a reference to the given NullableInt64RangeSelectorModel and assigns it to the TestCasesCount field.
+func (o *ProjectsFilterModel) SetTestCasesCount(v Int64RangeSelectorModel) {
 	o.TestCasesCount.Set(&v)
 }
 // SetTestCasesCountNil sets the value for TestCasesCount to be an explicit nil
@@ -229,9 +229,9 @@ func (o *ProjectsFilterModel) UnsetTestCasesCount() {
 }
 
 // GetChecklistsCount returns the ChecklistsCount field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ProjectsFilterModel) GetChecklistsCount() Int32RangeSelectorModel {
+func (o *ProjectsFilterModel) GetChecklistsCount() Int64RangeSelectorModel {
 	if o == nil || IsNil(o.ChecklistsCount.Get()) {
-		var ret Int32RangeSelectorModel
+		var ret Int64RangeSelectorModel
 		return ret
 	}
 	return *o.ChecklistsCount.Get()
@@ -240,7 +240,7 @@ func (o *ProjectsFilterModel) GetChecklistsCount() Int32RangeSelectorModel {
 // GetChecklistsCountOk returns a tuple with the ChecklistsCount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ProjectsFilterModel) GetChecklistsCountOk() (*Int32RangeSelectorModel, bool) {
+func (o *ProjectsFilterModel) GetChecklistsCountOk() (*Int64RangeSelectorModel, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -256,8 +256,8 @@ func (o *ProjectsFilterModel) HasChecklistsCount() bool {
 	return false
 }
 
-// SetChecklistsCount gets a reference to the given NullableInt32RangeSelectorModel and assigns it to the ChecklistsCount field.
-func (o *ProjectsFilterModel) SetChecklistsCount(v Int32RangeSelectorModel) {
+// SetChecklistsCount gets a reference to the given NullableInt64RangeSelectorModel and assigns it to the ChecklistsCount field.
+func (o *ProjectsFilterModel) SetChecklistsCount(v Int64RangeSelectorModel) {
 	o.ChecklistsCount.Set(&v)
 }
 // SetChecklistsCountNil sets the value for ChecklistsCount to be an explicit nil
@@ -271,9 +271,9 @@ func (o *ProjectsFilterModel) UnsetChecklistsCount() {
 }
 
 // GetSharedStepsCount returns the SharedStepsCount field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ProjectsFilterModel) GetSharedStepsCount() Int32RangeSelectorModel {
+func (o *ProjectsFilterModel) GetSharedStepsCount() Int64RangeSelectorModel {
 	if o == nil || IsNil(o.SharedStepsCount.Get()) {
-		var ret Int32RangeSelectorModel
+		var ret Int64RangeSelectorModel
 		return ret
 	}
 	return *o.SharedStepsCount.Get()
@@ -282,7 +282,7 @@ func (o *ProjectsFilterModel) GetSharedStepsCount() Int32RangeSelectorModel {
 // GetSharedStepsCountOk returns a tuple with the SharedStepsCount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ProjectsFilterModel) GetSharedStepsCountOk() (*Int32RangeSelectorModel, bool) {
+func (o *ProjectsFilterModel) GetSharedStepsCountOk() (*Int64RangeSelectorModel, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -298,8 +298,8 @@ func (o *ProjectsFilterModel) HasSharedStepsCount() bool {
 	return false
 }
 
-// SetSharedStepsCount gets a reference to the given NullableInt32RangeSelectorModel and assigns it to the SharedStepsCount field.
-func (o *ProjectsFilterModel) SetSharedStepsCount(v Int32RangeSelectorModel) {
+// SetSharedStepsCount gets a reference to the given NullableInt64RangeSelectorModel and assigns it to the SharedStepsCount field.
+func (o *ProjectsFilterModel) SetSharedStepsCount(v Int64RangeSelectorModel) {
 	o.SharedStepsCount.Set(&v)
 }
 // SetSharedStepsCountNil sets the value for SharedStepsCount to be an explicit nil
@@ -313,9 +313,9 @@ func (o *ProjectsFilterModel) UnsetSharedStepsCount() {
 }
 
 // GetAutotestsCount returns the AutotestsCount field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ProjectsFilterModel) GetAutotestsCount() Int32RangeSelectorModel {
+func (o *ProjectsFilterModel) GetAutotestsCount() Int64RangeSelectorModel {
 	if o == nil || IsNil(o.AutotestsCount.Get()) {
-		var ret Int32RangeSelectorModel
+		var ret Int64RangeSelectorModel
 		return ret
 	}
 	return *o.AutotestsCount.Get()
@@ -324,7 +324,7 @@ func (o *ProjectsFilterModel) GetAutotestsCount() Int32RangeSelectorModel {
 // GetAutotestsCountOk returns a tuple with the AutotestsCount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ProjectsFilterModel) GetAutotestsCountOk() (*Int32RangeSelectorModel, bool) {
+func (o *ProjectsFilterModel) GetAutotestsCountOk() (*Int64RangeSelectorModel, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -340,8 +340,8 @@ func (o *ProjectsFilterModel) HasAutotestsCount() bool {
 	return false
 }
 
-// SetAutotestsCount gets a reference to the given NullableInt32RangeSelectorModel and assigns it to the AutotestsCount field.
-func (o *ProjectsFilterModel) SetAutotestsCount(v Int32RangeSelectorModel) {
+// SetAutotestsCount gets a reference to the given NullableInt64RangeSelectorModel and assigns it to the AutotestsCount field.
+func (o *ProjectsFilterModel) SetAutotestsCount(v Int64RangeSelectorModel) {
 	o.AutotestsCount.Set(&v)
 }
 // SetAutotestsCountNil sets the value for AutotestsCount to be an explicit nil

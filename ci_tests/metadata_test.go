@@ -221,6 +221,30 @@ func TestMetadata_with_links_failed(t *testing.T) {
 		})
 }
 
+func TestMetadata_with_layer_success(t *testing.T) {
+	t.Parallel()
+	tms.Test(t,
+		tms.TestMetadata{
+			DisplayName: "with layer success",
+			Layer:       tms.TestLayers.API,
+		},
+		func() {
+			tms.True(t, true)
+		})
+}
+
+func TestMetadata_with_layer_custom_failed(t *testing.T) {
+	t.Parallel()
+	tms.Test(t,
+		tms.TestMetadata{
+			DisplayName: "with custom layer failed",
+			Layer:       "my-custom-layer",
+		},
+		func() {
+			tms.True(t, false)
+		})
+}
+
 func TestMetadata_with_all_success(t *testing.T) {
 	tms.Test(t,
 		tms.TestMetadata{

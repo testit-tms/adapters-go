@@ -25,6 +25,8 @@ type TestResultShortResponse struct {
 	Id string `json:"id"`
 	// Name of autotest represented by the test result
 	Name string `json:"name"`
+	// Global ID of autotest represented by the test result
+	AutotestGlobalId int64 `json:"autotestGlobalId"`
 	// External ID of autotest represented by the test result
 	AutotestExternalId NullableString `json:"autotestExternalId,omitempty"`
 	// Tags of the autotest represented by the test result
@@ -59,10 +61,11 @@ type _TestResultShortResponse TestResultShortResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTestResultShortResponse(id string, name string, autoTestTags []string, testRunId string, configurationId string, configurationName string, status TestStatusApiResult, resultReasons []AutoTestResultReasonShort, links []TestResultLinkApiResult, attachments []AttachmentApiResult, rerunCompletedCount int32) *TestResultShortResponse {
+func NewTestResultShortResponse(id string, name string, autotestGlobalId int64, autoTestTags []string, testRunId string, configurationId string, configurationName string, status TestStatusApiResult, resultReasons []AutoTestResultReasonShort, links []TestResultLinkApiResult, attachments []AttachmentApiResult, rerunCompletedCount int32) *TestResultShortResponse {
 	this := TestResultShortResponse{}
 	this.Id = id
 	this.Name = name
+	this.AutotestGlobalId = autotestGlobalId
 	this.AutoTestTags = autoTestTags
 	this.TestRunId = testRunId
 	this.ConfigurationId = configurationId
@@ -129,6 +132,30 @@ func (o *TestResultShortResponse) GetNameOk() (*string, bool) {
 // SetName sets field value
 func (o *TestResultShortResponse) SetName(v string) {
 	o.Name = v
+}
+
+// GetAutotestGlobalId returns the AutotestGlobalId field value
+func (o *TestResultShortResponse) GetAutotestGlobalId() int64 {
+	if o == nil {
+		var ret int64
+		return ret
+	}
+
+	return o.AutotestGlobalId
+}
+
+// GetAutotestGlobalIdOk returns a tuple with the AutotestGlobalId field value
+// and a boolean to check if the value has been set.
+func (o *TestResultShortResponse) GetAutotestGlobalIdOk() (*int64, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.AutotestGlobalId, true
+}
+
+// SetAutotestGlobalId sets field value
+func (o *TestResultShortResponse) SetAutotestGlobalId(v int64) {
+	o.AutotestGlobalId = v
 }
 
 // GetAutotestExternalId returns the AutotestExternalId field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -530,6 +557,7 @@ func (o TestResultShortResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["id"] = o.Id
 	toSerialize["name"] = o.Name
+	toSerialize["autotestGlobalId"] = o.AutotestGlobalId
 	if o.AutotestExternalId.IsSet() {
 		toSerialize["autotestExternalId"] = o.AutotestExternalId.Get()
 	}
@@ -561,6 +589,7 @@ func (o *TestResultShortResponse) UnmarshalJSON(data []byte) (err error) {
 	requiredProperties := []string{
 		"id",
 		"name",
+		"autotestGlobalId",
 		"autoTestTags",
 		"testRunId",
 		"configurationId",

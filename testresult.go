@@ -31,6 +31,7 @@ type TestResult struct {
 	completedOn time.Time
 	duration    int64
 	externalKey string
+	layer       string
 }
 
 func (tr *TestResult) addStatus(v string) {

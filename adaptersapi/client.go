@@ -55,6 +55,8 @@ type APIClient struct {
 
 	ConfigurationsAPI *ConfigurationsAPIService
 
+	CustomAttributesAPI *CustomAttributesAPIService
+
 	ParametersAPI *ParametersAPIService
 
 	ProjectAttributesAPI *ProjectAttributesAPIService
@@ -95,6 +97,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.AttachmentsAPI = (*AttachmentsAPIService)(&c.common)
 	c.AutoTestsAPI = (*AutoTestsAPIService)(&c.common)
 	c.ConfigurationsAPI = (*ConfigurationsAPIService)(&c.common)
+	c.CustomAttributesAPI = (*CustomAttributesAPIService)(&c.common)
 	c.ParametersAPI = (*ParametersAPIService)(&c.common)
 	c.ProjectAttributesAPI = (*ProjectAttributesAPIService)(&c.common)
 	c.ProjectSectionsAPI = (*ProjectSectionsAPIService)(&c.common)

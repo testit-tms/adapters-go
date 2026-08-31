@@ -41,6 +41,10 @@ type AutoTestUpdateApiModel struct {
 	Description NullableString `json:"description,omitempty"`
 	// Indicates if the autotest is marked as flaky
 	IsFlaky NullableBool `json:"isFlaky,omitempty"`
+	// Layer of the autotest. Assigns layer by rules if omitted.
+	Layer NullableLayerApiModel `json:"layer,omitempty"`
+	// Indicates if the autotest layer should be reset.
+	ResetLayer bool `json:"resetLayer"`
 	// Collection of the autotest steps
 	Steps []AutoTestStepApiModel `json:"steps,omitempty"`
 	// Collection of the autotest setup steps
@@ -61,11 +65,12 @@ type _AutoTestUpdateApiModel AutoTestUpdateApiModel
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewAutoTestUpdateApiModel(projectId string, externalId string, name string) *AutoTestUpdateApiModel {
+func NewAutoTestUpdateApiModel(projectId string, externalId string, name string, resetLayer bool) *AutoTestUpdateApiModel {
 	this := AutoTestUpdateApiModel{}
 	this.ProjectId = projectId
 	this.ExternalId = externalId
 	this.Name = name
+	this.ResetLayer = resetLayer
 	return &this
 }
 
@@ -443,6 +448,72 @@ func (o *AutoTestUpdateApiModel) UnsetIsFlaky() {
 	o.IsFlaky.Unset()
 }
 
+// GetLayer returns the Layer field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *AutoTestUpdateApiModel) GetLayer() LayerApiModel {
+	if o == nil || IsNil(o.Layer.Get()) {
+		var ret LayerApiModel
+		return ret
+	}
+	return *o.Layer.Get()
+}
+
+// GetLayerOk returns a tuple with the Layer field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *AutoTestUpdateApiModel) GetLayerOk() (*LayerApiModel, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Layer.Get(), o.Layer.IsSet()
+}
+
+// HasLayer returns a boolean if a field has been set.
+func (o *AutoTestUpdateApiModel) HasLayer() bool {
+	if o != nil && o.Layer.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetLayer gets a reference to the given NullableLayerApiModel and assigns it to the Layer field.
+func (o *AutoTestUpdateApiModel) SetLayer(v LayerApiModel) {
+	o.Layer.Set(&v)
+}
+// SetLayerNil sets the value for Layer to be an explicit nil
+func (o *AutoTestUpdateApiModel) SetLayerNil() {
+	o.Layer.Set(nil)
+}
+
+// UnsetLayer ensures that no value is present for Layer, not even an explicit nil
+func (o *AutoTestUpdateApiModel) UnsetLayer() {
+	o.Layer.Unset()
+}
+
+// GetResetLayer returns the ResetLayer field value
+func (o *AutoTestUpdateApiModel) GetResetLayer() bool {
+	if o == nil {
+		var ret bool
+		return ret
+	}
+
+	return o.ResetLayer
+}
+
+// GetResetLayerOk returns a tuple with the ResetLayer field value
+// and a boolean to check if the value has been set.
+func (o *AutoTestUpdateApiModel) GetResetLayerOk() (*bool, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.ResetLayer, true
+}
+
+// SetResetLayer sets field value
+func (o *AutoTestUpdateApiModel) SetResetLayer(v bool) {
+	o.ResetLayer = v
+}
+
 // GetSteps returns the Steps field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *AutoTestUpdateApiModel) GetSteps() []AutoTestStepApiModel {
 	if o == nil {
@@ -675,6 +746,10 @@ func (o AutoTestUpdateApiModel) ToMap() (map[string]interface{}, error) {
 	if o.IsFlaky.IsSet() {
 		toSerialize["isFlaky"] = o.IsFlaky.Get()
 	}
+	if o.Layer.IsSet() {
+		toSerialize["layer"] = o.Layer.Get()
+	}
+	toSerialize["resetLayer"] = o.ResetLayer
 	if o.Steps != nil {
 		toSerialize["steps"] = o.Steps
 	}
@@ -704,6 +779,7 @@ func (o *AutoTestUpdateApiModel) UnmarshalJSON(data []byte) (err error) {
 		"projectId",
 		"externalId",
 		"name",
+		"resetLayer",
 	}
 
 	allProperties := make(map[string]interface{})
