@@ -16,11 +16,15 @@ import (
 	"fmt"
 )
 
-// checks if the CustomAttributeApiResult type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &CustomAttributeApiResult{}
+// checks if the CustomAttributeSearchApiResult type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &CustomAttributeSearchApiResult{}
 
-// CustomAttributeApiResult struct for CustomAttributeApiResult
-type CustomAttributeApiResult struct {
+// CustomAttributeSearchApiResult struct for CustomAttributeSearchApiResult
+type CustomAttributeSearchApiResult struct {
+	// Projects where attribute is used in work items
+	WorkItemUsage []ProjectShortestApiResult `json:"workItemUsage"`
+	// Projects where attribute is used in test plans
+	TestPlanUsage []ProjectShortestApiResult `json:"testPlanUsage"`
 	// Unique ID of the attribute
 	Id string `json:"id"`
 	// Optional code identifier for the attribute
@@ -47,14 +51,16 @@ type CustomAttributeApiResult struct {
 	Targets []string `json:"targets"`
 }
 
-type _CustomAttributeApiResult CustomAttributeApiResult
+type _CustomAttributeSearchApiResult CustomAttributeSearchApiResult
 
-// NewCustomAttributeApiResult instantiates a new CustomAttributeApiResult object
+// NewCustomAttributeSearchApiResult instantiates a new CustomAttributeSearchApiResult object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCustomAttributeApiResult(id string, options []CustomAttributeOptionApiResult, type_ CustomAttributeType, isDeleted bool, name string, isEnabled bool, isRequired bool, isGlobal bool, isReadOnly bool, isSystem bool, targets []string) *CustomAttributeApiResult {
-	this := CustomAttributeApiResult{}
+func NewCustomAttributeSearchApiResult(workItemUsage []ProjectShortestApiResult, testPlanUsage []ProjectShortestApiResult, id string, options []CustomAttributeOptionApiResult, type_ CustomAttributeType, isDeleted bool, name string, isEnabled bool, isRequired bool, isGlobal bool, isReadOnly bool, isSystem bool, targets []string) *CustomAttributeSearchApiResult {
+	this := CustomAttributeSearchApiResult{}
+	this.WorkItemUsage = workItemUsage
+	this.TestPlanUsage = testPlanUsage
 	this.Id = id
 	this.Options = options
 	this.Type = type_
@@ -69,16 +75,64 @@ func NewCustomAttributeApiResult(id string, options []CustomAttributeOptionApiRe
 	return &this
 }
 
-// NewCustomAttributeApiResultWithDefaults instantiates a new CustomAttributeApiResult object
+// NewCustomAttributeSearchApiResultWithDefaults instantiates a new CustomAttributeSearchApiResult object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewCustomAttributeApiResultWithDefaults() *CustomAttributeApiResult {
-	this := CustomAttributeApiResult{}
+func NewCustomAttributeSearchApiResultWithDefaults() *CustomAttributeSearchApiResult {
+	this := CustomAttributeSearchApiResult{}
 	return &this
 }
 
+// GetWorkItemUsage returns the WorkItemUsage field value
+func (o *CustomAttributeSearchApiResult) GetWorkItemUsage() []ProjectShortestApiResult {
+	if o == nil {
+		var ret []ProjectShortestApiResult
+		return ret
+	}
+
+	return o.WorkItemUsage
+}
+
+// GetWorkItemUsageOk returns a tuple with the WorkItemUsage field value
+// and a boolean to check if the value has been set.
+func (o *CustomAttributeSearchApiResult) GetWorkItemUsageOk() ([]ProjectShortestApiResult, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.WorkItemUsage, true
+}
+
+// SetWorkItemUsage sets field value
+func (o *CustomAttributeSearchApiResult) SetWorkItemUsage(v []ProjectShortestApiResult) {
+	o.WorkItemUsage = v
+}
+
+// GetTestPlanUsage returns the TestPlanUsage field value
+func (o *CustomAttributeSearchApiResult) GetTestPlanUsage() []ProjectShortestApiResult {
+	if o == nil {
+		var ret []ProjectShortestApiResult
+		return ret
+	}
+
+	return o.TestPlanUsage
+}
+
+// GetTestPlanUsageOk returns a tuple with the TestPlanUsage field value
+// and a boolean to check if the value has been set.
+func (o *CustomAttributeSearchApiResult) GetTestPlanUsageOk() ([]ProjectShortestApiResult, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.TestPlanUsage, true
+}
+
+// SetTestPlanUsage sets field value
+func (o *CustomAttributeSearchApiResult) SetTestPlanUsage(v []ProjectShortestApiResult) {
+	o.TestPlanUsage = v
+}
+
 // GetId returns the Id field value
-func (o *CustomAttributeApiResult) GetId() string {
+func (o *CustomAttributeSearchApiResult) GetId() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -89,7 +143,7 @@ func (o *CustomAttributeApiResult) GetId() string {
 
 // GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetIdOk() (*string, bool) {
+func (o *CustomAttributeSearchApiResult) GetIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -97,12 +151,12 @@ func (o *CustomAttributeApiResult) GetIdOk() (*string, bool) {
 }
 
 // SetId sets field value
-func (o *CustomAttributeApiResult) SetId(v string) {
+func (o *CustomAttributeSearchApiResult) SetId(v string) {
 	o.Id = v
 }
 
 // GetCode returns the Code field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *CustomAttributeApiResult) GetCode() string {
+func (o *CustomAttributeSearchApiResult) GetCode() string {
 	if o == nil || IsNil(o.Code.Get()) {
 		var ret string
 		return ret
@@ -113,7 +167,7 @@ func (o *CustomAttributeApiResult) GetCode() string {
 // GetCodeOk returns a tuple with the Code field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *CustomAttributeApiResult) GetCodeOk() (*string, bool) {
+func (o *CustomAttributeSearchApiResult) GetCodeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -121,7 +175,7 @@ func (o *CustomAttributeApiResult) GetCodeOk() (*string, bool) {
 }
 
 // HasCode returns a boolean if a field has been set.
-func (o *CustomAttributeApiResult) HasCode() bool {
+func (o *CustomAttributeSearchApiResult) HasCode() bool {
 	if o != nil && o.Code.IsSet() {
 		return true
 	}
@@ -130,21 +184,21 @@ func (o *CustomAttributeApiResult) HasCode() bool {
 }
 
 // SetCode gets a reference to the given NullableString and assigns it to the Code field.
-func (o *CustomAttributeApiResult) SetCode(v string) {
+func (o *CustomAttributeSearchApiResult) SetCode(v string) {
 	o.Code.Set(&v)
 }
 // SetCodeNil sets the value for Code to be an explicit nil
-func (o *CustomAttributeApiResult) SetCodeNil() {
+func (o *CustomAttributeSearchApiResult) SetCodeNil() {
 	o.Code.Set(nil)
 }
 
 // UnsetCode ensures that no value is present for Code, not even an explicit nil
-func (o *CustomAttributeApiResult) UnsetCode() {
+func (o *CustomAttributeSearchApiResult) UnsetCode() {
 	o.Code.Unset()
 }
 
 // GetOptions returns the Options field value
-func (o *CustomAttributeApiResult) GetOptions() []CustomAttributeOptionApiResult {
+func (o *CustomAttributeSearchApiResult) GetOptions() []CustomAttributeOptionApiResult {
 	if o == nil {
 		var ret []CustomAttributeOptionApiResult
 		return ret
@@ -155,7 +209,7 @@ func (o *CustomAttributeApiResult) GetOptions() []CustomAttributeOptionApiResult
 
 // GetOptionsOk returns a tuple with the Options field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetOptionsOk() ([]CustomAttributeOptionApiResult, bool) {
+func (o *CustomAttributeSearchApiResult) GetOptionsOk() ([]CustomAttributeOptionApiResult, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -163,12 +217,12 @@ func (o *CustomAttributeApiResult) GetOptionsOk() ([]CustomAttributeOptionApiRes
 }
 
 // SetOptions sets field value
-func (o *CustomAttributeApiResult) SetOptions(v []CustomAttributeOptionApiResult) {
+func (o *CustomAttributeSearchApiResult) SetOptions(v []CustomAttributeOptionApiResult) {
 	o.Options = v
 }
 
 // GetType returns the Type field value
-func (o *CustomAttributeApiResult) GetType() CustomAttributeType {
+func (o *CustomAttributeSearchApiResult) GetType() CustomAttributeType {
 	if o == nil {
 		var ret CustomAttributeType
 		return ret
@@ -179,7 +233,7 @@ func (o *CustomAttributeApiResult) GetType() CustomAttributeType {
 
 // GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetTypeOk() (*CustomAttributeType, bool) {
+func (o *CustomAttributeSearchApiResult) GetTypeOk() (*CustomAttributeType, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -187,12 +241,12 @@ func (o *CustomAttributeApiResult) GetTypeOk() (*CustomAttributeType, bool) {
 }
 
 // SetType sets field value
-func (o *CustomAttributeApiResult) SetType(v CustomAttributeType) {
+func (o *CustomAttributeSearchApiResult) SetType(v CustomAttributeType) {
 	o.Type = v
 }
 
 // GetIsDeleted returns the IsDeleted field value
-func (o *CustomAttributeApiResult) GetIsDeleted() bool {
+func (o *CustomAttributeSearchApiResult) GetIsDeleted() bool {
 	if o == nil {
 		var ret bool
 		return ret
@@ -203,7 +257,7 @@ func (o *CustomAttributeApiResult) GetIsDeleted() bool {
 
 // GetIsDeletedOk returns a tuple with the IsDeleted field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetIsDeletedOk() (*bool, bool) {
+func (o *CustomAttributeSearchApiResult) GetIsDeletedOk() (*bool, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -211,12 +265,12 @@ func (o *CustomAttributeApiResult) GetIsDeletedOk() (*bool, bool) {
 }
 
 // SetIsDeleted sets field value
-func (o *CustomAttributeApiResult) SetIsDeleted(v bool) {
+func (o *CustomAttributeSearchApiResult) SetIsDeleted(v bool) {
 	o.IsDeleted = v
 }
 
 // GetName returns the Name field value
-func (o *CustomAttributeApiResult) GetName() string {
+func (o *CustomAttributeSearchApiResult) GetName() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -227,7 +281,7 @@ func (o *CustomAttributeApiResult) GetName() string {
 
 // GetNameOk returns a tuple with the Name field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetNameOk() (*string, bool) {
+func (o *CustomAttributeSearchApiResult) GetNameOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -235,12 +289,12 @@ func (o *CustomAttributeApiResult) GetNameOk() (*string, bool) {
 }
 
 // SetName sets field value
-func (o *CustomAttributeApiResult) SetName(v string) {
+func (o *CustomAttributeSearchApiResult) SetName(v string) {
 	o.Name = v
 }
 
 // GetIsEnabled returns the IsEnabled field value
-func (o *CustomAttributeApiResult) GetIsEnabled() bool {
+func (o *CustomAttributeSearchApiResult) GetIsEnabled() bool {
 	if o == nil {
 		var ret bool
 		return ret
@@ -251,7 +305,7 @@ func (o *CustomAttributeApiResult) GetIsEnabled() bool {
 
 // GetIsEnabledOk returns a tuple with the IsEnabled field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetIsEnabledOk() (*bool, bool) {
+func (o *CustomAttributeSearchApiResult) GetIsEnabledOk() (*bool, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -259,12 +313,12 @@ func (o *CustomAttributeApiResult) GetIsEnabledOk() (*bool, bool) {
 }
 
 // SetIsEnabled sets field value
-func (o *CustomAttributeApiResult) SetIsEnabled(v bool) {
+func (o *CustomAttributeSearchApiResult) SetIsEnabled(v bool) {
 	o.IsEnabled = v
 }
 
 // GetIsRequired returns the IsRequired field value
-func (o *CustomAttributeApiResult) GetIsRequired() bool {
+func (o *CustomAttributeSearchApiResult) GetIsRequired() bool {
 	if o == nil {
 		var ret bool
 		return ret
@@ -275,7 +329,7 @@ func (o *CustomAttributeApiResult) GetIsRequired() bool {
 
 // GetIsRequiredOk returns a tuple with the IsRequired field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetIsRequiredOk() (*bool, bool) {
+func (o *CustomAttributeSearchApiResult) GetIsRequiredOk() (*bool, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -283,12 +337,12 @@ func (o *CustomAttributeApiResult) GetIsRequiredOk() (*bool, bool) {
 }
 
 // SetIsRequired sets field value
-func (o *CustomAttributeApiResult) SetIsRequired(v bool) {
+func (o *CustomAttributeSearchApiResult) SetIsRequired(v bool) {
 	o.IsRequired = v
 }
 
 // GetIsGlobal returns the IsGlobal field value
-func (o *CustomAttributeApiResult) GetIsGlobal() bool {
+func (o *CustomAttributeSearchApiResult) GetIsGlobal() bool {
 	if o == nil {
 		var ret bool
 		return ret
@@ -299,7 +353,7 @@ func (o *CustomAttributeApiResult) GetIsGlobal() bool {
 
 // GetIsGlobalOk returns a tuple with the IsGlobal field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetIsGlobalOk() (*bool, bool) {
+func (o *CustomAttributeSearchApiResult) GetIsGlobalOk() (*bool, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -307,12 +361,12 @@ func (o *CustomAttributeApiResult) GetIsGlobalOk() (*bool, bool) {
 }
 
 // SetIsGlobal sets field value
-func (o *CustomAttributeApiResult) SetIsGlobal(v bool) {
+func (o *CustomAttributeSearchApiResult) SetIsGlobal(v bool) {
 	o.IsGlobal = v
 }
 
 // GetIsReadOnly returns the IsReadOnly field value
-func (o *CustomAttributeApiResult) GetIsReadOnly() bool {
+func (o *CustomAttributeSearchApiResult) GetIsReadOnly() bool {
 	if o == nil {
 		var ret bool
 		return ret
@@ -323,7 +377,7 @@ func (o *CustomAttributeApiResult) GetIsReadOnly() bool {
 
 // GetIsReadOnlyOk returns a tuple with the IsReadOnly field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetIsReadOnlyOk() (*bool, bool) {
+func (o *CustomAttributeSearchApiResult) GetIsReadOnlyOk() (*bool, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -331,12 +385,12 @@ func (o *CustomAttributeApiResult) GetIsReadOnlyOk() (*bool, bool) {
 }
 
 // SetIsReadOnly sets field value
-func (o *CustomAttributeApiResult) SetIsReadOnly(v bool) {
+func (o *CustomAttributeSearchApiResult) SetIsReadOnly(v bool) {
 	o.IsReadOnly = v
 }
 
 // GetIsSystem returns the IsSystem field value
-func (o *CustomAttributeApiResult) GetIsSystem() bool {
+func (o *CustomAttributeSearchApiResult) GetIsSystem() bool {
 	if o == nil {
 		var ret bool
 		return ret
@@ -347,7 +401,7 @@ func (o *CustomAttributeApiResult) GetIsSystem() bool {
 
 // GetIsSystemOk returns a tuple with the IsSystem field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetIsSystemOk() (*bool, bool) {
+func (o *CustomAttributeSearchApiResult) GetIsSystemOk() (*bool, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -355,12 +409,12 @@ func (o *CustomAttributeApiResult) GetIsSystemOk() (*bool, bool) {
 }
 
 // SetIsSystem sets field value
-func (o *CustomAttributeApiResult) SetIsSystem(v bool) {
+func (o *CustomAttributeSearchApiResult) SetIsSystem(v bool) {
 	o.IsSystem = v
 }
 
 // GetTargets returns the Targets field value
-func (o *CustomAttributeApiResult) GetTargets() []string {
+func (o *CustomAttributeSearchApiResult) GetTargets() []string {
 	if o == nil {
 		var ret []string
 		return ret
@@ -371,7 +425,7 @@ func (o *CustomAttributeApiResult) GetTargets() []string {
 
 // GetTargetsOk returns a tuple with the Targets field value
 // and a boolean to check if the value has been set.
-func (o *CustomAttributeApiResult) GetTargetsOk() ([]string, bool) {
+func (o *CustomAttributeSearchApiResult) GetTargetsOk() ([]string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -379,11 +433,11 @@ func (o *CustomAttributeApiResult) GetTargetsOk() ([]string, bool) {
 }
 
 // SetTargets sets field value
-func (o *CustomAttributeApiResult) SetTargets(v []string) {
+func (o *CustomAttributeSearchApiResult) SetTargets(v []string) {
 	o.Targets = v
 }
 
-func (o CustomAttributeApiResult) MarshalJSON() ([]byte, error) {
+func (o CustomAttributeSearchApiResult) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -391,8 +445,10 @@ func (o CustomAttributeApiResult) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o CustomAttributeApiResult) ToMap() (map[string]interface{}, error) {
+func (o CustomAttributeSearchApiResult) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["workItemUsage"] = o.WorkItemUsage
+	toSerialize["testPlanUsage"] = o.TestPlanUsage
 	toSerialize["id"] = o.Id
 	if o.Code.IsSet() {
 		toSerialize["code"] = o.Code.Get()
@@ -410,11 +466,13 @@ func (o CustomAttributeApiResult) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-func (o *CustomAttributeApiResult) UnmarshalJSON(data []byte) (err error) {
+func (o *CustomAttributeSearchApiResult) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
+		"workItemUsage",
+		"testPlanUsage",
 		"id",
 		"options",
 		"type",
@@ -442,53 +500,53 @@ func (o *CustomAttributeApiResult) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varCustomAttributeApiResult := _CustomAttributeApiResult{}
+	varCustomAttributeSearchApiResult := _CustomAttributeSearchApiResult{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varCustomAttributeApiResult)
+	err = decoder.Decode(&varCustomAttributeSearchApiResult)
 
 	if err != nil {
 		return err
 	}
 
-	*o = CustomAttributeApiResult(varCustomAttributeApiResult)
+	*o = CustomAttributeSearchApiResult(varCustomAttributeSearchApiResult)
 
 	return err
 }
 
-type NullableCustomAttributeApiResult struct {
-	value *CustomAttributeApiResult
+type NullableCustomAttributeSearchApiResult struct {
+	value *CustomAttributeSearchApiResult
 	isSet bool
 }
 
-func (v NullableCustomAttributeApiResult) Get() *CustomAttributeApiResult {
+func (v NullableCustomAttributeSearchApiResult) Get() *CustomAttributeSearchApiResult {
 	return v.value
 }
 
-func (v *NullableCustomAttributeApiResult) Set(val *CustomAttributeApiResult) {
+func (v *NullableCustomAttributeSearchApiResult) Set(val *CustomAttributeSearchApiResult) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableCustomAttributeApiResult) IsSet() bool {
+func (v NullableCustomAttributeSearchApiResult) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableCustomAttributeApiResult) Unset() {
+func (v *NullableCustomAttributeSearchApiResult) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableCustomAttributeApiResult(val *CustomAttributeApiResult) *NullableCustomAttributeApiResult {
-	return &NullableCustomAttributeApiResult{value: val, isSet: true}
+func NewNullableCustomAttributeSearchApiResult(val *CustomAttributeSearchApiResult) *NullableCustomAttributeSearchApiResult {
+	return &NullableCustomAttributeSearchApiResult{value: val, isSet: true}
 }
 
-func (v NullableCustomAttributeApiResult) MarshalJSON() ([]byte, error) {
+func (v NullableCustomAttributeSearchApiResult) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableCustomAttributeApiResult) UnmarshalJSON(src []byte) error {
+func (v *NullableCustomAttributeSearchApiResult) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

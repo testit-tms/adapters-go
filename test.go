@@ -26,6 +26,8 @@ type TestMetadata struct {
 	Tags        []string
 	ExternalId  string
 	WorkItemIds []string
+	// Layer is the test pyramid layer for the autotest card (source Run). Empty — do not send.
+	Layer string
 }
 
 func Test(t *testing.T, m TestMetadata, f func()) {
@@ -97,6 +99,7 @@ func newTestResult(m TestMetadata, t *testing.T) *TestResult {
 		externalId:  m.ExternalId,
 		workItemIds: m.WorkItemIds,
 		parameters:  m.Parameters,
+		layer:       m.Layer,
 	}
 
 	if TestResult.displayName == "" {

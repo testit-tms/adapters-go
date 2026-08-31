@@ -8,6 +8,7 @@ import (
 	tmsclient "github.com/testit-tms/adapters-go/v2/adaptersapi"
 	"github.com/testit-tms/adapters-go/v2/config"
 	"github.com/testit-tms/adapters-go/v2/htmlutils"
+	"github.com/testit-tms/adapters-go/v2/models"
 )
 
 // TODO: validate that hasInfo always true is correct
@@ -75,6 +76,7 @@ func testToAutotestModel(test TestResult, projectId string) tmsclient.AutoTestCr
 	}
 
 	req.SetExternalKey(test.externalKey)
+	applyLayerToCreate(req, test.layer)
 
 	// Apply HTML escaping to the model
 	htmlutils.EscapeHtmlInObject(req)
@@ -102,7 +104,7 @@ func stepToAutoTestStepModel(s []StepResult) []tmsclient.AutoTestStepApiModel {
 }
 
 func testToUpdateAutotestModel(test TestResult, autotest tmsclient.AutoTestApiResult) tmsclient.AutoTestUpdateApiModel {
-	req := tmsclient.NewAutoTestUpdateApiModel(autotest.ProjectId, test.externalId, test.displayName)
+	req := tmsclient.NewAutoTestUpdateApiModel(autotest.ProjectId, test.externalId, test.displayName, false)
 
 	if test.description != "" {
 		req.SetDescription(test.description)
@@ -171,11 +173,24 @@ func testToUpdateAutotestModel(test TestResult, autotest tmsclient.AutoTestApiRe
 	req.SetExternalKey(test.externalKey)
 	req.SetIsFlaky(autotest.IsFlaky)
 	req.SetId(autotest.Id)
+	applyLayerToUpdate(req, test.layer)
 
 	// Apply HTML escaping to the model
 	htmlutils.EscapeHtmlInObject(req)
 
 	return *req
+}
+
+func applyLayerToCreate(req *tmsclient.AutoTestCreateApiModel, layer string) {
+	if name, ok := models.NormalizeLayer(layer); ok {
+		req.SetLayer(*tmsclient.NewLayerApiModel(name, tmsclient.LAYERSOURCE_RUN))
+	}
+}
+
+func applyLayerToUpdate(req *tmsclient.AutoTestUpdateApiModel, layer string) {
+	if name, ok := models.NormalizeLayer(layer); ok {
+		req.SetLayer(*tmsclient.NewLayerApiModel(name, tmsclient.LAYERSOURCE_RUN))
+	}
 }
 
 // passed failed skipped from framework

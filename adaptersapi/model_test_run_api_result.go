@@ -25,6 +25,12 @@ type TestRunApiResult struct {
 	Id string `json:"id"`
 	// Test run name
 	Name string `json:"name"`
+	// Test run description
+	Description NullableString `json:"description,omitempty"`
+	// Test run launch source              Once launch source is specified it cannot be updated.
+	LaunchSource NullableString `json:"launchSource,omitempty"`
+	// Project unique identifier              This property is used to link test run with project.
+	ProjectId string `json:"projectId"`
 	// Test run state
 	// Deprecated
 	StateName TestRunState `json:"stateName"`
@@ -44,10 +50,11 @@ type _TestRunApiResult TestRunApiResult
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTestRunApiResult(id string, name string, stateName TestRunState, status TestStatusApiResult, attachments []AttachmentApiResult, links []LinkApiResult, tags []string) *TestRunApiResult {
+func NewTestRunApiResult(id string, name string, projectId string, stateName TestRunState, status TestStatusApiResult, attachments []AttachmentApiResult, links []LinkApiResult, tags []string) *TestRunApiResult {
 	this := TestRunApiResult{}
 	this.Id = id
 	this.Name = name
+	this.ProjectId = projectId
 	this.StateName = stateName
 	this.Status = status
 	this.Attachments = attachments
@@ -110,6 +117,114 @@ func (o *TestRunApiResult) GetNameOk() (*string, bool) {
 // SetName sets field value
 func (o *TestRunApiResult) SetName(v string) {
 	o.Name = v
+}
+
+// GetDescription returns the Description field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *TestRunApiResult) GetDescription() string {
+	if o == nil || IsNil(o.Description.Get()) {
+		var ret string
+		return ret
+	}
+	return *o.Description.Get()
+}
+
+// GetDescriptionOk returns a tuple with the Description field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *TestRunApiResult) GetDescriptionOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Description.Get(), o.Description.IsSet()
+}
+
+// HasDescription returns a boolean if a field has been set.
+func (o *TestRunApiResult) HasDescription() bool {
+	if o != nil && o.Description.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetDescription gets a reference to the given NullableString and assigns it to the Description field.
+func (o *TestRunApiResult) SetDescription(v string) {
+	o.Description.Set(&v)
+}
+// SetDescriptionNil sets the value for Description to be an explicit nil
+func (o *TestRunApiResult) SetDescriptionNil() {
+	o.Description.Set(nil)
+}
+
+// UnsetDescription ensures that no value is present for Description, not even an explicit nil
+func (o *TestRunApiResult) UnsetDescription() {
+	o.Description.Unset()
+}
+
+// GetLaunchSource returns the LaunchSource field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *TestRunApiResult) GetLaunchSource() string {
+	if o == nil || IsNil(o.LaunchSource.Get()) {
+		var ret string
+		return ret
+	}
+	return *o.LaunchSource.Get()
+}
+
+// GetLaunchSourceOk returns a tuple with the LaunchSource field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *TestRunApiResult) GetLaunchSourceOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.LaunchSource.Get(), o.LaunchSource.IsSet()
+}
+
+// HasLaunchSource returns a boolean if a field has been set.
+func (o *TestRunApiResult) HasLaunchSource() bool {
+	if o != nil && o.LaunchSource.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetLaunchSource gets a reference to the given NullableString and assigns it to the LaunchSource field.
+func (o *TestRunApiResult) SetLaunchSource(v string) {
+	o.LaunchSource.Set(&v)
+}
+// SetLaunchSourceNil sets the value for LaunchSource to be an explicit nil
+func (o *TestRunApiResult) SetLaunchSourceNil() {
+	o.LaunchSource.Set(nil)
+}
+
+// UnsetLaunchSource ensures that no value is present for LaunchSource, not even an explicit nil
+func (o *TestRunApiResult) UnsetLaunchSource() {
+	o.LaunchSource.Unset()
+}
+
+// GetProjectId returns the ProjectId field value
+func (o *TestRunApiResult) GetProjectId() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.ProjectId
+}
+
+// GetProjectIdOk returns a tuple with the ProjectId field value
+// and a boolean to check if the value has been set.
+func (o *TestRunApiResult) GetProjectIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.ProjectId, true
+}
+
+// SetProjectId sets field value
+func (o *TestRunApiResult) SetProjectId(v string) {
+	o.ProjectId = v
 }
 
 // GetStateName returns the StateName field value
@@ -247,6 +362,13 @@ func (o TestRunApiResult) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["id"] = o.Id
 	toSerialize["name"] = o.Name
+	if o.Description.IsSet() {
+		toSerialize["description"] = o.Description.Get()
+	}
+	if o.LaunchSource.IsSet() {
+		toSerialize["launchSource"] = o.LaunchSource.Get()
+	}
+	toSerialize["projectId"] = o.ProjectId
 	toSerialize["stateName"] = o.StateName
 	toSerialize["status"] = o.Status
 	toSerialize["attachments"] = o.Attachments
@@ -262,6 +384,7 @@ func (o *TestRunApiResult) UnmarshalJSON(data []byte) (err error) {
 	requiredProperties := []string{
 		"id",
 		"name",
+		"projectId",
 		"stateName",
 		"status",
 		"attachments",

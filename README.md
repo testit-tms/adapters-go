@@ -278,7 +278,23 @@ Description of metadata:
 * `Labels` - labels listed in the autotest card
 * `Tags` - tags listed in the autotest card
 * `Links` - links listed in the autotest card ( not in the TestResult card. Additionally, there is URL validation on Link.Url and it's must be a correct URL. )
+* `Layer` - test pyramid layer on the autotest card (source **Run**). Use `tms.TestLayers` constants or any custom non-empty string. Omit or leave empty to not send layer.
 * `Step` - the designation of the step
+
+Recommended layer constants (`tms.TestLayers`): `E2E`, `UI`, `API`, `Contract`, `Integration`, `Component`, `Unit`. Any other non-empty string is accepted.
+
+```go
+tms.Test(t, tms.TestMetadata{
+    DisplayName: "API test",
+    Layer:       tms.TestLayers.API,
+}, func() { ... })
+
+tms.Test(t, tms.TestMetadata{
+    Layer: "my-custom-layer",
+}, func() { ... })
+```
+
+Layer is **not** configurable via env/CLI and is independent from autotest `Tags` / test run `testRunTags`.
 
 Description of methods:
 
