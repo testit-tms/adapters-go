@@ -11,8 +11,12 @@
 | 5.5     | v0.6.1-tms-5.5      |
 | 5.6     | v0.7.0-tms-5.6      |
 | 5.7     | v1.0.0-tms-5.7      |
-| 5.8     | v1.1.0-tms-5.8      |
-| Cloud   | v1.0.0 +            |
+| 5.8     | v2.0.1-tms-5.8      |
+| Cloud   | v2.0.0 +            |
+
+Note: v2 versions import should be like this:
+
+`github.com/testit-tms/adapters-go/v2 v2.0.1-tms-5.8` # /v2 at the end of the url
 
 1. For current versions, see the releases tab. 
 2. Starting with 5.2, we have added a TMS postscript, which means that the utility is compatible with a specific enterprise version. 
