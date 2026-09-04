@@ -56,6 +56,17 @@ curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID
 ```
 5. You can read the sync-storage logs from the service.log file.
 
+NOTE: It can be OK for `adapterMode=2` and automatic creation of new test-run + call for `curl -v http://127.0.0.1:49152/wait-completion || true` in the end of your running job like this:
+
+```bash
+export TMS_ADAPTER_MODE=2
+
+eval "${{ matrix.test_command }}" || true #ignore error code
+
+sleep 1
+curl -v http://127.0.0.1:49152/wait-completion --max-time 120 || true
+```
+
 
 ### How to use new importRealtime: false (true by default)?
 
