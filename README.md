@@ -60,7 +60,7 @@ You can see how we implement this [here.](https://github.com/testit-tms/adapters
 nohup .caches/syncstorage-linux-amd64 --testRunId ${{ env.TMS_TEST_RUN_ID }} --port 49152 \
     --baseURL ${{ env.TMS_URL }} --privateToken ${{ env.TMS_PRIVATE_TOKEN }}  > service.log 2>&1 & 
 ```
-3. Start the adapter using adapterMode=1 or adapterMode=0 for the selected testRunId.
+3. Start the adapter using adapterMode=1 for the selected testRunId.
 4. Wait for sync-storage to complete background jobs by calling:
 ```bash
 curl -v http://127.0.0.1:49152/wait-completion?testRunId=${{ env.TMS_TEST_RUN_ID }} || true
@@ -169,7 +169,7 @@ export TMS_TEST_RUN_LINKS='[{"url":"https://gitlab.example.com/group/project/-/j
 ```
 
 - **adapterMode=2** (create run): tags/links are sent in the create request.
-- **adapterMode=0/1** (existing run): tags/links are merged into the run at adapter startup (existing UI/API items are kept; duplicates by tag name / link URL are skipped).
+- **adapterMode=1** (existing run): tags/links are merged into the run at adapter startup (existing UI/API items are kept; duplicates by tag name / link URL are skipped).
 
 #### File
 
