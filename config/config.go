@@ -59,12 +59,12 @@ func MustLoad() *Config {
 		log.Fatalf("cannot update config: %s", err)
 	}
 
-	validateConfig(cfg)
+	validateConfig(&cfg)
 
 	return &cfg
 }
 
-func validateConfig(cfg Config) {
+func validateConfig(cfg *Config) {
 	_, err := url.ParseRequestURI(cfg.Url)
 	if err != nil {
 		panic("Url is invalid")
@@ -89,16 +89,19 @@ func validateConfig(cfg Config) {
 		panic("Adapter mode is invalid")
 	}
 
+	if adapterMode == 0 {
+		log.Println("adapterMode 0 is not allowed for current version of go adapter. " +
+			"Use default value instead: 1")
+		cfg.AdapterMode = "1"
+		adapterMode = 1
+	}
+
 	// adapter mode 2 - test run id is created automatically
 	if adapterMode == 2 {
 		// do nothing
 	} else if adapterMode == 1 {
 		if !r.MatchString(cfg.TestRunId) {
 			panic("Adapter works in mode 1. Config should contains valid test run id")
-		}
-	} else if adapterMode == 0 {
-		if !r.MatchString(cfg.TestRunId) {
-			panic("Adapter works in mode 0. Config should contains valid test run id")
 		}
 	} else {
 		panic("Adapter mode is invalid")
