@@ -25,6 +25,8 @@ type TestMetadata struct {
 	Labels      []string
 	Tags        []string
 	ExternalId  string
+	WorkItemId  string
+	// Deprecated: Use WorkItemId with a single globalId instead.
 	WorkItemIds []string
 	// Layer is the test pyramid layer for the autotest card (source Run). Empty — do not send.
 	Layer string
@@ -97,7 +99,7 @@ func newTestResult(m TestMetadata, t *testing.T) *TestResult {
 		labels:      m.Labels,
 		tags:        m.Tags,
 		externalId:  m.ExternalId,
-		workItemIds: m.WorkItemIds,
+		workItemIds: resolveWorkItemIds(m),
 		parameters:  m.Parameters,
 		layer:       m.Layer,
 	}
@@ -137,4 +139,14 @@ func newTestResult(m TestMetadata, t *testing.T) *TestResult {
 	TestResult.externalKey = t.Name()
 
 	return TestResult
+}
+
+func resolveWorkItemIds(m TestMetadata) []string {
+	if len(m.WorkItemIds) > 0 {
+		logger.Warn("WorkItemIds is deprecated. Use WorkItemId with a single globalId instead.")
+	}
+	if m.WorkItemId != "" {
+		return []string{m.WorkItemId}
+	}
+	return m.WorkItemIds
 }
