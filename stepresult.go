@@ -1,6 +1,10 @@
 package tms
 
-import "time"
+import (
+	"time"
+
+	"github.com/testit-tms/adapters-go/v2/models"
+)
 
 type StepResult struct {
 	Name          string
@@ -23,7 +27,7 @@ func (s *StepResult) addStep(step StepResult) {
 }
 
 func (s *StepResult) addStatus(status string) {
-	s.Status = status
+	s.Status = models.MergeStatus(s.Status, status)
 }
 
 func (s *StepResult) addAttachments(a string) {

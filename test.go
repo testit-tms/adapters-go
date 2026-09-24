@@ -54,7 +54,9 @@ func Test(t *testing.T, m TestMetadata, f func()) {
 			tr.addBefore(testPhaseObjects.before.convertToStepResult())
 		}
 
-		if tr.status == "" {
+		if t.Failed() {
+			tr.status = models.Failed
+		} else if tr.status == "" {
 			if testPhaseObjects.before != nil && testPhaseObjects.before.status == models.Failed {
 				tr.status = models.Failed
 				tr.message = testPhaseObjects.before.message
