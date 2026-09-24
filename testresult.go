@@ -35,7 +35,7 @@ type TestResult struct {
 }
 
 func (tr *TestResult) addStatus(v string) {
-	tr.status = v
+	tr.status = models.MergeStatus(tr.status, v)
 }
 
 func (tr *TestResult) addStep(step StepResult) {
