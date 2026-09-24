@@ -8,6 +8,7 @@ import (
 	tmsclient "github.com/testit-tms/adapters-go/v2/adaptersapi"
 	"github.com/testit-tms/adapters-go/v2/config"
 	"github.com/testit-tms/adapters-go/v2/htmlutils"
+	"github.com/testit-tms/adapters-go/v2/testrunv2"
 )
 
 // TODO: validate that hasInfo always true is correct
@@ -468,42 +469,50 @@ func mapLinkApiResultsToCreateLinkApiModels(links []tmsclient.LinkApiResult) []t
 	return result
 }
 
-func buildUpdateEmptyTestRunApiModel(testRun *tmsclient.TestRunApiResult) *tmsclient.UpdateEmptyTestRunApiModel {
+func buildUpdateEmptyTestRunApiModel(testRun *testrunv2.Snapshot) *tmsclient.UpdateEmptyTestRunApiModel {
 	model := tmsclient.NewUpdateEmptyTestRunApiModel(testRun.Id, testRun.Name)
-	model.Attachments = buildAssignAttachmentApiModel(testRun.Attachments)
-	model.Links = buildUpdateLinkApiModel(testRun.Links)
+	model.SetDescription(testRun.Description)
+	model.SetLaunchSource(testRun.LaunchSource)
+	model.Attachments = snapshotAttachmentsToAssign(testRun.Attachments)
+	model.Links = snapshotLinksToUpdate(testRun.Links)
 
 	return model
 }
 
-func buildAssignAttachmentApiModel(attachments []tmsclient.AttachmentApiResult) []tmsclient.AssignAttachmentApiModel {
-	updateAttachments := make([]tmsclient.AssignAttachmentApiModel, len(attachments))
-	for i, attachment := range attachments {
-		updateAttachment := tmsclient.NewAssignAttachmentApiModel(attachment.Id)
-		updateAttachments[i] = *updateAttachment
+func snapshotAttachmentsToAssign(attachments []testrunv2.Attachment) []tmsclient.AssignAttachmentApiModel {
+	out := make([]tmsclient.AssignAttachmentApiModel, 0, len(attachments))
+	for _, a := range attachments {
+		if a.Id == "" {
+			continue
+		}
+		out = append(out, *tmsclient.NewAssignAttachmentApiModel(a.Id))
 	}
-
-	return updateAttachments
+	return out
 }
 
-func buildUpdateLinkApiModel(links []tmsclient.LinkApiResult) []tmsclient.UpdateLinkApiModel {
-	updateLinks := make([]tmsclient.UpdateLinkApiModel, len(links))
-	for i, link := range links {
-		updateLink := tmsclient.NewUpdateLinkApiModel(link.Url, link.Type)
-		if link.Id.IsSet() {
-			updateLink.SetId(link.GetId())
+func snapshotLinksToUpdate(links []testrunv2.Link) []tmsclient.UpdateLinkApiModel {
+	out := make([]tmsclient.UpdateLinkApiModel, 0, len(links))
+	for _, link := range links {
+		linkType, err := tmsclient.NewLinkTypeFromValue(link.Type)
+		if err != nil || linkType == nil {
+			linkType = tmsclient.LINKTYPE_RELATED.Ptr()
 		}
-		if link.Title.IsSet() {
-			updateLink.SetTitle(link.GetTitle())
+		if link.Url == "" || linkType == nil {
+			continue
 		}
-		if link.Description.IsSet() {
-			updateLink.SetDescription(link.GetDescription())
+		m := tmsclient.NewUpdateLinkApiModel(link.Url, *linkType)
+		if link.Id != "" {
+			m.SetId(link.Id)
 		}
-
-		updateLinks[i] = *updateLink
+		if link.Title != "" {
+			m.SetTitle(link.Title)
+		}
+		if link.Description != "" {
+			m.SetDescription(link.Description)
+		}
+		out = append(out, *m)
 	}
-
-	return updateLinks
+	return out
 }
 
 func configLinksToCreateLinkApiModels(links []config.TestRunLink) []tmsclient.CreateLinkApiModel {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -15,6 +16,7 @@ import (
 	"github.com/testit-tms/adapters-go/v2/client_helpers"
 	"github.com/testit-tms/adapters-go/v2/config"
 	"github.com/testit-tms/adapters-go/v2/htmlutils"
+	"github.com/testit-tms/adapters-go/v2/testrunv2"
 	"golang.org/x/exp/slog"
 )
 
@@ -322,22 +324,54 @@ func (c *tmsClient) createTestRun() string {
 	return testRun.Id
 }
 
-// return test run
-func (c *tmsClient) getTestRun() *tmsclient.TestRunApiResult {
+// getTestRun loads metadata via GET /api/v2/testRuns/{id}.
+// Adapters GET on TMS 5.8 omits description/launchSource and returns empty links/attachments.
+func (c *tmsClient) getTestRun() *testrunv2.Snapshot {
 	const op = "tmsClient.getTestRun"
 	logger := logger.With("op", op)
 
-	ctx := client_helpers.AuthContext(c.cfg.Token)
+	cfg := c.client.GetConfig()
+	u := url.URL{
+		Scheme: cfg.Scheme,
+		Host:   cfg.Host,
+		Path:   "/api/v2/testRuns/" + url.PathEscape(c.cfg.TestRunId),
+	}
 
-	testRun, r, err := c.client.TestRunsAPI.AdaptersTestRunsIdGet(ctx, c.cfg.TestRunId).
-		Execute()
-
+	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
-		_ = client_helpers.LogAndWrapAPIError(logger, op, "failed to get test run", err, r)
+		logger.Error("failed to build get test run request", "error", err)
+		return nil
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", "PrivateToken "+c.cfg.Token)
+
+	hc := cfg.HTTPClient
+	if hc == nil {
+		hc = http.DefaultClient
+	}
+	resp, err := hc.Do(req)
+	if err != nil {
+		logger.Error("failed to get test run", "error", err)
+		return nil
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		logger.Error("failed to read test run response", "error", err)
+		return nil
+	}
+	if resp.StatusCode >= 300 {
+		logger.Error("failed to get test run", "status", resp.StatusCode, "response", string(body))
 		return nil
 	}
 
-	return testRun
+	snapshot, err := testrunv2.Parse(body)
+	if err != nil {
+		logger.Error("failed to parse test run", "error", err)
+		return nil
+	}
+	return snapshot
 }
 
 func (c *tmsClient) updateTestRun() {
@@ -377,7 +411,7 @@ func (c *tmsClient) updateTestRun() {
 		}
 	}
 
-	mergedLinks := buildUpdateLinkApiModel(testRun.Links)
+	mergedLinks := snapshotLinksToUpdate(testRun.Links)
 	linksChanged := false
 	if len(c.cfg.TestRunLinks) > 0 {
 		existingURLs := make([]string, 0, len(testRun.Links))
