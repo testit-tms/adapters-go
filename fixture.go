@@ -2,6 +2,8 @@ package tms
 
 import (
 	"time"
+
+	"github.com/testit-tms/adapters-go/v2/models"
 )
 
 type fixture struct {
@@ -27,7 +29,7 @@ func (b *fixture) addStep(step StepResult) {
 }
 
 func (b *fixture) addStatus(status string) {
-	b.status = status
+	b.status = models.MergeStatus(b.status, status)
 }
 
 func (b *fixture) addAttachments(a string) {
