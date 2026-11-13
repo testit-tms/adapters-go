@@ -60,6 +60,8 @@ type WorkItemApiResult struct {
 	Iterations []IterationModel `json:"iterations"`
 	// Automated tests associated with the work item
 	AutoTests []AutoTestModel `json:"autoTests"`
+	// Set of automated test cases linked to the work item
+	AutoTestCases []AutoTestCaseApiModel `json:"autoTestCases"`
 	// Files attached to the work item
 	Attachments []AttachmentModel `json:"attachments"`
 	// Set of links related to the work item
@@ -76,7 +78,7 @@ type _WorkItemApiResult WorkItemApiResult
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkItemApiResult(id string, globalId int64, projectId string, sectionId string, name string, entityTypeName WorkItemEntityTypeApiModel, duration int32, state WorkItemStateApiModel, priority WorkItemPriorityApiModel, isAutomated bool, attributes map[string]interface{}, tags []TagModel, sectionPreconditionSteps []StepModel, sectionPostconditionSteps []StepModel, preconditionSteps []StepModel, steps []StepModel, postconditionSteps []StepModel, iterations []IterationModel, autoTests []AutoTestModel, attachments []AttachmentModel, links []LinkModel, parameters []WorkItemParameterKeyApiResult, isDeleted bool) *WorkItemApiResult {
+func NewWorkItemApiResult(id string, globalId int64, projectId string, sectionId string, name string, entityTypeName WorkItemEntityTypeApiModel, duration int32, state WorkItemStateApiModel, priority WorkItemPriorityApiModel, isAutomated bool, attributes map[string]interface{}, tags []TagModel, sectionPreconditionSteps []StepModel, sectionPostconditionSteps []StepModel, preconditionSteps []StepModel, steps []StepModel, postconditionSteps []StepModel, iterations []IterationModel, autoTests []AutoTestModel, autoTestCases []AutoTestCaseApiModel, attachments []AttachmentModel, links []LinkModel, parameters []WorkItemParameterKeyApiResult, isDeleted bool) *WorkItemApiResult {
 	this := WorkItemApiResult{}
 	this.Id = id
 	this.GlobalId = globalId
@@ -97,6 +99,7 @@ func NewWorkItemApiResult(id string, globalId int64, projectId string, sectionId
 	this.PostconditionSteps = postconditionSteps
 	this.Iterations = iterations
 	this.AutoTests = autoTests
+	this.AutoTestCases = autoTestCases
 	this.Attachments = attachments
 	this.Links = links
 	this.Parameters = parameters
@@ -610,6 +613,30 @@ func (o *WorkItemApiResult) SetAutoTests(v []AutoTestModel) {
 	o.AutoTests = v
 }
 
+// GetAutoTestCases returns the AutoTestCases field value
+func (o *WorkItemApiResult) GetAutoTestCases() []AutoTestCaseApiModel {
+	if o == nil {
+		var ret []AutoTestCaseApiModel
+		return ret
+	}
+
+	return o.AutoTestCases
+}
+
+// GetAutoTestCasesOk returns a tuple with the AutoTestCases field value
+// and a boolean to check if the value has been set.
+func (o *WorkItemApiResult) GetAutoTestCasesOk() ([]AutoTestCaseApiModel, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.AutoTestCases, true
+}
+
+// SetAutoTestCases sets field value
+func (o *WorkItemApiResult) SetAutoTestCases(v []AutoTestCaseApiModel) {
+	o.AutoTestCases = v
+}
+
 // GetAttachments returns the Attachments field value
 func (o *WorkItemApiResult) GetAttachments() []AttachmentModel {
 	if o == nil {
@@ -738,6 +765,7 @@ func (o WorkItemApiResult) ToMap() (map[string]interface{}, error) {
 	toSerialize["postconditionSteps"] = o.PostconditionSteps
 	toSerialize["iterations"] = o.Iterations
 	toSerialize["autoTests"] = o.AutoTests
+	toSerialize["autoTestCases"] = o.AutoTestCases
 	toSerialize["attachments"] = o.Attachments
 	toSerialize["links"] = o.Links
 	toSerialize["parameters"] = o.Parameters
@@ -769,6 +797,7 @@ func (o *WorkItemApiResult) UnmarshalJSON(data []byte) (err error) {
 		"postconditionSteps",
 		"iterations",
 		"autoTests",
+		"autoTestCases",
 		"attachments",
 		"links",
 		"parameters",

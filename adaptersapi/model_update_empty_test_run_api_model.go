@@ -27,7 +27,7 @@ type UpdateEmptyTestRunApiModel struct {
 	Name string `json:"name"`
 	// Test run description
 	Description NullableString `json:"description,omitempty"`
-	// Test run launch source                Once launch source is specified it cannot be updated
+	// Test run launch source              Once launch source is specified it cannot be updated
 	LaunchSource NullableString `json:"launchSource,omitempty"`
 	// Collection of attachments related to the test run
 	Attachments []AssignAttachmentApiModel `json:"attachments,omitempty"`

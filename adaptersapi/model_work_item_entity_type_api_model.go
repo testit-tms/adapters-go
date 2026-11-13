@@ -23,6 +23,7 @@ const (
 	WORKITEMENTITYTYPEAPIMODEL_TEST_CASES WorkItemEntityTypeApiModel = "TestCases"
 	WORKITEMENTITYTYPEAPIMODEL_CHECK_LISTS WorkItemEntityTypeApiModel = "CheckLists"
 	WORKITEMENTITYTYPEAPIMODEL_SHARED_STEPS WorkItemEntityTypeApiModel = "SharedSteps"
+	WORKITEMENTITYTYPEAPIMODEL_AUTO_TEST_CASES WorkItemEntityTypeApiModel = "AutoTestCases"
 )
 
 // All allowed values of WorkItemEntityTypeApiModel enum
@@ -30,6 +31,7 @@ var AllowedWorkItemEntityTypeApiModelEnumValues = []WorkItemEntityTypeApiModel{
 	"TestCases",
 	"CheckLists",
 	"SharedSteps",
+	"AutoTestCases",
 }
 
 func (v *WorkItemEntityTypeApiModel) UnmarshalJSON(src []byte) error {

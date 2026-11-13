@@ -57,6 +57,12 @@ type WorkItemFilterApiModel struct {
 	ExcludeTags []string `json:"excludeTags,omitempty"`
 	// Collection of identifiers of linked autotests
 	AutoTestIds []string `json:"autoTestIds,omitempty"`
+	// Specifies auto test case layers to search for
+	Layers []string `json:"layers,omitempty"`
+	// Specifies list of auto test case layer sources to search for
+	LayerSources []LayerSource `json:"layerSources,omitempty"`
+	// External identifier of the work item
+	ExternalId NullableString `json:"externalId,omitempty"`
 }
 
 // NewWorkItemFilterApiModel instantiates a new WorkItemFilterApiModel object
@@ -748,6 +754,114 @@ func (o *WorkItemFilterApiModel) SetAutoTestIds(v []string) {
 	o.AutoTestIds = v
 }
 
+// GetLayers returns the Layers field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *WorkItemFilterApiModel) GetLayers() []string {
+	if o == nil {
+		var ret []string
+		return ret
+	}
+	return o.Layers
+}
+
+// GetLayersOk returns a tuple with the Layers field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *WorkItemFilterApiModel) GetLayersOk() ([]string, bool) {
+	if o == nil || IsNil(o.Layers) {
+		return nil, false
+	}
+	return o.Layers, true
+}
+
+// HasLayers returns a boolean if a field has been set.
+func (o *WorkItemFilterApiModel) HasLayers() bool {
+	if o != nil && !IsNil(o.Layers) {
+		return true
+	}
+
+	return false
+}
+
+// SetLayers gets a reference to the given []string and assigns it to the Layers field.
+func (o *WorkItemFilterApiModel) SetLayers(v []string) {
+	o.Layers = v
+}
+
+// GetLayerSources returns the LayerSources field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *WorkItemFilterApiModel) GetLayerSources() []LayerSource {
+	if o == nil {
+		var ret []LayerSource
+		return ret
+	}
+	return o.LayerSources
+}
+
+// GetLayerSourcesOk returns a tuple with the LayerSources field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *WorkItemFilterApiModel) GetLayerSourcesOk() ([]LayerSource, bool) {
+	if o == nil || IsNil(o.LayerSources) {
+		return nil, false
+	}
+	return o.LayerSources, true
+}
+
+// HasLayerSources returns a boolean if a field has been set.
+func (o *WorkItemFilterApiModel) HasLayerSources() bool {
+	if o != nil && !IsNil(o.LayerSources) {
+		return true
+	}
+
+	return false
+}
+
+// SetLayerSources gets a reference to the given []LayerSource and assigns it to the LayerSources field.
+func (o *WorkItemFilterApiModel) SetLayerSources(v []LayerSource) {
+	o.LayerSources = v
+}
+
+// GetExternalId returns the ExternalId field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *WorkItemFilterApiModel) GetExternalId() string {
+	if o == nil || IsNil(o.ExternalId.Get()) {
+		var ret string
+		return ret
+	}
+	return *o.ExternalId.Get()
+}
+
+// GetExternalIdOk returns a tuple with the ExternalId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *WorkItemFilterApiModel) GetExternalIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.ExternalId.Get(), o.ExternalId.IsSet()
+}
+
+// HasExternalId returns a boolean if a field has been set.
+func (o *WorkItemFilterApiModel) HasExternalId() bool {
+	if o != nil && o.ExternalId.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetExternalId gets a reference to the given NullableString and assigns it to the ExternalId field.
+func (o *WorkItemFilterApiModel) SetExternalId(v string) {
+	o.ExternalId.Set(&v)
+}
+// SetExternalIdNil sets the value for ExternalId to be an explicit nil
+func (o *WorkItemFilterApiModel) SetExternalIdNil() {
+	o.ExternalId.Set(nil)
+}
+
+// UnsetExternalId ensures that no value is present for ExternalId, not even an explicit nil
+func (o *WorkItemFilterApiModel) UnsetExternalId() {
+	o.ExternalId.Unset()
+}
+
 func (o WorkItemFilterApiModel) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -814,6 +928,15 @@ func (o WorkItemFilterApiModel) ToMap() (map[string]interface{}, error) {
 	}
 	if o.AutoTestIds != nil {
 		toSerialize["autoTestIds"] = o.AutoTestIds
+	}
+	if o.Layers != nil {
+		toSerialize["layers"] = o.Layers
+	}
+	if o.LayerSources != nil {
+		toSerialize["layerSources"] = o.LayerSources
+	}
+	if o.ExternalId.IsSet() {
+		toSerialize["externalId"] = o.ExternalId.Get()
 	}
 	return toSerialize, nil
 }

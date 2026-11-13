@@ -26,6 +26,7 @@ const (
 	CUSTOMATTRIBUTETYPE_USER CustomAttributeType = "user"
 	CUSTOMATTRIBUTETYPE_MULTIPLE_OPTIONS CustomAttributeType = "multipleOptions"
 	CUSTOMATTRIBUTETYPE_CHECKBOX CustomAttributeType = "checkbox"
+	CUSTOMATTRIBUTETYPE_NUMERIC CustomAttributeType = "numeric"
 )
 
 // All allowed values of CustomAttributeType enum
@@ -36,6 +37,7 @@ var AllowedCustomAttributeTypeEnumValues = []CustomAttributeType{
 	"user",
 	"multipleOptions",
 	"checkbox",
+	"numeric",
 }
 
 func (v *CustomAttributeType) UnmarshalJSON(src []byte) error {

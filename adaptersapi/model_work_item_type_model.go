@@ -23,6 +23,7 @@ const (
 	WORKITEMTYPEMODEL_TEST_CASES WorkItemTypeModel = "TestCases"
 	WORKITEMTYPEMODEL_CHECK_LISTS WorkItemTypeModel = "CheckLists"
 	WORKITEMTYPEMODEL_SHARED_STEPS WorkItemTypeModel = "SharedSteps"
+	WORKITEMTYPEMODEL_AUTO_TEST_CASES WorkItemTypeModel = "AutoTestCases"
 )
 
 // All allowed values of WorkItemTypeModel enum
@@ -30,6 +31,7 @@ var AllowedWorkItemTypeModelEnumValues = []WorkItemTypeModel{
 	"TestCases",
 	"CheckLists",
 	"SharedSteps",
+	"AutoTestCases",
 }
 
 func (v *WorkItemTypeModel) UnmarshalJSON(src []byte) error {

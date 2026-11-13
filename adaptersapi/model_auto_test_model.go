@@ -53,6 +53,8 @@ type AutoTestModel struct {
 	LastTestResultStatus NullableTestStatusModel `json:"lastTestResultStatus,omitempty"`
 	// Stability percentage of the autotest
 	StabilityPercentage NullableInt32 `json:"stabilityPercentage,omitempty"`
+	// Auto test case linked with the autotest
+	AutoTestCase NullableAutoTestCaseModel `json:"autoTestCase,omitempty"`
 	// External ID of the autotest
 	ExternalId string `json:"externalId"`
 	// Collection of the autotest links
@@ -636,6 +638,48 @@ func (o *AutoTestModel) UnsetStabilityPercentage() {
 	o.StabilityPercentage.Unset()
 }
 
+// GetAutoTestCase returns the AutoTestCase field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *AutoTestModel) GetAutoTestCase() AutoTestCaseModel {
+	if o == nil || IsNil(o.AutoTestCase.Get()) {
+		var ret AutoTestCaseModel
+		return ret
+	}
+	return *o.AutoTestCase.Get()
+}
+
+// GetAutoTestCaseOk returns a tuple with the AutoTestCase field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *AutoTestModel) GetAutoTestCaseOk() (*AutoTestCaseModel, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.AutoTestCase.Get(), o.AutoTestCase.IsSet()
+}
+
+// HasAutoTestCase returns a boolean if a field has been set.
+func (o *AutoTestModel) HasAutoTestCase() bool {
+	if o != nil && o.AutoTestCase.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetAutoTestCase gets a reference to the given NullableAutoTestCaseModel and assigns it to the AutoTestCase field.
+func (o *AutoTestModel) SetAutoTestCase(v AutoTestCaseModel) {
+	o.AutoTestCase.Set(&v)
+}
+// SetAutoTestCaseNil sets the value for AutoTestCase to be an explicit nil
+func (o *AutoTestModel) SetAutoTestCaseNil() {
+	o.AutoTestCase.Set(nil)
+}
+
+// UnsetAutoTestCase ensures that no value is present for AutoTestCase, not even an explicit nil
+func (o *AutoTestModel) UnsetAutoTestCase() {
+	o.AutoTestCase.Unset()
+}
+
 // GetExternalId returns the ExternalId field value
 func (o *AutoTestModel) GetExternalId() string {
 	if o == nil {
@@ -1167,6 +1211,9 @@ func (o AutoTestModel) ToMap() (map[string]interface{}, error) {
 	}
 	if o.StabilityPercentage.IsSet() {
 		toSerialize["stabilityPercentage"] = o.StabilityPercentage.Get()
+	}
+	if o.AutoTestCase.IsSet() {
+		toSerialize["autoTestCase"] = o.AutoTestCase.Get()
 	}
 	toSerialize["externalId"] = o.ExternalId
 	if o.Links != nil {

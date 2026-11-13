@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	syncStorageVersion        = "v0.3.7-tms-5.7"
+	syncStorageVersion        = "v0.3.12-tms-5.8"
 	syncStorageRepoURL        = "https://github.com/testit-tms/sync-storage-public/releases/download/"
 	defaultPort               = "49152"
 	startupTimeout            = 30 * time.Second

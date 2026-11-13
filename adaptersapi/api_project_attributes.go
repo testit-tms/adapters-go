@@ -247,7 +247,7 @@ func (r ApiAdaptersProjectsProjectIdAttributesSearchPostRequest) ProjectAttribut
 	return r
 }
 
-func (r ApiAdaptersProjectsProjectIdAttributesSearchPostRequest) Execute() ([]CustomAttributeGetModel, *http.Response, error) {
+func (r ApiAdaptersProjectsProjectIdAttributesSearchPostRequest) Execute() ([]CustomAttributeModel, *http.Response, error) {
 	return r.ApiService.AdaptersProjectsProjectIdAttributesSearchPostExecute(r)
 }
 
@@ -267,13 +267,13 @@ func (a *ProjectAttributesAPIService) AdaptersProjectsProjectIdAttributesSearchP
 }
 
 // Execute executes the request
-//  @return []CustomAttributeGetModel
-func (a *ProjectAttributesAPIService) AdaptersProjectsProjectIdAttributesSearchPostExecute(r ApiAdaptersProjectsProjectIdAttributesSearchPostRequest) ([]CustomAttributeGetModel, *http.Response, error) {
+//  @return []CustomAttributeModel
+func (a *ProjectAttributesAPIService) AdaptersProjectsProjectIdAttributesSearchPostExecute(r ApiAdaptersProjectsProjectIdAttributesSearchPostRequest) ([]CustomAttributeModel, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  []CustomAttributeGetModel
+		localVarReturnValue  []CustomAttributeModel
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ProjectAttributesAPIService.AdaptersProjectsProjectIdAttributesSearchPost")

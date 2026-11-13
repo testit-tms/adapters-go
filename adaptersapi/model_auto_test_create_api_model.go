@@ -39,6 +39,8 @@ type AutoTestCreateApiModel struct {
 	Description NullableString `json:"description,omitempty"`
 	// Indicates if the autotest is marked as flaky
 	IsFlaky NullableBool `json:"isFlaky,omitempty"`
+	// Layer of the autotest. Assigns layer by rules if omitted.
+	Layer NullableLayerApiModel `json:"layer,omitempty"`
 	// Collection of the autotest steps
 	Steps []AutoTestStepApiModel `json:"steps,omitempty"`
 	// Collection of the autotest setup steps
@@ -401,6 +403,48 @@ func (o *AutoTestCreateApiModel) UnsetIsFlaky() {
 	o.IsFlaky.Unset()
 }
 
+// GetLayer returns the Layer field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *AutoTestCreateApiModel) GetLayer() LayerApiModel {
+	if o == nil || IsNil(o.Layer.Get()) {
+		var ret LayerApiModel
+		return ret
+	}
+	return *o.Layer.Get()
+}
+
+// GetLayerOk returns a tuple with the Layer field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *AutoTestCreateApiModel) GetLayerOk() (*LayerApiModel, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Layer.Get(), o.Layer.IsSet()
+}
+
+// HasLayer returns a boolean if a field has been set.
+func (o *AutoTestCreateApiModel) HasLayer() bool {
+	if o != nil && o.Layer.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetLayer gets a reference to the given NullableLayerApiModel and assigns it to the Layer field.
+func (o *AutoTestCreateApiModel) SetLayer(v LayerApiModel) {
+	o.Layer.Set(&v)
+}
+// SetLayerNil sets the value for Layer to be an explicit nil
+func (o *AutoTestCreateApiModel) SetLayerNil() {
+	o.Layer.Set(nil)
+}
+
+// UnsetLayer ensures that no value is present for Layer, not even an explicit nil
+func (o *AutoTestCreateApiModel) UnsetLayer() {
+	o.Layer.Unset()
+}
+
 // GetSteps returns the Steps field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *AutoTestCreateApiModel) GetSteps() []AutoTestStepApiModel {
 	if o == nil {
@@ -671,6 +715,9 @@ func (o AutoTestCreateApiModel) ToMap() (map[string]interface{}, error) {
 	}
 	if o.IsFlaky.IsSet() {
 		toSerialize["isFlaky"] = o.IsFlaky.Get()
+	}
+	if o.Layer.IsSet() {
+		toSerialize["layer"] = o.Layer.Get()
 	}
 	if o.Steps != nil {
 		toSerialize["steps"] = o.Steps
